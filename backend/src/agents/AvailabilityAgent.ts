@@ -46,18 +46,18 @@ export class AvailabilityAgent implements IAgent {
 
             if (availableDoctors.length === 0) {
                 return "I couldn't find any available appointments matching your criteria. Would you like to:\n\n" +
-                       "• Try a different date or time\n" +
-                       "• Look for doctors in a different specialization\n" +
-                       "• Get notified when slots become available";
+                       '• Try a different date or time\n' +
+                       '• Look for doctors in a different specialization\n' +
+                       '• Get notified when slots become available';
             }
 
             // Format the response
-            let response = "Here are our available doctors and appointment slots:\n\n";
+            let response = 'Here are our available doctors and appointment slots:\n\n';
             
             for (const doctor of availableDoctors) {
                 response += `**${doctor.name}** - ${doctor.specialization}\n`;
                 response += `${doctor.credentials}\n`;
-                response += "Available times:\n";
+                response += 'Available times:\n';
                 
                 doctor.availableSlots.slice(0, 3).forEach((slot: Date) => {
                     const date = new Date(slot);
@@ -66,7 +66,7 @@ export class AvailabilityAgent implements IAgent {
                 response += '\n';
             }
             
-            response += "Would you like to book with any of these doctors? Just let me know your preference!";
+            response += 'Would you like to book with any of these doctors? Just let me know your preference!';
 
             this.metrics.endOperation('availability_process');
             return response;

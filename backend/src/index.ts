@@ -170,7 +170,7 @@ class AgentCareApplication {
                     defaultSrc: ["'self'"],
                     styleSrc: ["'self'", "'unsafe-inline'"],
                     scriptSrc: ["'self'"],
-                    imgSrc: ["'self'", "data:", "https:"],
+                    imgSrc: ["'self'", 'data:', 'https:'],
                 },
             },
         }));
@@ -552,7 +552,7 @@ class AgentCareApplication {
             }
 
             this.app.listen(port, () => {
-                this.logger.info(`🚀 AgentCare server started successfully`, {
+                this.logger.info('🚀 AgentCare server started successfully', {
                     port,
                     environment: this.config.get('NODE_ENV'),
                     features: {

@@ -433,19 +433,19 @@ export class RAGService {
         // Initialize with general healthcare knowledge
         const healthcareKnowledge = [
             {
-                content: "AgentCare offers appointment booking with specialists including cardiology, dermatology, and pediatrics.",
+                content: 'AgentCare offers appointment booking with specialists including cardiology, dermatology, and pediatrics.',
                 type: 'knowledge' as const
             },
             {
-                content: "Appointments can be scheduled Monday through Friday, 9 AM to 5 PM.",
+                content: 'Appointments can be scheduled Monday through Friday, 9 AM to 5 PM.',
                 type: 'knowledge' as const
             },
             {
-                content: "Patients can cancel or reschedule appointments up to 24 hours in advance.",
+                content: 'Patients can cancel or reschedule appointments up to 24 hours in advance.',
                 type: 'knowledge' as const
             },
             {
-                content: "We accept most major insurance providers. Please bring your insurance card to your appointment.",
+                content: 'We accept most major insurance providers. Please bring your insurance card to your appointment.',
                 type: 'knowledge' as const
             }
         ];

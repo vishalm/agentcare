@@ -25,31 +25,31 @@ export class DoctorService {
     private doctors: Doctor[] = [
         {
             id: 1,
-            name: "Dr. Sarah Johnson",
-            specialization: "Cardiology",
-            credentials: "MD, FACC - Board Certified Cardiologist",
-            email: "s.johnson@agentcare.dev",
-            phone: "(555) 123-4567",
+            name: 'Dr. Sarah Johnson',
+            specialization: 'Cardiology',
+            credentials: 'MD, FACC - Board Certified Cardiologist',
+            email: 's.johnson@agentcare.dev',
+            phone: '(555) 123-4567',
             createdAt: new Date(),
             updatedAt: new Date()
         },
         {
             id: 2,
-            name: "Dr. Michael Chen",
-            specialization: "Dermatology",
-            credentials: "MD, PhD - Dermatology Specialist",
-            email: "m.chen@agentcare.dev",
-            phone: "(555) 234-5678",
+            name: 'Dr. Michael Chen',
+            specialization: 'Dermatology',
+            credentials: 'MD, PhD - Dermatology Specialist',
+            email: 'm.chen@agentcare.dev',
+            phone: '(555) 234-5678',
             createdAt: new Date(),
             updatedAt: new Date()
         },
         {
             id: 3,
-            name: "Dr. Emily Rodriguez",
-            specialization: "Pediatrics",
-            credentials: "MD, FAAP - Pediatric Medicine",
-            email: "e.rodriguez@agentcare.dev",
-            phone: "(555) 345-6789",
+            name: 'Dr. Emily Rodriguez',
+            specialization: 'Pediatrics',
+            credentials: 'MD, FAAP - Pediatric Medicine',
+            email: 'e.rodriguez@agentcare.dev',
+            phone: '(555) 345-6789',
             createdAt: new Date(),
             updatedAt: new Date()
         }

@@ -78,7 +78,7 @@ export class FAQAgent implements IAgent {
     private async handleDoctorInfo(message: string): Promise<string> {
         const doctors = await this.tools.getDoctorInformation(message);
         
-        let response = "**Our Medical Team:**\n\n";
+        let response = '**Our Medical Team:**\n\n';
         doctors.forEach(doctor => {
             response += `**${doctor.name}**\n`;
             response += `• Specialization: ${doctor.specialization}\n`;
@@ -119,7 +119,7 @@ export class FAQAgent implements IAgent {
     private async handleGeneralInfo(): Promise<string> {
         const faqs = await this.tools.getAllFAQEntries();
         
-        let response = "**Frequently Asked Questions:**\n\n";
+        let response = '**Frequently Asked Questions:**\n\n';
         faqs.forEach(faq => {
             response += `• **${faq.question}** ${faq.answer}\n\n`;
         });

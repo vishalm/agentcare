@@ -78,9 +78,9 @@ export class BookingAgent implements IAgent {
         
         // Validate booking details
         if (!bookingDetails.doctorId || !bookingDetails.dateTime) {
-            return "I need a bit more information to book your appointment. Please specify:\n" +
+            return 'I need a bit more information to book your appointment. Please specify:\n' +
                    "• Which doctor you'd like to see\n" +
-                   "• Your preferred date and time";
+                   '• Your preferred date and time';
         }
 
         // Create the appointment
@@ -93,7 +93,7 @@ export class BookingAgent implements IAgent {
                `${new Date(appointment.dateTime).toLocaleString()}.\n\n` +
                `A confirmation email has been sent to ${appointment.patientEmail}.\n\n` +
                `Appointment ID: ${appointment.id}\n` +
-               `Please arrive 15 minutes before your scheduled time.`;
+               'Please arrive 15 minutes before your scheduled time.';
     }
 
     /**
@@ -106,7 +106,7 @@ export class BookingAgent implements IAgent {
         
         if (!appointmentId) {
             return "I couldn't find the appointment you want to cancel. Please provide:\n" +
-                   "• Your appointment ID, or\n" +
+                   '• Your appointment ID, or\n' +
                    "• The doctor's name and appointment date";
         }
 
@@ -126,9 +126,9 @@ export class BookingAgent implements IAgent {
         const rescheduleDetails = await this.tools.extractRescheduleDetails(message);
         
         if (!rescheduleDetails.appointmentId || !rescheduleDetails.newDateTime) {
-            return "I need more information to reschedule your appointment. Please provide:\n" +
-                   "• Your appointment ID\n" +
-                   "• Your preferred new date and time";
+            return 'I need more information to reschedule your appointment. Please provide:\n' +
+                   '• Your appointment ID\n' +
+                   '• Your preferred new date and time';
         }
 
         const rescheduled = await this.tools.rescheduleAppointment(rescheduleDetails);
@@ -144,9 +144,9 @@ export class BookingAgent implements IAgent {
      */
     private handleInvalidRequest(): string {
         return "I'm not sure what you'd like to do with your appointment. I can help you:\n\n" +
-               "• Book a new appointment\n" +
-               "• Cancel an existing appointment\n" +
-               "• Reschedule an appointment\n\n" +
+               '• Book a new appointment\n' +
+               '• Cancel an existing appointment\n' +
+               '• Reschedule an appointment\n\n' +
                "Please let me know what you'd like to do!";
     }
 
