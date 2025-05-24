@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentcare
+  labels:
+    name: agentcare
+    app.kubernetes.io/name: agentcare
+    app.kubernetes.io/version: "2.0.0-alpha"
+    app.kubernetes.io/component: namespace
+    app.kubernetes.io/part-of: agentcare-platform
+    app.kubernetes.io/managed-by: kubectl
+    environment: production
+    tier: healthcare
+  annotations:
+    description: "AgentCare Multi-Agent Healthcare Scheduling System"
+    contact: "maintainers@agentcare.dev"
+    compliance: "HIPAA"
+    created-by: "agentcare-deployment"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: agentcare-quota
+  namespace: agentcare
+  labels:
+    app.kubernetes.io/name: agentcare
+    app.kubernetes.io/component: resource-quota
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+    persistentvolumeclaims: "10"
+    pods: "20"
+    services: "10"
+    secrets: "20"
+    configmaps: "10"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: agentcare-limits
+  namespace: agentcare
+  labels:
+    app.kubernetes.io/name: agentcare
+    app.kubernetes.io/component: limit-range
+spec:
+  limits:
+  - default:
+      cpu: 500m
+      memory: 512Mi
+    defaultRequest:
+      cpu: 100m
+      memory: 128Mi
+    type: Container
+  - max:
+      cpu: 2
+      memory: 4Gi
+    min:
+      cpu: 50m
+      memory: 64Mi
+    type: Container
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: agentcare-network-policy
+  namespace: agentcare
+  labels:
+    app.kubernetes.io/name: agentcare
+    app.kubernetes.io/component: network-policy
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: agentcare
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: agentcare
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 80 

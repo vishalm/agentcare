@@ -1,0 +1,302 @@
+groups:
+  - name: agentcare.healthcare
+    interval: 30s
+    rules:
+      # Healthcare Critical Alerts
+      - alert: AgentCareDown
+        expr: up{job="agentcare-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: agentcare
+          category: availability
+        annotations:
+          summary: "AgentCare API is down"
+          description: "AgentCare API has been down for more than 1 minute. Healthcare services are unavailable."
+          runbook_url: "https://docs.agentcare.dev/runbooks/api-down"
+
+      - alert: AppointmentBookingFailureRate
+        expr: rate(agentcare_appointments_failed_total[5m]) / rate(agentcare_appointments_attempted_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          service: agentcare
+          category: healthcare
+        annotations:
+          summary: "High appointment booking failure rate"
+          description: "Appointment booking failure rate is {{ $value | humanizePercentage }} over the last 5 minutes."
+          runbook_url: "https://docs.agentcare.dev/runbooks/booking-failures"
+
+      - alert: PatientDataAccessFailure
+        expr: rate(agentcare_patient_data_access_errors_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          service: agentcare
+          category: security
+        annotations:
+          summary: "Patient data access errors detected"
+          description: "Errors accessing patient data detected. Potential HIPAA compliance issue."
+          runbook_url: "https://docs.agentcare.dev/runbooks/patient-data-errors"
+
+      # Agent Performance Alerts
+      - alert: SupervisorAgentHighLatency
+        expr: histogram_quantile(0.95, rate(agentcare_agent_response_duration_seconds_bucket{agent="supervisor"}[5m])) > 2
+        for: 3m
+        labels:
+          severity: warning
+          service: agentcare
+          category: performance
+          agent: supervisor
+        annotations:
+          summary: "Supervisor Agent high latency"
+          description: "95th percentile latency for Supervisor Agent is {{ $value }}s over the last 5 minutes."
+
+      - alert: AgentErrorRate
+        expr: rate(agentcare_agent_errors_total[5m]) / rate(agentcare_agent_requests_total[5m]) > 0.03
+        for: 2m
+        labels:
+          severity: warning
+          service: agentcare
+          category: performance
+        annotations:
+          summary: "High agent error rate"
+          description: "Agent error rate is {{ $value | humanizePercentage }} for agent {{ $labels.agent }}."
+
+      - alert: AvailabilityAgentFailure
+        expr: rate(agentcare_agent_tool_failures_total{agent="availability"}[5m]) > 0.1
+        for: 1m
+        labels:
+          severity: critical
+          service: agentcare
+          category: healthcare
+          agent: availability
+        annotations:
+          summary: "Availability Agent tool failures"
+          description: "High failure rate in Availability Agent tools. Doctor availability checks may be failing."
+
+      # LLM/Ollama Alerts
+      - alert: OllamaDown
+        expr: up{job="ollama"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          service: ollama
+          category: availability
+        annotations:
+          summary: "Ollama LLM service is down"
+          description: "Ollama service is unavailable. LLM-powered features will be degraded."
+
+      - alert: OllamaHighLatency
+        expr: histogram_quantile(0.95, rate(ollama_request_duration_seconds_bucket[5m])) > 10
+        for: 3m
+        labels:
+          severity: warning
+          service: ollama
+          category: performance
+        annotations:
+          summary: "Ollama high response latency"
+          description: "95th percentile latency for Ollama is {{ $value }}s. LLM responses are slow."
+
+      - alert: RAGSystemFailure
+        expr: rate(agentcare_rag_retrieval_errors_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          service: agentcare
+          category: ai
+        annotations:
+          summary: "RAG system retrieval failures"
+          description: "High failure rate in RAG system. Conversation memory may be impacted."
+
+  - name: agentcare.infrastructure
+    interval: 30s
+    rules:
+      # Infrastructure Alerts
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+          category: resources
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is above 85% for {{ $labels.instance }}."
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+          category: resources
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is above 80% for {{ $labels.instance }}."
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_free_bytes / node_filesystem_size_bytes) * 100 < 10
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+          category: resources
+        annotations:
+          summary: "Low disk space"
+          description: "Disk space is below 10% for {{ $labels.instance }} on {{ $labels.mountpoint }}."
+
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: redis
+          category: availability
+        annotations:
+          summary: "Redis is down"
+          description: "Redis service is unavailable. Session storage and caching affected."
+
+      - alert: PostgreSQLDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: postgres
+          category: availability
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL database is unavailable. Data persistence affected."
+
+  - name: agentcare.security
+    interval: 30s
+    rules:
+      # Security Alerts
+      - alert: HighAuthenticationFailureRate
+        expr: rate(agentcare_auth_failures_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          service: agentcare
+          category: security
+        annotations:
+          summary: "High authentication failure rate"
+          description: "Authentication failure rate is {{ $value }} per second. Possible brute force attack."
+
+      - alert: UnauthorizedAPIAccess
+        expr: rate(agentcare_http_requests_total{code=~"401|403"}[5m]) > 5
+        for: 1m
+        labels:
+          severity: warning
+          service: agentcare
+          category: security
+        annotations:
+          summary: "High rate of unauthorized API access"
+          description: "High rate of 401/403 responses detected. Possible security issue."
+
+      - alert: SuspiciousUserActivity
+        expr: rate(agentcare_user_actions_total[1m]) > 100
+        for: 30s
+        labels:
+          severity: warning
+          service: agentcare
+          category: security
+        annotations:
+          summary: "Suspicious user activity detected"
+          description: "Unusually high user activity rate detected for user {{ $labels.user_id }}."
+
+      - alert: PHIAccessWithoutAuditLog
+        expr: agentcare_phi_access_total unless agentcare_audit_log_entries_total
+        for: 0s
+        labels:
+          severity: critical
+          service: agentcare
+          category: compliance
+        annotations:
+          summary: "PHI accessed without audit log"
+          description: "Patient Health Information accessed without corresponding audit log entry. HIPAA compliance violation."
+
+  - name: agentcare.business
+    interval: 60s
+    rules:
+      # Business Logic Alerts
+      - alert: LowAppointmentBookingRate
+        expr: rate(agentcare_appointments_booked_total[1h]) < 0.5
+        for: 10m
+        labels:
+          severity: warning
+          service: agentcare
+          category: business
+        annotations:
+          summary: "Low appointment booking rate"
+          description: "Appointment booking rate has dropped below 0.5 per hour."
+
+      - alert: HighAppointmentCancellationRate
+        expr: rate(agentcare_appointments_cancelled_total[1h]) / rate(agentcare_appointments_booked_total[1h]) > 0.2
+        for: 15m
+        labels:
+          severity: warning
+          service: agentcare
+          category: business
+        annotations:
+          summary: "High appointment cancellation rate"
+          description: "Appointment cancellation rate is {{ $value | humanizePercentage }}."
+
+      - alert: PatientSatisfactionDropped
+        expr: agentcare_patient_satisfaction_score < 4.0
+        for: 5m
+        labels:
+          severity: warning
+          service: agentcare
+          category: business
+        annotations:
+          summary: "Patient satisfaction score dropped"
+          description: "Average patient satisfaction score is {{ $value }}, below the 4.0 threshold."
+
+      - alert: AgentPerformanceDegraded
+        expr: agentcare_agent_success_rate < 0.9
+        for: 5m
+        labels:
+          severity: warning
+          service: agentcare
+          category: performance
+        annotations:
+          summary: "Agent performance degraded"
+          description: "Agent {{ $labels.agent }} success rate is {{ $value | humanizePercentage }}, below 90%."
+
+  - name: agentcare.sla
+    interval: 60s
+    rules:
+      # SLA Monitoring
+      - alert: APIResponseTimeSLABreach
+        expr: histogram_quantile(0.95, rate(agentcare_http_request_duration_seconds_bucket[5m])) > 0.5
+        for: 3m
+        labels:
+          severity: warning
+          service: agentcare
+          category: sla
+        annotations:
+          summary: "API response time SLA breach"
+          description: "95th percentile API response time is {{ $value }}s, breaching SLA of 500ms."
+
+      - alert: ServiceAvailabilitySLABreach
+        expr: (avg_over_time(up{job="agentcare-api"}[1h])) < 0.999
+        for: 5m
+        labels:
+          severity: critical
+          service: agentcare
+          category: sla
+        annotations:
+          summary: "Service availability SLA breach"
+          description: "Service availability over the last hour is {{ $value | humanizePercentage }}, below 99.9% SLA."
+
+      - alert: ErrorRateSLABreach
+        expr: rate(agentcare_http_requests_total{code=~"5.."}[5m]) / rate(agentcare_http_requests_total[5m]) > 0.001
+        for: 3m
+        labels:
+          severity: warning
+          service: agentcare
+          category: sla
+        annotations:
+          summary: "Error rate SLA breach"
+          description: "Error rate is {{ $value | humanizePercentage }}, above 0.1% SLA threshold." 

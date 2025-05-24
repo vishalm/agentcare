@@ -1,0 +1,137 @@
+apiVersion: v2
+name: agentcare
+description: A Multi-Agent Healthcare Scheduling System with LLM and RAG capabilities
+type: application
+version: 2.0.0-alpha
+appVersion: "2.0.0-alpha"
+
+# Chart metadata
+keywords:
+  - healthcare
+  - ai
+  - agents
+  - scheduling
+  - llm
+  - rag
+  - nodejs
+  - typescript
+
+home: https://github.com/vishalm/agentcare
+sources:
+  - https://github.com/vishalm/agentcare
+
+maintainers:
+  - name: Vishal Mishra
+    email: vishal@agentcare.dev
+    url: https://github.com/vishalm
+
+# Chart annotations
+annotations:
+  category: Healthcare
+  licenses: MIT
+  images: |
+    - name: agentcare
+      image: agentcare/api:2.0.0-alpha
+    - name: ollama
+      image: ollama/ollama:latest
+    - name: redis
+      image: redis:7-alpine
+    - name: postgres
+      image: postgres:15-alpine
+  
+  # Security and compliance
+  compliance: HIPAA
+  security.policy: restricted
+  
+  # Artifact Hub annotations
+  artifacthub.io/license: MIT
+  artifacthub.io/operator: "false"
+  artifacthub.io/prerelease: "true"
+  artifacthub.io/containsSecurityUpdates: "true"
+  artifacthub.io/changes: |
+    - Added comprehensive observability stack
+    - Implemented HIPAA-compliant security measures
+    - Enhanced multi-agent system with LLM integration
+    - Added RAG system for conversation memory
+    - Kubernetes-native deployment with Helm
+  
+  # Documentation links
+  artifacthub.io/links: |
+    - name: Chart Source
+      url: https://github.com/vishalm/agentcare/tree/main/helm/agentcare
+    - name: Documentation
+      url: https://docs.agentcare.dev
+    - name: Setup Guide
+      url: https://github.com/vishalm/agentcare/blob/main/SETUP_GUIDE.md
+
+# Dependencies
+dependencies:
+  - name: redis
+    version: "18.1.5"
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
+    tags:
+      - cache
+      - session-store
+
+  - name: postgresql
+    version: "12.12.10"
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+    tags:
+      - database
+      - persistence
+
+  - name: prometheus
+    version: "25.8.0"
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: monitoring.prometheus.enabled
+    tags:
+      - monitoring
+      - observability
+
+  - name: grafana
+    version: "7.0.19"
+    repository: https://grafana.github.io/helm-charts
+    condition: monitoring.grafana.enabled
+    tags:
+      - monitoring
+      - visualization
+
+  - name: loki
+    version: "5.36.3"
+    repository: https://grafana.github.io/helm-charts
+    condition: logging.loki.enabled
+    tags:
+      - logging
+      - observability
+
+  - name: promtail
+    version: "6.15.3"
+    repository: https://grafana.github.io/helm-charts
+    condition: logging.promtail.enabled
+    tags:
+      - logging
+      - log-shipping
+
+  - name: jaeger
+    version: "0.71.12"
+    repository: https://jaegertracing.github.io/helm-charts
+    condition: tracing.jaeger.enabled
+    tags:
+      - tracing
+      - observability
+
+  - name: nginx-ingress
+    version: "4.8.3"
+    repository: https://kubernetes.github.io/ingress-nginx
+    condition: ingress.enabled
+    tags:
+      - ingress
+      - networking
+
+# Minimum Kubernetes version
+kubeVersion: ">=1.24.0-0"
+
+# Engine constraint for Helm
+engine: gotpl 

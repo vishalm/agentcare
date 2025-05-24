@@ -1,0 +1,252 @@
+name: ✨ Feature Request
+description: Suggest a new feature for AgentCare
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+assignees:
+  - vishalm
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new feature! ✨
+        
+        Before submitting, please:
+        - Search existing issues and discussions
+        - Consider if this fits AgentCare's healthcare focus
+        - Think about HIPAA compliance implications
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight Checklist
+      description: Please ensure you've completed these steps
+      options:
+        - label: I have searched for existing feature requests
+          required: true
+        - label: This feature aligns with AgentCare's healthcare mission
+          required: true
+        - label: I have considered security and compliance implications
+          required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: What category does this feature belong to?
+      options:
+        - Multi-Agent System Enhancement
+        - New Agent Type
+        - API Enhancement
+        - Frontend/UI Improvement
+        - Authentication/Security
+        - LLM/AI Integration
+        - RAG System Enhancement
+        - Healthcare Workflow
+        - Monitoring/Observability
+        - DevOps/Infrastructure
+        - Integration (EHR/EMR)
+        - Mobile Support
+        - Analytics/Reporting
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature?
+      options:
+        - Critical (Essential for healthcare compliance)
+        - High (Significantly improves user experience)
+        - Medium (Nice to have enhancement)
+        - Low (Minor improvement)
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature Summary
+      description: A clear and concise description of the feature
+      placeholder: |
+        Example: "Add support for multi-language patient interactions in the chat interface to better serve diverse patient populations."
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve?
+      placeholder: |
+        Example: "Currently, non-English speaking patients struggle to interact with the system, creating barriers to healthcare access and potentially leading to miscommunication about appointment details."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe your proposed solution in detail
+      placeholder: |
+        Example: "Integrate a translation service (like Google Translate API) into the chat interface that can detect the patient's language and provide real-time translation. Include support for common healthcare languages in the local area."
+    validations:
+      required: true
+
+  - type: textarea
+    id: user_story
+    attributes:
+      label: User Story
+      description: Write this as a user story with acceptance criteria
+      placeholder: |
+        As a [type of user], I want [some goal] so that [some reason].
+        
+        Example:
+        As a Spanish-speaking patient, I want to interact with AgentCare in my native language so that I can confidently book appointments without language barriers.
+        
+        Acceptance Criteria:
+        - [ ] System detects user's preferred language
+        - [ ] Chat interface displays in selected language
+        - [ ] Agent responses are translated accurately
+        - [ ] Medical terminology is preserved correctly
+        - [ ] Confirmation emails are sent in user's language
+    validations:
+      required: true
+
+  - type: textarea
+    id: healthcare_benefits
+    attributes:
+      label: Healthcare Benefits
+      description: How does this feature improve healthcare delivery or patient outcomes?
+      placeholder: |
+        Example: "This feature would improve healthcare accessibility, reduce appointment booking errors due to language barriers, and ensure better patient understanding of appointment details, leading to reduced no-shows."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: compliance_considerations
+    attributes:
+      label: Compliance Considerations
+      description: Have you considered these compliance aspects?
+      options:
+        - label: HIPAA compliance (patient data protection)
+        - label: Accessibility (ADA compliance)
+        - label: Security implications
+        - label: Audit trail requirements
+        - label: Data retention policies
+
+  - type: textarea
+    id: implementation_ideas
+    attributes:
+      label: Implementation Ideas
+      description: Any thoughts on how this could be implemented?
+      placeholder: |
+        Example: "Could use a middleware layer that intercepts messages, translates them using Google Translate API, and maintains context. Would need to store language preferences in user profiles."
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: What alternative solutions have you considered?
+      placeholder: |
+        Example: "Could provide static translations for common phrases, or integrate with existing hospital translation services."
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Expected Complexity
+      description: How complex do you think this feature would be to implement?
+      options:
+        - Simple (1-2 weeks)
+        - Medium (1-2 months)
+        - Complex (3-6 months)
+        - Very Complex (6+ months)
+        - Unsure
+
+  - type: checkboxes
+    id: impact_areas
+    attributes:
+      label: Impact Areas
+      description: Which parts of the system would this feature affect?
+      options:
+        - label: Frontend/UI changes required
+        - label: Backend API changes required
+        - label: Database schema changes required
+        - label: Multi-agent system changes
+        - label: Authentication/authorization changes
+        - label: Third-party integrations required
+        - label: Documentation updates required
+        - label: New dependencies required
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups/Examples
+      description: Include mockups, wireframes, or examples if applicable
+      placeholder: |
+        You can drag and drop images here, or provide links to mockups/examples.
+
+  - type: input
+    id: similar_systems
+    attributes:
+      label: Similar Systems
+      description: Are there similar features in other healthcare systems?
+      placeholder: "e.g., Epic's MyChart translation feature, Cerner's multi-language support"
+
+  - type: dropdown
+    id: target_users
+    attributes:
+      label: Target Users
+      description: Who would primarily benefit from this feature?
+      options:
+        - Patients
+        - Healthcare Providers
+        - System Administrators
+        - Developers/Integrators
+        - All Users
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: textarea
+    id: success_metrics
+    attributes:
+      label: Success Metrics
+      description: How would we measure the success of this feature?
+      placeholder: |
+        Example: "Increased appointment booking completion rate among non-English speakers, reduced support tickets related to language barriers, improved patient satisfaction scores."
+
+  - type: checkboxes
+    id: willingness
+    attributes:
+      label: Contribution
+      description: Are you willing to help implement this feature?
+      options:
+        - label: I can help with design/specifications
+        - label: I can help with development
+        - label: I can help with testing
+        - label: I can help with documentation
+        - label: I can provide domain expertise
+        - label: I cannot contribute but think this is important
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any additional information that might be helpful
+      placeholder: |
+        - Links to relevant research or standards
+        - References to similar implementations
+        - Business justification
+        - Timeline considerations
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this feature request, you agree to follow our Code of Conduct
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true 

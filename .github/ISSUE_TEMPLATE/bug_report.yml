@@ -1,0 +1,225 @@
+name: 🐛 Bug Report
+description: Report a bug or unexpected behavior in AgentCare
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+assignees:
+  - vishalm
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a bug! 🐛
+        
+        Before submitting, please:
+        - Search existing issues to avoid duplicates
+        - Use the latest version of AgentCare
+        - Check our [troubleshooting guide](../../SETUP_GUIDE.md#troubleshooting)
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight Checklist
+      description: Please ensure you've completed these steps
+      options:
+        - label: I have searched for existing issues
+          required: true
+        - label: I am using the latest version of AgentCare
+          required: true
+        - label: I have read the troubleshooting guide
+          required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: AgentCare Version
+      description: What version of AgentCare are you running?
+      placeholder: "e.g., 2.0.0-alpha, commit hash, or 'latest'"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Where are you running AgentCare?
+      options:
+        - Local Development
+        - Docker (local)
+        - Docker Compose
+        - Kubernetes
+        - Cloud Platform (AWS/Azure/GCP)
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is affected?
+      options:
+        - Multi-Agent System
+        - REST API
+        - Frontend/UI
+        - Authentication
+        - LLM/Ollama Integration
+        - RAG System
+        - Database
+        - Docker/Containers
+        - Kubernetes
+        - Monitoring/Observability
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this bug?
+      options:
+        - Critical (System unusable/Security issue)
+        - High (Major functionality broken)
+        - Medium (Feature partially working)
+        - Low (Minor issue/Enhancement)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: |
+        Example: "When I try to book an appointment through the SupervisorAgent, the system returns a 500 error instead of creating the appointment."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should happen instead?
+      placeholder: |
+        Example: "The system should successfully create an appointment and return a confirmation with the appointment ID."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: |
+        Example: "The system returns a 500 Internal Server Error and no appointment is created."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the bug
+      placeholder: |
+        1. Start AgentCare with `npm run start:dev`
+        2. Open the web interface at http://localhost:3000
+        3. Login with demo credentials
+        4. Send message: "I want to book an appointment with a cardiologist"
+        5. Observe the error
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Logs
+      description: Please include relevant error logs (remove any sensitive information)
+      placeholder: |
+        ```
+        error: Database connection failed {"error":"Connection timeout","timestamp":"2025-01-24T10:00:00Z"}
+        ```
+      render: shell
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Configuration
+      description: Relevant configuration (environment variables, settings, etc.)
+      placeholder: |
+        ```
+        NODE_ENV=development
+        OLLAMA_BASE_URL=http://localhost:11434
+        ENABLE_OLLAMA_LLM=true
+        API_PORT=3000
+        ```
+      render: shell
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      placeholder: "e.g., macOS 14.0, Ubuntu 22.04, Windows 11"
+    validations:
+      required: true
+
+  - type: input
+    id: node_version
+    attributes:
+      label: Node.js Version
+      description: What version of Node.js are you using?
+      placeholder: "e.g., 18.17.0"
+    validations:
+      required: true
+
+  - type: input
+    id: docker_version
+    attributes:
+      label: Docker Version (if applicable)
+      description: What version of Docker are you using?
+      placeholder: "e.g., 24.0.6"
+
+  - type: dropdown
+    id: ollama_status
+    attributes:
+      label: Ollama Status
+      description: Is Ollama installed and running?
+      options:
+        - Ollama installed and running
+        - Ollama installed but not running
+        - Ollama not installed
+        - Not applicable
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: hipaa_impact
+    attributes:
+      label: Healthcare/HIPAA Impact
+      description: Does this bug affect healthcare data or HIPAA compliance?
+      options:
+        - label: This bug involves patient data (PHI)
+        - label: This bug affects healthcare workflows
+        - label: This bug has security implications
+        - label: This bug affects audit logging
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any additional information that might help us understand the problem
+      placeholder: |
+        - Screenshots/videos if applicable
+        - Related issues or pull requests
+        - Workarounds you've tried
+        - Impact on your use case
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our Code of Conduct
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true 

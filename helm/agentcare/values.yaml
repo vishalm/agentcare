@@ -1,0 +1,405 @@
+# AgentCare Helm Chart Values
+# Default values for agentcare chart
+
+# Global settings
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+  environment: production
+  
+# AgentCare Application
+agentcare:
+  image:
+    registry: docker.io
+    repository: agentcare/api
+    tag: "2.0.0-alpha"
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+
+  replicaCount: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 3000
+    targetPort: 3000
+    annotations: {}
+
+  # Resource limits
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+  # Health checks
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 3000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 3000
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+  # Autoscaling
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  # Security context
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    fsGroup: 1001
+    seccompProfile:
+      type: RuntimeDefault
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1001
+
+  # Environment variables
+  env:
+    NODE_ENV: production
+    API_PORT: "3000"
+    LOG_LEVEL: info
+    ENABLE_OLLAMA_LLM: "true"
+    ENABLE_RAG_SYSTEM: "true"
+    ENABLE_USER_REGISTRATION: "true"
+    HIPAA_LOGGING: "true"
+    ENABLE_METRICS: "true"
+    ENABLE_TRACING: "true"
+
+  # ConfigMap and Secret references
+  configMap:
+    name: agentcare-config
+  
+  secret:
+    name: agentcare-secrets
+
+  # Volume mounts
+  volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+    - name: cache
+      mountPath: /app/cache
+
+  volumes:
+    - name: tmp
+      emptyDir: {}
+    - name: cache
+      emptyDir: {}
+
+# Ollama LLM Service
+ollama:
+  enabled: true
+  image:
+    registry: docker.io
+    repository: ollama/ollama
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+  
+  service:
+    type: ClusterIP
+    port: 11434
+    targetPort: 11434
+
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+      nvidia.com/gpu: 1  # Optional GPU support
+    requests:
+      cpu: 500m
+      memory: 2Gi
+
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 50Gi
+    accessMode: ReadWriteOnce
+
+  models:
+    - qwen2.5:latest
+    - llama2:latest
+
+  env:
+    OLLAMA_HOST: "0.0.0.0:11434"
+    OLLAMA_NUM_PARALLEL: "2"
+    OLLAMA_MAX_LOADED_MODELS: "1"
+
+# Redis Configuration
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: ""  # Will be generated if empty
+  
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+    
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+  replica:
+    replicaCount: 1
+    persistence:
+      enabled: true
+      size: 8Gi
+
+# PostgreSQL Configuration
+postgresql:
+  enabled: true
+  auth:
+    database: agentcare
+    username: agentcare_user
+    password: ""  # Will be generated if empty
+  
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+    
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+
+  metrics:
+    enabled: true
+
+# Ingress Configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  
+  hosts:
+    - host: agentcare.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service:
+            name: agentcare
+            port:
+              number: 3000
+  
+  tls:
+    - secretName: agentcare-tls
+      hosts:
+        - agentcare.example.com
+
+# Monitoring Configuration
+monitoring:
+  prometheus:
+    enabled: true
+    namespace: monitoring
+    serviceMonitor:
+      enabled: true
+      interval: 30s
+      path: /api/v1/metrics
+      labels:
+        app: agentcare
+    
+    rules:
+      enabled: true
+
+  grafana:
+    enabled: true
+    namespace: monitoring
+    adminPassword: admin123  # Change in production
+    
+    dashboards:
+      enabled: true
+      folder: AgentCare
+    
+    datasources:
+      prometheus:
+        url: http://prometheus:9090
+      loki:
+        url: http://loki:3100
+
+# Logging Configuration
+logging:
+  loki:
+    enabled: true
+    namespace: logging
+    persistence:
+      enabled: true
+      size: 50Gi
+
+  promtail:
+    enabled: true
+    config:
+      clients:
+        - url: http://loki:3100/loki/api/v1/push
+
+# Tracing Configuration
+tracing:
+  jaeger:
+    enabled: true
+    namespace: tracing
+    
+    collector:
+      service:
+        type: ClusterIP
+    
+    query:
+      service:
+        type: ClusterIP
+
+# Security and Compliance
+security:
+  podSecurityPolicy:
+    enabled: true
+  
+  networkPolicies:
+    enabled: true
+  
+  rbac:
+    create: true
+  
+  serviceAccount:
+    create: true
+    name: agentcare
+    annotations: {}
+
+# Secrets Management
+secrets:
+  # External secrets operator
+  externalSecrets:
+    enabled: false
+    secretStore:
+      name: vault-backend
+      kind: SecretStore
+  
+  # Manual secrets
+  jwt:
+    secret: ""  # Generated if empty
+    expiresIn: 24h
+  
+  session:
+    secret: ""  # Generated if empty
+  
+  encryption:
+    key: ""  # Generated if empty
+
+# Backup Configuration
+backup:
+  enabled: false
+  schedule: "0 2 * * *"
+  retention: "30d"
+  storage:
+    type: s3
+    bucket: agentcare-backups
+    region: us-west-2
+
+# Compliance
+compliance:
+  hipaa:
+    enabled: true
+    auditLog:
+      enabled: true
+      retention: "7y"
+    
+    encryption:
+      atRest: true
+      inTransit: true
+    
+    accessControl:
+      enabled: true
+      rbac: true
+
+# Node Selection
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - agentcare
+        topologyKey: kubernetes.io/hostname
+
+# Persistent Volumes
+persistence:
+  logs:
+    enabled: true
+    storageClass: ""
+    size: 10Gi
+    accessMode: ReadWriteOnce
+  
+  cache:
+    enabled: true
+    storageClass: ""
+    size: 5Gi
+    accessMode: ReadWriteOnce
+
+# Development and Testing
+development:
+  enabled: false
+  debugMode: false
+  mockData: false
+
+# Feature Flags
+features:
+  ollamaLLM: true
+  ragSystem: true
+  userRegistration: true
+  guestBooking: true
+  smsNotifications: false
+  calendarSync: false
+  emailReminders: true
+  monitoring: true
+  tracing: true
+  auditLogging: true 
