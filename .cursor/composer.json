@@ -1,0 +1,33 @@
+{
+    "name": "AgentCare Healthcare Scheduling",
+    "description": "Multi-agent appointment booking system for healthcare providers",
+    "version": "1.0.0",
+    "rules": [
+      {
+        "pattern": "**/*.js",
+        "description": "JavaScript files should follow ES6+ standards with proper error handling"
+      },
+      {
+        "pattern": "**/*.ts", 
+        "description": "TypeScript files with strict typing and interface definitions"
+      },
+      {
+        "pattern": "**/agents/*.js",
+        "description": "Agent classes must implement IAgent interface with process() method"
+      },
+      {
+        "pattern": "**/api/*.js",
+        "description": "API endpoints with proper validation, error handling, and documentation"
+      },
+      {
+        "pattern": "**/*.test.js",
+        "description": "Test files should use Jest and include comprehensive coverage"
+      }
+    ],
+    "context": {
+      "architecture": "multi-agent-system",
+      "domain": "healthcare-scheduling",
+      "patterns": ["agent-coordination", "microservices", "event-driven"],
+      "technologies": ["node.js", "react", "postgresql", "docker"]
+    }
+  }

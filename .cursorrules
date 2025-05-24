@@ -1,0 +1,72 @@
+# AgentCare - Multi-Agent Healthcare Scheduling System
+
+## Project Overview
+This is a sophisticated healthcare appointment booking system built using multi-agent architecture principles. The system features coordinated AI agents that work together to provide seamless patient scheduling.
+
+## Architecture
+- **Planner Layer**: Supervisor Agent + Finish Process
+- **Agent Layer**: Availability, Booking, FAQ Agents  
+- **Tooling Layer**: Specialized tools for each agent
+
+## Code Standards
+- Use TypeScript for new development
+- Follow functional programming patterns for agents
+- Implement proper error handling and logging
+- Write comprehensive tests for all agent interactions
+- Use semantic commit messages (feat:, fix:, docs:, etc.)
+
+## File Structure Rules
+- `/frontend/` - React/TypeScript UI components
+- `/backend/` - Node.js/Express API server
+- `/database/` - Schema, migrations, seeds
+- `/docs/` - Architecture and API documentation
+- `/tests/` - Unit, integration, and e2e tests
+
+## Development Guidelines
+1. Always implement agents as classes with clear interfaces
+2. Use async/await for all agent coordination
+3. Implement proper tool activation/deactivation
+4. Add comprehensive error handling
+5. Include JSDoc comments for all public methods
+6. Write tests before implementing new features
+
+## Database Conventions
+- Use snake_case for table and column names
+- Include created_at and updated_at timestamps
+- Add proper foreign key constraints
+- Use meaningful index names
+
+## API Conventions
+- RESTful endpoints with proper HTTP methods
+- Use /api/v1/ prefix for all endpoints
+- Include proper error responses (400, 401, 403, 404, 500)
+- Implement request validation middleware
+- Add rate limiting for all endpoints
+
+## Agent Development Rules
+1. Each agent must have a `process()` method
+2. All agents should return promises
+3. Implement proper tool activation tracking
+4. Use dependency injection for agent coordination
+5. Add metrics collection for performance monitoring
+
+## Security Requirements
+- Never commit API keys or secrets
+- Use environment variables for configuration
+- Implement proper input sanitization
+- Add CORS configuration
+- Include authentication middleware
+
+## Testing Requirements
+- Minimum 80% code coverage
+- Unit tests for all agent classes
+- Integration tests for API endpoints
+- E2E tests for critical user flows
+- Mock external dependencies in tests
+
+When suggesting code, always consider:
+- Multi-agent coordination patterns
+- Healthcare data privacy (HIPAA compliance)
+- Scalability and performance
+- Error handling and recovery
+- Real-time user experience

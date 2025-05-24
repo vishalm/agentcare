@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent Appointment Booking System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            opacity: 0.3;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #fff, #a8edea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            position: relative;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            height: 800px;
+        }
+
+        .chat-section {
+            display: flex;
+            flex-direction: column;
+            background: #f8fafc;
+        }
+
+        .system-monitor {
+            background: #fff;
+            border-left: 1px solid #e2e8f0;
+            overflow-y: auto;
+        }
+
+        .chat-header {
+            padding: 30px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .chat-header h2 {
+            color: #1e293b;
+            font-size: 1.5em;
+            margin-bottom: 8px;
+        }
+
+        .chat-header p {
+            color: #64748b;
+            font-size: 0.95em;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: messageSlide 0.4s ease-out;
+        }
+
+        .user-message {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .user-message .message-content {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 20px 20px 5px 20px;
+            max-width: 70%;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .agent-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+
+        .supervisor { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        .availability { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
+        .booking { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .faq { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+
+        .agent-message .message-content {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 5px 20px 20px 20px;
+            max-width: 70%;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .agent-name {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .chat-input input:focus {
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .send-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .send-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .quick-btn {
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .quick-btn:hover {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+            color: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .monitor-header {
+            padding: 30px 25px 20px;
+            background: #1e293b;
+            color: white;
+        }
+
+        .monitor-header h2 {
+            font-size: 1.3em;
+            margin-bottom: 8px;
+        }
+
+        .monitor-header p {
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        .system-layers {
+            padding: 25px;
+        }
+
+        .layer-section {
+            margin-bottom: 30px;
+        }
+
+        .layer-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .agent-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .agent-card.active::before { background: #10b981; }
+        .agent-card.thinking::before { background: #f59e0b; }
+
+        .agent-card.active {
+            border-color: #10b981;
+            background: #f0fdf4;
+            transform: translateX(5px);
+        }
+
+        .agent-card.thinking {
+            border-color: #f59e0b;
+            background: #fffbeb;
+            animation: pulse 2s infinite;
+        }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .agent-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 1em;
+        }
+
+        .agent-status {
+            font-size: 0.8em;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .status-standby {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-thinking {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .agent-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .tool-badge {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 6px 10px;
+            border-radius: 16px;
+            font-size: 0.75em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tool-badge.active {
+            background: #3b82f6;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .finish-section {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #64748b;
+            font-style: italic;
+            padding: 10px 0;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typingDots 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes typingDots {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .system-monitor {
+                border-left: none;
+                border-top: 1px solid #e2e8f0;
+                max-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Multi-Agent Booking System</h1>
+            <p>Advanced appointment scheduling with coordinated AI agent architecture</p>
+        </div>
+        
+        <div class="main-layout">
+            <div class="chat-section">
+                <div class="chat-header">
+                    <h2>Patient Chat Interface</h2>
+                    <p>Communicate with our intelligent agent system for seamless appointment booking</p>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message agent-message">
+                        <div class="agent-avatar supervisor">SV</div>
+                        <div class="message-content">
+                            <div class="agent-name">Supervisor Agent</div>
+                            Welcome! I'm your appointment booking assistant. I coordinate with specialized agents to help you schedule, modify, or get information about appointments. How can I help you today?
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-input-area">
+                    <div class="chat-input">
+                        <input type="text" id="userInput" placeholder="Type your message here..." onkeypress="handleKeyPress(event)">
+                        <button class="send-btn" onclick="sendMessage()">Send</button>
+                    </div>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="quickMessage('I need to book an appointment')">📅 Book Appointment</button>
+                        <button class="quick-btn" onclick="quickMessage('Check doctor availability')">🔍 Check Availability</button>
+                        <button class="quick-btn" onclick="quickMessage('Cancel my appointment')">❌ Cancel Booking</button>
+                        <button class="quick-btn" onclick="quickMessage('Tell me about the doctors')">👨‍⚕️ Doctor Info</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="system-monitor">
+                <div class="monitor-header">
+                    <h2>System Architecture Monitor</h2>
+                    <p>Real-time agent coordination status</p>
+                </div>
+                
+                <div class="system-layers">
+                    <div class="layer-section">
+                        <div class="layer-title">🎯 Planner Layer</div>
+                        
+                        <div class="agent-card active" id="supervisorAgent">
+                            <div class="agent-header">
+                                <div class="agent-title">Supervisor Agent</div>
+                                <span class="agent-status status-active">Active</span>
+                            </div>
+                            <div style="font-size: 0.9em; color: #64748b;">
+                                Orchestrating conversation flow and delegating tasks
+                            </div>
+                            <div class="agent-tools">
+                                <span class="tool-badge active">Intent Analysis</span>
+                                <span class="tool-badge">Task Delegation</span>
+                            </div>
+                        </div>
+                        
+                        <div class="finish-section">
+                            <div style="font-weight: 600; margin-bottom: 5px;">Finish Process</div>
+                            <div style="font-size: 0.9em;">Session completion & cleanup</div>
+                        </div>
+                    </div>
+                    
+                    <div class="layer-section">
+                        <div class="layer-title">🤖 Agent Layer</div>
+                        
+                        <div class="agent-card" id="availabilityAgent">
+                            <div class="agent-header">
+                                <div class="agent-title">Availability Agent</div>
+                                <span class="agent-status status-standby">Standby</span>
+                            </div>
+                            <div style="font-size: 0.9em; color: #64748b;">
+                                Manages doctor schedules and availability checks
+                            </div>
+                            <div class="agent-tools">
+                                <span class="tool-badge">Schedule Check</span>
+                                <span class="tool-badge">Specialization Filter</span>
+                            </div>
+                        </div>
+                        
+                        <div class="agent-card" id="bookingAgent">
+                            <div class="agent-header">
+                                <div class="agent-title">Booking Agent</div>
+                                <span class="agent-status status-standby">Standby</span>
+                            </div>
+                            <div style="font-size: 0.9em; color: #64748b;">
+                                Handles appointment creation and modifications
+                            </div>
+                            <div class="agent-tools">
+                                <span class="tool-badge">Create Appointment</span>
+                                <span class="tool-badge">Cancel Booking</span>
+                                <span class="tool-badge">Reschedule</span>
+                                <span class="tool-badge">Email Confirm</span>
+                            </div>
+                        </div>
+                        
+                        <div class="agent-card" id="faqAgent">
+                            <div class="agent-header">
+                                <div class="agent-title">FAQ Agent</div>
+                                <span class="agent-status status-standby">Standby</span>
+                            </div>
+                            <div style="font-size: 0.9em; color: #64748b;">
+                                Provides information and answers questions
+                            </div>
+                            <div class="agent-tools">
+                                <span class="tool-badge">FAQ Database</span>
+                                <span class="tool-badge">Doctor Credentials</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="layer-section">
+                        <div class="layer-title">🛠️ Tooling Layer</div>
+                        <div style="font-size: 0.9em; color: #64748b; line-height: 1.6;">
+                            <strong>Available Tools:</strong><br>
+                            • Doctor availability checking<br>
+                            • Specialization-based search<br>
+                            • Appointment management<br>
+                            • Email notifications<br>
+                            • FAQ knowledge base<br>
+                            • Credential verification
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System Architecture Implementation
+        class MultiAgentSystem {
+            constructor() {
+                this.currentAgent = 'supervisor';
+                this.conversationHistory = [];
+                this.systemState = {
+                    activeTools: new Set(),
+                    currentTask: null,
+                    userContext: {}
+                };
+                
+                // Mock data
+                this.doctors = [
+                    { 
+                        id: 1, 
+                        name: 'Dr. Sarah Mitchell', 
+                        specialization: 'Cardiology', 
+                        credentials: 'MD, FACC - 15 years experience',
+                        available: ['2025-05-26 09:00', '2025-05-26 14:00', '2025-05-27 10:00', '2025-05-28 11:00'] 
+                    },
+                    { 
+                        id: 2, 
+                        name: 'Dr. James Wilson', 
+                        specialization: 'Dermatology', 
+                        credentials: 'MD, AAD - 12 years experience',
+                        available: ['2025-05-26 11:00', '2025-05-27 09:00', '2025-05-27 15:00', '2025-05-28 13:00'] 
+                    },
+                    { 
+                        id: 3, 
+                        name: 'Dr. Maria Rodriguez', 
+                        specialization: 'Orthopedics', 
+                        credentials: 'MD, AAOS - 18 years experience',
+                        available: ['2025-05-26 13:00', '2025-05-27 11:00', '2025-05-28 09:00', '2025-05-29 14:00'] 
+                    }
+                ];
+                
+                this.faqs = {
+                    preparation: "Please arrive 15 minutes early with your insurance card and ID. Bring any relevant medical records.",
+                    cancellation: "You can cancel up to 24 hours before your appointment without any fees.",
+                    insurance: "We accept most major insurance plans. Please verify with your provider before your visit.",
+                    location: "Our clinic is located at 123 Medical Center Dr, Suite 200. Free parking is available."
+                };
+                
+                this.initializeAgents();
+            }
+            
+            initializeAgents() {
+                this.agents = {
+                    supervisor: new SupervisorAgent(this),
+                    availability: new AvailabilityAgent(this),
+                    booking: new BookingAgent(this),
+                    faq: new FAQAgent(this)
+                };
+            }
+            
+            async processMessage(message) {
+                this.conversationHistory.push({ type: 'user', content: message, timestamp: new Date() });
+                
+                // Always start with supervisor agent for coordination
+                const response = await this.agents.supervisor.process(message);
+                return response;
+            }
+            
+            switchAgent(agentType) {
+                // Update UI to show agent transition
+                this.updateAgentStatus(this.currentAgent, 'standby');
+                this.currentAgent = agentType;
+                this.updateAgentStatus(agentType, 'thinking');
+                
+                // Simulate processing time
+                setTimeout(() => {
+                    this.updateAgentStatus(agentType, 'active');
+                }, 1000);
+            }
+            
+            updateAgentStatus(agentType, status) {
+                const agentCard = document.getElementById(agentType + 'Agent');
+                const statusBadge = agentCard.querySelector('.agent-status');
+                
+                // Remove existing status classes
+                agentCard.classList.remove('active', 'thinking');
+                statusBadge.classList.remove('status-active', 'status-thinking', 'status-standby');
+                
+                // Apply new status
+                switch(status) {
+                    case 'active':
+                        agentCard.classList.add('active');
+                        statusBadge.classList.add('status-active');
+                        statusBadge.textContent = 'Active';
+                        break;
+                    case 'thinking':
+                        agentCard.classList.add('thinking');
+                        statusBadge.classList.add('status-thinking');
+                        statusBadge.textContent = 'Processing';
+                        break;
+                    case 'standby':
+                        statusBadge.classList.add('status-standby');
+                        statusBadge.textContent = 'Standby';
+                        break;
+                }
+            }
+            
+            activateTools(agentType, tools) {
+                const agentCard = document.getElementById(agentType + 'Agent');
+                const toolBadges = agentCard.querySelectorAll('.tool-badge');
+                
+                // Reset all tools
+                toolBadges.forEach(badge => badge.classList.remove('active'));
+                
+                // Activate specified tools
+                toolBadges.forEach(badge => {
+                    if (tools.includes(badge.textContent)) {
+                        badge.classList.add('active');
+                        this.systemState.activeTools.add(badge.textContent);
+                    }
+                });
+                
+                // Auto-deactivate after processing
+                setTimeout(() => {
+                    toolBadges.forEach(badge => {
+                        badge.classList.remove('active');
+                        this.systemState.activeTools.delete(badge.textContent);
+                    });
+                }, 3000);
+            }
+        }
+        
+        // Agent Classes
+        class SupervisorAgent {
+            constructor(system) {
+                this.system = system;
+            }
+            
+            async process(message) {
+                const intent = this.analyzeIntent(message);
+                
+                switch(intent.type) {
+                    case 'booking':
+                        return await this.delegateToAvailability(message, intent);
+                    case 'availability':
+                        return await this.delegateToAvailability(message, intent);
+                    case 'cancel':
+                    case 'reschedule':
+                        return await this.delegateToBooking(message, intent);
+                    case 'information':
+                        return await this.delegateToFAQ(message, intent);
+                    default:
+                        return this.handleGeneral(message);
+                }
+            }
+            
+            analyzeIntent(message) {
+                const lower = message.toLowerCase();
+                
+                if (lower.includes('book') || lower.includes('schedule') || lower.includes('appointment')) {
+                    return { type: 'booking', confidence: 0.9 };
+                }
+                if (lower.includes('available') || lower.includes('when') || lower.includes('time')) {
+                    return { type: 'availability', confidence: 0.8 };
+                }
+                if (lower.includes('cancel')) {
+                    return { type: 'cancel', confidence: 0.9 };
+                }
+                if (lower.includes('reschedule') || lower.includes('change') || lower.includes('move')) {
+                    return { type: 'reschedule', confidence: 0.8 };
+                }
+                if (lower.includes('doctor') || lower.includes('info') || lower.includes('about') || lower.includes('tell me')) {
+                    return { type: 'information', confidence: 0.7 };
+                }
+                
+                return { type: 'general', confidence: 0.5 };
+            }
+            
+            async delegateToAvailability(message, intent) {
+                this.system.switchAgent('availability');
+                return await this.system.agents.availability.process(message, intent);
+            }
+            
+            async delegateToBooking(message, intent) {
+                this.system.switchAgent('booking');
+                return await this.system.agents.booking.process(message, intent);
+            }
+            
+            async delegateToFAQ(message, intent) {
+                this.system.switchAgent('faq');
+                return await this.system.agents.faq.process(message, intent);
+            }
+            
+            handleGeneral(message) {
+                return "I understand you need assistance with appointments. I can help you:\n\n• Book a new appointment\n• Check doctor availability\n• Cancel or reschedule existing appointments\n• Get information about our doctors and services\n\nWhat would you like to do?";
+            }
+        }
+        
+        class AvailabilityAgent {
+            constructor(system) {
+                this.system = system;
+            }
+            
+            async process(message, intent) {
+                this.system.activateTools('availability', ['Schedule Check', 'Specialization Filter']);
+                
+                // Simulate processing time
+                await this.delay(2000);
+                
+                const availableDoctors = this.system.doctors.filter(doc => doc.available.length > 0);
+                
+                let response = "Here are our available doctors and appointment slots:\n\n";
+                
+                availableDoctors.forEach(doctor => {
+                    response += `**${doctor.name}** - ${doctor.specialization}\n`;
+                    response += `${doctor.credentials}\n`;
+                    response += "Available times:\n";
+                    
+                    doctor.available.slice(0, 3).forEach(slot => {
+                        const date = new Date(slot);
+                        response += `• ${date.toLocaleDateString()} at ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}\n`;
+                    });
+                    response += '\n';
+                });
+                
+                response += "Would you like to book with any of these doctors? Just let me know your preference!";
+                
+                // Return control to supervisor
+                setTimeout(() => {
+                    this.system.switchAgent('supervisor');
+                }, 1000);
+                
+                return response;
+            }
+            
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+        
+        class BookingAgent {
+            constructor(system) {
+                this.system = system;
+            }
+            
+            async process(message, intent) {
+                const tools = intent.type === 'cancel' ? 
+                    ['Cancel Booking'] : 
+                    intent.type === 'reschedule' ? 
+                        ['Reschedule', 'Email Confirm'] : 
+                        ['Create Appointment', 'Email Confirm'];
+                
+                this.system.activateTools('booking', tools);
+                
+                await this.delay(2500);
+                
+                let response;
+                
+                switch(intent.type) {
+                    case 'cancel':
+                        response = "I can help you cancel your appointment. To proceed, I'll need:\n\n• Your appointment confirmation number, OR\n• Your name and date of birth\n\nOnce I locate your appointment, I'll process the cancellation and send you a confirmation email.";
+                        break;
+                    case 'reschedule':
+                        response = "I'll help you reschedule your appointment. Please provide:\n\n• Your current appointment details\n• Your preferred new date and time\n\nI'll check availability and update your booking accordingly.";
+                        break;
+                    default:
+                        response = "Perfect! I'm ready to book your appointment. Based on the available slots shown, please tell me:\n\n• Which doctor you'd prefer\n• Your preferred date and time\n• Your contact information\n\nOnce confirmed, I'll send you an appointment confirmation email with all the details.";
+                }
+                
+                setTimeout(() => {
+                    this.system.switchAgent('supervisor');
+                }, 1000);
+                
+                return response;
+            }
+            
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+        
+        class FAQAgent {
+            constructor(system) {
+                this.system = system;
+            }
+            
+            async process(message, intent) {
+                this.system.activateTools('faq', ['FAQ Database', 'Doctor Credentials']);
+                
+                await this.delay(1500);
+                
+                const lower = message.toLowerCase();
+                let response = "Here's the information you requested:\n\n";
+                
+                if (lower.includes('doctor') || lower.includes('credential') || lower.includes('about')) {
+                    response += "**Our Medical Team:**\n\n";
+                    this.system.doctors.forEach(doctor => {
+                        response += `**${doctor.name}**\n`;
+                        response += `• Specialization: ${doctor.specialization}\n`;
+                        response += `• Credentials: ${doctor.credentials}\n`;
+                        response += `• Available appointments: ${doctor.available.length} slots\n\n`;
+                    });
+                } else if (lower.includes('prepare') || lower.includes('what to bring')) {
+                    response += `**Appointment Preparation:**\n${this.system.faqs.preparation}\n\n`;
+                } else if (lower.includes('cancel') || lower.includes('policy')) {
+                    response += `**Cancellation Policy:**\n${this.system.faqs.cancellation}\n\n`;
+                } else if (lower.includes('insurance')) {
+                    response += `**Insurance Information:**\n${this.system.faqs.insurance}\n\n`;
+                } else if (lower.includes('location') || lower.includes('where')) {
+                    response += `**Location & Parking:**\n${this.system.faqs.location}\n\n`;
+                } else {
+                    response += "**Frequently Asked Questions:**\n\n";
+                    response += "• **How do I prepare?** " + this.system.faqs.preparation + "\n\n";
+                    response += "• **Cancellation policy?** " + this.system.faqs.cancellation + "\n\n";
+                    response += "• **Insurance accepted?** " + this.system.faqs.insurance + "\n\n";
+                    response += "• **Where are you located?** " + this.system.faqs.location + "\n\n";
+                }
+                
+                response += "Is there anything specific you'd like to know more about?";
+                
+                setTimeout(() => {
+                    this.system.switchAgent('supervisor');
+                }, 1000);
+                
+                return response;
+            }
+            
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+        
+        // Initialize system
+        let multiAgentSystem;
+        let isProcessing = false;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            multiAgentSystem = new MultiAgentSystem();
+        });
+        
+        // UI Functions
+        async function sendMessage() {
+            if (isProcessing) return;
+            
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            isProcessing = true;
+            input.value = '';
+            
+            // Add user message to chat
+            addUserMessage(message);
+            
+            // Show typing indicator
+            const typingIndicator = showTypingIndicator();
+            
+            try {
+                // Process message through multi-agent system
+                const response = await multiAgentSystem.processMessage(message);
+                
+                // Remove typing indicator
+                typingIndicator.remove();
+                
+                // Add agent response
+                addAgentMessage(getAgentDisplayName(multiAgentSystem.currentAgent), response, multiAgentSystem.currentAgent);
+                
+            } catch (error) {
+                console.error('Error processing message:', error);
+                typingIndicator.remove();
+                addAgentMessage('System', 'Sorry, I encountered an error. Please try again.', 'supervisor');
+            } finally {
+                isProcessing = false;
+            }
+        }
+        
+        function quickMessage(message) {
+            document.getElementById('userInput').value = message;
+            sendMessage();
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+        
+        function addUserMessage(message) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user-message';
+            messageDiv.innerHTML = `
+                <div class="message-content">${escapeHtml(message)}</div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function addAgentMessage(agentName, message, agentType) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message agent-message';
+            
+            const agentClass = getAgentClass(agentType);
+            const agentInitials = getAgentInitials(agentType);
+            
+            messageDiv.innerHTML = `
+                <div class="agent-avatar ${agentClass}">${agentInitials}</div>
+                <div class="message-content">
+                    <div class="agent-name">${agentName}</div>
+                    ${formatMessage(message)}
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function showTypingIndicator() {
+            const chatMessages = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <span>Agent is processing</span>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return typingDiv;
+        }
+        
+        function getAgentDisplayName(agentType) {
+            const names = {
+                supervisor: 'Supervisor Agent',
+                availability: 'Availability Agent',
+                booking: 'Booking Agent',
+                faq: 'FAQ Agent'
+            };
+            return names[agentType] || 'System Agent';
+        }
+        
+        function getAgentClass(agentType) {
+            const classes = {
+                supervisor: 'supervisor',
+                availability: 'availability',
+                booking: 'booking',
+                faq: 'faq'
+            };
+            return classes[agentType] || 'supervisor';
+        }
+        
+        function getAgentInitials(agentType) {
+            const initials = {
+                supervisor: 'SV',
+                availability: 'AV',
+                booking: 'BK',
+                faq: 'FAQ'
+            };
+            return initials[agentType] || 'SYS';
+        }
+        
+        function formatMessage(message) {
+            return message
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/• /g, '• ');
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // System initialization
+        window.addEventListener('load', function() {
+            // Initialize with welcome message
+            setTimeout(() => {
+                const welcomeMessages = [
+                    "The system architecture is now active and ready to assist you.",
+                    "All agents are coordinated and standing by for your requests.",
+                    "You can start by telling me what type of appointment you need!"
+                ];
+                
+                welcomeMessages.forEach((msg, index) => {
+                    setTimeout(() => {
+                        addAgentMessage('Supervisor Agent', msg, 'supervisor');
+                    }, index * 1500);
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
