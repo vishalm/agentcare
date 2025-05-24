@@ -37,6 +37,17 @@ fi
 
 echo -e "${GREEN}✅ Using: $COMPOSE_CMD${NC}"
 
+# Docker Compose file location
+COMPOSE_FILE="infrastructure/docker/docker-compose.yml"
+
+# Check if compose file exists
+if [ ! -f "$COMPOSE_FILE" ]; then
+    echo -e "${RED}❌ Docker Compose file not found at $COMPOSE_FILE${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✅ Using compose file: $COMPOSE_FILE${NC}"
+
 # Create .env file if it doesn't exist
 if [ ! -f ".env" ]; then
     echo -e "${BLUE}⚙️  Creating environment file...${NC}"
@@ -54,7 +65,7 @@ fi
 # Function to stop and clean up
 cleanup() {
     echo -e "\n${YELLOW}🛑 Stopping AgentCare containers...${NC}"
-    $COMPOSE_CMD down
+    $COMPOSE_CMD -f $COMPOSE_FILE down
     exit 0
 }
 
@@ -73,19 +84,19 @@ read -p "Enter choice (1-4): " choice
 case $choice in
     1)
         echo -e "${BLUE}🔨 Starting development mode...${NC}"
-        $COMPOSE_CMD --profile development up --build
+        $COMPOSE_CMD -f $COMPOSE_FILE --profile development up --build
         ;;
     2)
         echo -e "${BLUE}🏭 Starting production mode...${NC}"
-        $COMPOSE_CMD up --build agentcare ollama redis
+        $COMPOSE_CMD -f $COMPOSE_FILE up --build agentcare ollama redis
         ;;
     3)
         echo -e "${BLUE}📊 Starting full stack with monitoring...${NC}"
-        $COMPOSE_CMD --profile monitoring up --build
+        $COMPOSE_CMD -f $COMPOSE_FILE --profile monitoring up --build
         ;;
     4)
         echo -e "${BLUE}🛑 Stopping all containers...${NC}"
-        $COMPOSE_CMD down --volumes
+        $COMPOSE_CMD -f $COMPOSE_FILE down --volumes
         docker system prune -f
         echo -e "${GREEN}✅ All containers stopped and cleaned up${NC}"
         exit 0

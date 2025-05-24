@@ -33,28 +33,32 @@ A sophisticated appointment booking system built using multi-agent architecture 
 - **[Test Summary](TEST_SUMMARY.md)** - Testing results and coverage
 
 ### 🔧 **Infrastructure & Deployment**
-- **[Docker Configuration](IGNORE_FILES_SUMMARY.md)** - Docker and Git ignore files documentation
-- **[Kubernetes Manifests](k8s/)** - Production-ready Kubernetes deployment
-  - [Namespace Configuration](k8s/namespace.yaml)
-- **[Helm Charts](helm/agentcare/)** - Cloud-native deployment charts
-  - [Chart Metadata](helm/agentcare/Chart.yaml)
-  - [Default Values](helm/agentcare/values.yaml)
+- **[Infrastructure Guide](infrastructure/README.md)** - Centralized infrastructure documentation
+- **[Docker Configuration](infrastructure/docker/)** - Docker containers and development environment
+  - [Dockerfile](infrastructure/docker/Dockerfile)
+  - [Docker Compose](infrastructure/docker/docker-compose.yml)
+- **[Kubernetes Manifests](infrastructure/kubernetes/)** - Production-ready Kubernetes deployment
+  - [Namespace Configuration](infrastructure/kubernetes/namespace.yaml)
+- **[Helm Charts](infrastructure/helm/agentcare/)** - Cloud-native deployment charts
+  - [Chart Metadata](infrastructure/helm/agentcare/Chart.yaml)
+  - [Default Values](infrastructure/helm/agentcare/values.yaml)
 
 ### 📊 **Monitoring & Observability**
-- **[Prometheus Configuration](observability/prometheus/prometheus.yml)** - Metrics collection
-- **[Alert Rules](observability/prometheus/rules/agentcare-alerts.yml)** - Healthcare-specific monitoring
-- **[Grafana Dashboards](observability/grafana/)** - System and business metrics
-- **[Jaeger Tracing](observability/jaeger/)** - Distributed tracing setup
+- **[Observability Stack](infrastructure/observability/)** - Complete monitoring and observability
+- **[Prometheus Configuration](infrastructure/observability/prometheus/prometheus.yml)** - Metrics collection
+- **[Alert Rules](infrastructure/observability/prometheus/rules/agentcare-alerts.yml)** - Healthcare-specific monitoring
+- **[Grafana Dashboards](infrastructure/observability/grafana/)** - System and business metrics
+- **[Jaeger Tracing](infrastructure/observability/jaeger/)** - Distributed tracing setup
 
 ### 🔒 **Security & Compliance**
 - **[GitHub Security Policy](.github/SECURITY.md)** - Security reporting and policies
 - **[HIPAA Compliance](DEVOPS_GUIDE.md#security--compliance)** - Healthcare data protection
-- **[CI/CD Security](.github/workflows/ci-cd.yml)** - Automated security scanning
+- **[CI/CD Security](infrastructure/ci-cd/ci-cd.yml)** - Automated security scanning
 
 ### 🐛 **Issue Templates & Workflows**
 - **[Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.yml)** - Healthcare-specific bug reporting
 - **[Feature Request Template](.github/ISSUE_TEMPLATE/feature_request.yml)** - Enhancement proposals
-- **[CI/CD Pipeline](.github/workflows/ci-cd.yml)** - Automated testing and deployment
+- **[CI/CD Pipeline](infrastructure/ci-cd/ci-cd.yml)** - Automated testing and deployment
 
 ## 🏗️ System Architecture
 
