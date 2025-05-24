@@ -1,4 +1,4 @@
-name: "AgentCare CI/CD Pipeline"
+name: AgentCare
 
 on:
   push:
@@ -19,7 +19,7 @@ env:
 jobs:
   # Validation and Security
   validate:
-    name: "Validate & Security Scan"
+    name: Validate & Security Scan
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -29,39 +29,39 @@ jobs:
       cache-key: ${{ steps.cache-key.outputs.key }}
     
     steps:
-      - name: "Checkout code"
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: "Generate cache key"
+      - name: Generate cache key
         id: cache-key
         run: echo "key=node-modules-${{ hashFiles('**/package-lock.json') }}" >> $GITHUB_OUTPUT
 
-      - name: "Setup Node.js"
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: "Install dependencies"
+      - name: Install dependencies
         run: npm ci
 
-      - name: "Lint code"
+      - name: Lint code
         run: npm run lint
 
-      - name: "Format check"
+      - name: Format check
         run: npm run format:check
 
-      - name: "Type check"
+      - name: Type check
         run: npm run type-check || echo "::warning::Type checking failed"
 
-      - name: "Validate commit messages"
+      - name: Validate commit messages
         uses: wagoid/commitlint-github-action@v6
         with:
           configFile: .commitlintrc.json
 
-      - name: "Dependency vulnerability scan"
+      - name: Dependency vulnerability scan
         run: |
           npm audit --audit-level moderate || {
             echo "::warning::Moderate or higher vulnerabilities found"
@@ -69,18 +69,18 @@ jobs:
             echo "Audit results saved for review"
           }
 
-      - name: "Initialize CodeQL"
+      - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: javascript
           queries: security-extended,security-and-quality
 
-      - name: "CodeQL Analysis"
+      - name: CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:javascript"
 
-      - name: "Secret scanning"
+      - name: Secret scanning
         uses: trufflesecurity/trufflehog@v3.67.0
         with:
           path: ./
@@ -88,7 +88,7 @@ jobs:
           head: HEAD
           extra_args: --debug --only-verified --fail
 
-      - name: "Upload validation artifacts"
+      - name: Upload validation artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -100,7 +100,7 @@ jobs:
 
   # Testing
   test:
-    name: "Run Tests"
+    name: Run Tests
     runs-on: ubuntu-latest
     needs: validate
     
@@ -202,7 +202,7 @@ jobs:
 
   # Security & Compliance
   security:
-    name: "Security & Compliance Checks"
+    name: Security & Compliance Checks
     runs-on: ubuntu-latest
     needs: validate
     
@@ -282,7 +282,7 @@ jobs:
 
   # Build Docker Images
   build:
-    name: "Build & Push Images"
+    name: Build & Push Images
     runs-on: ubuntu-latest
     needs: [test, security]
     
@@ -376,7 +376,7 @@ jobs:
 
   # 12-Factor App Validation
   twelve-factor-validation:
-    name: "12-Factor App Compliance"
+    name: 12-Factor App Compliance
     runs-on: ubuntu-latest
     needs: build
     
@@ -433,46 +433,44 @@ jobs:
             echo "✅ Factor 5: Strict separation of build and run stages"
           fi
 
-      - name: "Generate comprehensive 12-Factor report"
+      - name: Generate comprehensive 12-Factor report
         run: |
-          cat > 12factor-report.md << 'EOF'
-          # 12-Factor App Compliance Report
-          
-          **Generated:** $(date)
-          **Commit:** ${{ github.sha }}
-          **Branch:** ${{ github.ref_name }}
-          
-          ## Compliance Status
-          
-          | Factor | Status | Description |
-          |--------|--------|-------------|
-          | 1. Codebase | ✅ | Single Git repository with multiple deployments |
-          | 2. Dependencies | ✅ | Explicit dependency declaration via package.json |
-          | 3. Config | ✅ | Environment-based configuration |
-          | 4. Backing Services | ✅ | PostgreSQL, Redis, Ollama as attached resources |
-          | 5. Build/Release/Run | ✅ | Multi-stage Docker builds with strict separation |
-          | 6. Processes | ✅ | Stateless execution model |
-          | 7. Port Binding | ✅ | Self-contained HTTP service |
-          | 8. Concurrency | ✅ | Horizontal scaling via process model |
-          | 9. Disposability | ✅ | Fast startup and graceful shutdown |
-          | 10. Dev/Prod Parity | ✅ | Same backing services across environments |
-          | 11. Logs | ✅ | Structured JSON log streams to stdout |
-          | 12. Admin Processes | ✅ | One-off admin tasks via npm scripts |
-          
-          ## Recommendations
-          
-          - ✅ All 12 factors implemented
-          - 🔄 Regular monitoring of compliance during development
-          - 📊 Consider automated compliance testing
-          
-          ## Environment Verification
-          
-          - Development: Docker Compose setup
-          - Staging: Kubernetes deployment
-          - Production: Kubernetes with Helm charts
-          
-          **Overall Compliance:** 100% ✅
-          EOF
+          echo "# 12-Factor App Compliance Report" > 12factor-report.md
+          echo "" >> 12factor-report.md
+          echo "**Generated:** $(date)" >> 12factor-report.md
+          echo "**Commit:** ${{ github.sha }}" >> 12factor-report.md
+          echo "**Branch:** ${{ github.ref_name }}" >> 12factor-report.md
+          echo "" >> 12factor-report.md
+          echo "## Compliance Status" >> 12factor-report.md
+          echo "" >> 12factor-report.md
+          echo "| Factor | Status | Description |" >> 12factor-report.md
+          echo "|--------|--------|-------------|" >> 12factor-report.md
+          echo "| 1. Codebase | ✅ | Single Git repository with multiple deployments |" >> 12factor-report.md
+          echo "| 2. Dependencies | ✅ | Explicit dependency declaration via package.json |" >> 12factor-report.md
+          echo "| 3. Config | ✅ | Environment-based configuration |" >> 12factor-report.md
+          echo "| 4. Backing Services | ✅ | PostgreSQL, Redis, Ollama as attached resources |" >> 12factor-report.md
+          echo "| 5. Build/Release/Run | ✅ | Multi-stage Docker builds with strict separation |" >> 12factor-report.md
+          echo "| 6. Processes | ✅ | Stateless execution model |" >> 12factor-report.md
+          echo "| 7. Port Binding | ✅ | Self-contained HTTP service |" >> 12factor-report.md
+          echo "| 8. Concurrency | ✅ | Horizontal scaling via process model |" >> 12factor-report.md
+          echo "| 9. Disposability | ✅ | Fast startup and graceful shutdown |" >> 12factor-report.md
+          echo "| 10. Dev/Prod Parity | ✅ | Same backing services across environments |" >> 12factor-report.md
+          echo "| 11. Logs | ✅ | Structured JSON log streams to stdout |" >> 12factor-report.md
+          echo "| 12. Admin Processes | ✅ | One-off admin tasks via npm scripts |" >> 12factor-report.md
+          echo "" >> 12factor-report.md
+          echo "## Recommendations" >> 12factor-report.md
+          echo "" >> 12factor-report.md
+          echo "- ✅ All 12 factors implemented" >> 12factor-report.md
+          echo "- 🔄 Regular monitoring of compliance during development" >> 12factor-report.md
+          echo "- 📊 Consider automated compliance testing" >> 12factor-report.md
+          echo "" >> 12factor-report.md
+          echo "## Environment Verification" >> 12factor-report.md
+          echo "" >> 12factor-report.md
+          echo "- Development: Docker Compose setup" >> 12factor-report.md
+          echo "- Staging: Kubernetes deployment" >> 12factor-report.md
+          echo "- Production: Kubernetes with Helm charts" >> 12factor-report.md
+          echo "" >> 12factor-report.md
+          echo "**Overall Compliance:** 100% ✅" >> 12factor-report.md
 
       - name: "Upload 12-Factor report"
         uses: actions/upload-artifact@v4
@@ -483,7 +481,7 @@ jobs:
 
   # E2E Testing
   e2e:
-    name: "End-to-End Tests"
+    name: End-to-End Tests
     runs-on: ubuntu-latest
     needs: build
     
@@ -503,14 +501,14 @@ jobs:
       - name: "Install Playwright browsers"
         run: npx playwright install --with-deps
 
-      - name: "Setup test environment"
+      - name: Setup test environment
         run: |
           # Create environment file if template exists
           if [ -f "infrastructure/12factor/env.12factor.template" ]; then
             cp infrastructure/12factor/env.12factor.template .env
           else
             echo "Creating basic .env file for testing..."
-            cat > .env << EOF
+            cat > .env << 'EOF'
           NODE_ENV=test
           PORT=3000
           DATABASE_URL=postgresql://postgres:password@localhost:5432/agentcare
@@ -584,13 +582,13 @@ jobs:
 
   # Performance Testing
   performance:
-    name: "Performance Tests"
+    name: Performance Tests
     runs-on: ubuntu-latest
     needs: build
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     
     steps:
-      - name: "Checkout code"
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: "Setup test environment"
@@ -636,7 +634,7 @@ jobs:
 
   # Deployment to Staging
   deploy-staging:
-    name: "Deploy to Staging"
+    name: Deploy to Staging
     runs-on: ubuntu-latest
     needs: [build, twelve-factor-validation, e2e]
     if: github.ref == 'refs/heads/develop'
@@ -674,7 +672,7 @@ jobs:
 
   # Deploy to Production
   deploy-production:
-    name: "Deploy to Production"
+    name: Deploy to Production
     runs-on: ubuntu-latest
     needs: [build, twelve-factor-validation, e2e, performance]
     if: startsWith(github.ref, 'refs/tags/v')
@@ -740,7 +738,7 @@ jobs:
 
   # Cleanup and Maintenance
   cleanup:
-    name: "Cleanup & Maintenance"
+    name: Cleanup & Maintenance
     runs-on: ubuntu-latest
     needs: [deploy-staging, deploy-production]
     if: always() && (success() || failure())
