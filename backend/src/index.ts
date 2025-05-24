@@ -24,6 +24,11 @@ import { AvailabilityAgent } from './agents/AvailabilityAgent';
 import { BookingAgent } from './agents/BookingAgent';
 import { FAQAgent } from './agents/FAQAgent';
 
+// Tools
+import { AvailabilityTools } from './tools/AvailabilityTools';
+import { BookingTools } from './tools/BookingTools';
+import { FAQTools } from './tools/FAQTools';
+
 /**
  * AgentCare Main Application with Enhanced LLM, UMS, and RAG capabilities
  */
@@ -83,36 +88,57 @@ class AgentCareApplication {
             this.faqService = new FAQService(this.logger);
             this.emailService = new EmailService(this.logger);
             this.validationService = new ValidationService(this.logger);
-            this.notificationService = new NotificationService(this.logger, this.emailService);
+            this.notificationService = new NotificationService(this.logger);
 
             this.logger.info('All services initialized successfully');
         } catch (error) {
-            this.logger.error('Failed to initialize services', { error: error.message });
+            this.logger.error('Failed to initialize services', { 
+                error: error instanceof Error ? error.message : String(error) 
+            });
             throw error;
         }
     }
 
     private initializeAgents(): void {
         try {
-            // Initialize traditional agents first
+            // Create tools first
+            const availabilityTools = new AvailabilityTools(
+                this.logger,
+                this.doctorService,
+                this.appointmentService
+            );
+
+            const bookingTools = new BookingTools(
+                this.logger,
+                this.emailService,
+                this.appointmentService,
+                this.validationService,
+                this.notificationService
+            );
+
+            const faqTools = new FAQTools(
+                this.logger,
+                this.doctorService,
+                this.faqService
+            );
+
+            // Initialize agents with tools
             this.availabilityAgent = new AvailabilityAgent(
                 this.logger,
                 this.metrics,
-                this.doctorService
+                availabilityTools
             );
 
             this.bookingAgent = new BookingAgent(
                 this.logger,
                 this.metrics,
-                this.appointmentService,
-                this.notificationService,
-                this.validationService
+                bookingTools
             );
 
             this.faqAgent = new FAQAgent(
                 this.logger,
                 this.metrics,
-                this.faqService
+                faqTools
             );
 
             // Initialize enhanced supervisor agent with all new capabilities
@@ -129,7 +155,9 @@ class AgentCareApplication {
 
             this.logger.info('All agents initialized successfully');
         } catch (error) {
-            this.logger.error('Failed to initialize agents', { error: error.message });
+            this.logger.error('Failed to initialize agents', { 
+                error: error instanceof Error ? error.message : String(error) 
+            });
             throw error;
         }
     }
@@ -228,9 +256,11 @@ class AgentCareApplication {
                 });
 
             } catch (error) {
-                this.logger.error('Registration error', { error: error.message });
+                this.logger.error('Registration error', { 
+                    error: error instanceof Error ? error.message : String(error) 
+                });
                 res.status(400).json({
-                    error: error.message,
+                    error: error instanceof Error ? error.message : 'Registration failed',
                     timestamp: new Date().toISOString()
                 });
             }
@@ -256,7 +286,9 @@ class AgentCareApplication {
                 });
 
             } catch (error) {
-                this.logger.error('Login error', { error: error.message });
+                this.logger.error('Login error', { 
+                    error: error instanceof Error ? error.message : String(error) 
+                });
                 res.status(401).json({
                     error: 'Invalid credentials',
                     timestamp: new Date().toISOString()
@@ -300,7 +332,7 @@ class AgentCareApplication {
                 }
 
                 // Process with enhanced supervisor agent
-                const response = await this.supervisorAgent.process(message, { token });
+                const response = await this.supervisorAgent.process(message, token ? { token } : undefined);
 
                 this.metrics.incrementCounter('api_agent_requests');
 
@@ -311,7 +343,7 @@ class AgentCareApplication {
                 });
 
             } catch (error) {
-                this.errorHandler.handleError(error);
+                this.errorHandler.handleError(error instanceof Error ? error : new Error(String(error)));
                 res.status(500).json({
                     error: 'Failed to process request',
                     timestamp: new Date().toISOString()
@@ -362,7 +394,7 @@ class AgentCareApplication {
 
             } catch (error) {
                 res.status(400).json({
-                    error: error.message,
+                    error: error instanceof Error ? error.message : 'Failed to update preferences',
                     timestamp: new Date().toISOString()
                 });
             }
@@ -387,7 +419,7 @@ class AgentCareApplication {
 
             } catch (error) {
                 res.status(400).json({
-                    error: error.message,
+                    error: error instanceof Error ? error.message : 'Failed to reset conversation',
                     timestamp: new Date().toISOString()
                 });
             }
@@ -442,7 +474,7 @@ class AgentCareApplication {
             } catch (error) {
                 res.status(500).json({
                     status: 'error',
-                    error: error.message,
+                    error: error instanceof Error ? error.message : 'Ollama status check failed',
                     timestamp: new Date().toISOString()
                 });
             }
@@ -475,10 +507,10 @@ class AgentCareApplication {
 
         // Global error handler
         this.app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-            this.errorHandler.handleError(error);
+            this.errorHandler.handleError(error instanceof Error ? error : new Error(String(error)));
             
             res.status(error.status || 500).json({
-                error: error.message || 'Internal server error',
+                error: (error instanceof Error ? error.message : String(error)) || 'Internal server error',
                 timestamp: new Date().toISOString()
             });
         });
@@ -498,7 +530,9 @@ class AgentCareApplication {
             this.logger.info('Graceful shutdown completed');
             process.exit(0);
         } catch (error) {
-            this.logger.error('Error during graceful shutdown', { error: error.message });
+            this.logger.error('Error during graceful shutdown', { 
+                error: error instanceof Error ? error.message : String(error) 
+            });
             process.exit(1);
         }
     }
@@ -543,7 +577,9 @@ Environment: ${this.config.get('NODE_ENV')}
             });
 
         } catch (error) {
-            this.logger.error('Failed to start server', { error: error.message });
+            this.logger.error('Failed to start server', { 
+                error: error instanceof Error ? error.message : String(error) 
+            });
             process.exit(1);
         }
     }

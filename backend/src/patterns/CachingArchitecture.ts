@@ -347,7 +347,8 @@ export function Cached(
 
     descriptor.value = async function (...args: any[]) {
       const cacheKey = keyGenerator(...args);
-      const cacheManager = this.cacheManager as MultiTierCacheManager;
+      // Access cacheManager from the class instance
+      const cacheManager = (this as any).cacheManager as MultiTierCacheManager;
 
       if (cacheManager) {
         // Try to get from cache
@@ -361,11 +362,13 @@ export function Cached(
       const result = await method.apply(this, args);
 
       if (cacheManager && result !== null && result !== undefined) {
-        // Cache the result
+        // Cache the result using public methods
         if (tier === 'L1') {
-          await cacheManager.l1Cache.set(cacheKey, result, ttl);
+          // Use the public set method with appropriate TTL for L1 cache simulation
+          await cacheManager.set(cacheKey, result, ttl, 0);
         } else if (tier === 'L2') {
-          await cacheManager.l2Cache.set(cacheKey, result, ttl);
+          // Use the public set method with appropriate TTL for L2 cache simulation
+          await cacheManager.set(cacheKey, result, 0, ttl);
         } else {
           await cacheManager.set(cacheKey, result, ttl, ttl * 2);
         }

@@ -71,9 +71,9 @@ export class BookingAgent implements IAgent {
     /**
      * Handle appointment creation
      * @param message - The user's message
-     * @param action - The parsed booking action
+     * @param _action - The parsed booking action (unused but kept for interface consistency)
      */
-    private async handleCreateBooking(message: string, action: any): Promise<string> {
+    private async handleCreateBooking(message: string, _action: any): Promise<string> {
         const bookingDetails = await this.tools.extractBookingDetails(message);
         
         // Validate booking details
@@ -99,9 +99,9 @@ export class BookingAgent implements IAgent {
     /**
      * Handle appointment cancellation
      * @param message - The user's message
-     * @param action - The parsed booking action
+     * @param _action - The parsed booking action (unused but kept for interface consistency)
      */
-    private async handleCancelBooking(message: string, action: any): Promise<string> {
+    private async handleCancelBooking(message: string, _action: any): Promise<string> {
         const appointmentId = await this.tools.extractAppointmentId(message);
         
         if (!appointmentId) {
@@ -120,9 +120,9 @@ export class BookingAgent implements IAgent {
     /**
      * Handle appointment rescheduling
      * @param message - The user's message
-     * @param action - The parsed booking action
+     * @param _action - The parsed booking action (unused but kept for interface consistency)
      */
-    private async handleRescheduleBooking(message: string, action: any): Promise<string> {
+    private async handleRescheduleBooking(message: string, _action: any): Promise<string> {
         const rescheduleDetails = await this.tools.extractRescheduleDetails(message);
         
         if (!rescheduleDetails.appointmentId || !rescheduleDetails.newDateTime) {

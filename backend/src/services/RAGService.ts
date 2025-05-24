@@ -96,11 +96,12 @@ export class RAGService {
             });
 
         } catch (error) {
-            this.logger.error('Error storing conversation message', { 
-                error: error.message, 
-                userId, 
-                messageId: message.id 
+            this.logger.error('Error storing conversation message', {
+                error: error instanceof Error ? error.message : String(error),
+                userId,
+                sessionId
             });
+            throw error;
         }
     }
 
@@ -146,7 +147,7 @@ export class RAGService {
 
         } catch (error) {
             this.logger.error('Error storing structured data', { 
-                error: error.message, 
+                error: error instanceof Error ? error.message : String(error), 
                 userId, 
                 type 
             });
@@ -211,11 +212,14 @@ export class RAGService {
             return contextSummary;
 
         } catch (error) {
-            this.logger.error('Error retrieving context', { error: error.message, userId });
+            this.logger.error('Error retrieving context', { 
+                error: error instanceof Error ? error.message : String(error), 
+                userId 
+            });
             
-            // Return minimal context on error
+            // Return empty context on error
             return {
-                recentContext: await this.userService.getConversationHistory(userId, sessionId, 3),
+                recentContext: '',
                 relevantHistory: '',
                 userPreferences: '',
                 entities: new Map(),
@@ -260,11 +264,12 @@ export class RAGService {
             return systemPrompt;
 
         } catch (error) {
-            this.logger.error('Error generating enhanced prompt', { error: error.message, userId });
-            
-            // Return basic prompt on error
-            return `You are a ${agentType} agent in the AgentCare healthcare scheduling system. 
-            User message: ${userMessage}`;
+            this.logger.error('Error generating enhanced prompt', {
+                error: error instanceof Error ? error.message : String(error),
+                userId,
+                sessionId
+            });
+            throw error;
         }
     }
 
@@ -294,7 +299,10 @@ export class RAGService {
             this.logger.debug('Conversation summary updated', { userId, sessionId });
 
         } catch (error) {
-            this.logger.error('Error updating conversation summary', { error: error.message, userId });
+            this.logger.error('Error updating conversation summary', { 
+                error: error instanceof Error ? error.message : String(error), 
+                userId 
+            });
         }
     }
 
@@ -325,7 +333,10 @@ export class RAGService {
             });
 
         } catch (error) {
-            this.logger.error('Error cleaning up user data', { error: error.message, userId });
+            this.logger.error('Error cleaning up user data', { 
+                error: error instanceof Error ? error.message : String(error), 
+                userId 
+            });
         }
     }
 
@@ -459,7 +470,9 @@ export class RAGService {
 
                 this.vectorStore.set(document.id, document);
             } catch (error) {
-                this.logger.error('Error initializing knowledge base item', { error: error.message });
+                this.logger.error('Error initializing knowledge base item', { 
+                    error: error instanceof Error ? error.message : String(error) 
+                });
             }
         }
 

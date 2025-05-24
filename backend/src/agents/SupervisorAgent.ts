@@ -53,7 +53,8 @@ export class SupervisorAgent implements IAgent {
      * Process user message with authentication and RAG context
      */
     async process(message: string, context?: { token?: string }): Promise<string> {
-        const operationId = this.metrics.startOperation('supervisor_process');
+        const operationId = `supervisor_process_${Date.now()}`;
+        this.metrics.startOperation(operationId);
         this.isActive = true;
 
         try {
@@ -77,7 +78,9 @@ export class SupervisorAgent implements IAgent {
                     
                     this.logger.info('Authenticated user session', { userId: user.id, sessionId: session.sessionId });
                 } catch (error) {
-                    this.logger.warn('Token validation failed, creating guest session', { error: error.message });
+                    this.logger.warn('Token validation failed, creating guest session', { 
+                        error: error instanceof Error ? error.message : String(error) 
+                    });
                     processingContext = await this.createGuestSession();
                 }
             } else {
@@ -184,7 +187,9 @@ export class SupervisorAgent implements IAgent {
         } catch (error) {
             this.metrics.endOperation(operationId);
             this.metrics.recordError('supervisor_process');
-            this.logger.error('Error in SupervisorAgent processing', { error: error.message });
+            this.logger.error('Error in SupervisorAgent processing', { 
+                error: error instanceof Error ? error.message : String(error) 
+            });
             
             return "I apologize, but I'm experiencing some technical difficulties. Please try again in a moment. If the problem persists, you can contact our support team.";
         } finally {
@@ -223,7 +228,7 @@ export class SupervisorAgent implements IAgent {
             
             if (needsBookingAction) {
                 // Call the traditional booking agent for actual booking operations
-                const bookingResult = await this.bookingAgent.process(message);
+                const bookingResult = await this.bookingAgent.process(message, intentAnalysis);
                 
                 // Combine LLM response with booking result
                 return `${ollamaResponse.response}\n\n${bookingResult}`;
@@ -233,7 +238,9 @@ export class SupervisorAgent implements IAgent {
             return ollamaResponse.response;
 
         } catch (error) {
-            this.logger.error('Error delegating to BookingAgent', { error: error.message });
+            this.logger.error('Error delegating to BookingAgent', { 
+                error: error instanceof Error ? error.message : String(error) 
+            });
             return "I'm having trouble processing your booking request. Let me try a different approach.";
         }
     }
@@ -258,7 +265,7 @@ export class SupervisorAgent implements IAgent {
             );
 
             // Get actual availability data from the traditional agent
-            const availabilityData = await this.availabilityAgent.process(message);
+            const availabilityData = await this.availabilityAgent.process(message, intentAnalysis);
 
             // Use LLM to present the availability data in a conversational way
             const presentationPrompt = `Present the following availability information in a helpful, conversational manner:
@@ -279,7 +286,9 @@ export class SupervisorAgent implements IAgent {
             return ollamaResponse.response;
 
         } catch (error) {
-            this.logger.error('Error delegating to AvailabilityAgent', { error: error.message });
+            this.logger.error('Error delegating to AvailabilityAgent', { 
+                error: error instanceof Error ? error.message : String(error) 
+            });
             return "I'm having trouble checking availability. Let me try to help you another way.";
         }
     }
@@ -296,7 +305,7 @@ export class SupervisorAgent implements IAgent {
             this.logger.info('Delegating to FAQAgent', { userId: context.user.id });
 
             // Generate enhanced prompt with RAG context and FAQ data
-            const faqData = await this.faqAgent.process(message);
+            const faqData = await this.faqAgent.process(message, intentAnalysis);
             
             const enhancedPrompt = await this.ragService.generateEnhancedPrompt(
                 context.user.id,
@@ -323,7 +332,9 @@ export class SupervisorAgent implements IAgent {
             return ollamaResponse.response;
 
         } catch (error) {
-            this.logger.error('Error delegating to FAQAgent', { error: error.message });
+            this.logger.error('Error delegating to FAQAgent', { 
+                error: error instanceof Error ? error.message : String(error) 
+            });
             return "I'd be happy to help with your question. Could you please rephrase it, and I'll do my best to assist you?";
         }
     }
@@ -334,7 +345,7 @@ export class SupervisorAgent implements IAgent {
     private async handleGeneralConversation(
         message: string, 
         context: ProcessingContext, 
-        intentAnalysis: any
+        _intentAnalysis: any  // Prefixed with _ to indicate intentionally unused
     ): Promise<string> {
         try {
             this.logger.info('Handling general conversation', { userId: context.user.id });
@@ -347,7 +358,7 @@ export class SupervisorAgent implements IAgent {
             - Checking doctor availability  
             - Information about doctors and services
             
-            User's name: ${context.user.name}
+            User's name: ${context.user.name || 'Guest'}
             
             If the user seems to want healthcare assistance, gently guide them to the appropriate service.`;
 
@@ -361,7 +372,9 @@ export class SupervisorAgent implements IAgent {
             return ollamaResponse.response;
 
         } catch (error) {
-            this.logger.error('Error handling general conversation', { error: error.message });
+            this.logger.error('Error handling general conversation', { 
+                error: error instanceof Error ? error.message : String(error) 
+            });
             return "I'm here to help with your healthcare needs. You can ask me about booking appointments, checking doctor availability, or general information about our services.";
         }
     }
@@ -442,7 +455,10 @@ export class SupervisorAgent implements IAgent {
             this.logger.info('Conversation reset completed', { userId, sessionId });
             
         } catch (error) {
-            this.logger.error('Error resetting conversation', { error: error.message, userId });
+            this.logger.error('Error resetting conversation', { 
+                error: error instanceof Error ? error.message : String(error), 
+                userId 
+            });
         }
     }
 

@@ -33,9 +33,9 @@ export class AvailabilityTools {
 
     /**
      * Parse availability request to extract search criteria
-     * @param message - The user's availability request
+     * @param _message - The user's availability request (unused but kept for interface consistency)
      */
-    public async parseAvailabilityRequest(message: string): Promise<any> {
+    public async parseAvailabilityRequest(_message: string): Promise<any> {
         this.validateToolActive('checkAvailability');
         // Implementation would use NLP to extract search criteria
         return {

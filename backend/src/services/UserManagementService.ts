@@ -150,7 +150,10 @@ export class UserManagementService {
             };
 
         } catch (error) {
-            this.logger.error('Error registering user', { error: error.message, email });
+            this.logger.error('Error registering user', { 
+                error: error instanceof Error ? error.message : String(error), 
+                email 
+            });
             throw error;
         }
     }
@@ -186,7 +189,10 @@ export class UserManagementService {
             };
 
         } catch (error) {
-            this.logger.error('Error authenticating user', { error: error.message, email });
+            this.logger.error('Error authenticating user', { 
+                error: error instanceof Error ? error.message : String(error), 
+                email 
+            });
             throw error;
         }
     }
@@ -213,7 +219,9 @@ export class UserManagementService {
             return { user: this.sanitizeUser(user), session };
 
         } catch (error) {
-            this.logger.error('Error validating token', { error: error.message });
+            this.logger.error('Error validating token', { 
+                error: error instanceof Error ? error.message : String(error) 
+            });
             throw new Error('Invalid token');
         }
     }

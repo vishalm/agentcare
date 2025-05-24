@@ -62,9 +62,9 @@ export class BookingTools {
 
     /**
      * Extract booking details from user message
-     * @param message - The user's message
+     * @param _message - The user's message (unused but kept for interface consistency)
      */
-    public async extractBookingDetails(message: string): Promise<any> {
+    public async extractBookingDetails(_message: string): Promise<any> {
         this.validateToolActive('createAppointment');
         // Implementation would use NLP to extract details
         return {
@@ -96,9 +96,9 @@ export class BookingTools {
 
     /**
      * Extract appointment ID from user message
-     * @param message - The user's message
+     * @param _message - The user's message (unused but kept for interface consistency)
      */
-    public async extractAppointmentId(message: string): Promise<string | null> {
+    public async extractAppointmentId(_message: string): Promise<string | null> {
         this.validateToolActive('createAppointment');
         // Implementation would use NLP to extract ID
         return null;
@@ -115,9 +115,9 @@ export class BookingTools {
 
     /**
      * Extract rescheduling details from user message
-     * @param message - The user's message
+     * @param _message - The user's message (unused but kept for interface consistency)
      */
-    public async extractRescheduleDetails(message: string): Promise<any> {
+    public async extractRescheduleDetails(_message: string): Promise<any> {
         this.validateToolActive('createAppointment');
         // Implementation would use NLP to extract details
         return {

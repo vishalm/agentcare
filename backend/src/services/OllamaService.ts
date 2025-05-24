@@ -79,19 +79,21 @@ export class OllamaService {
 
             const data = await response.json();
 
-            this.logger.info('Ollama response received', { 
-                responseLength: data.message?.content?.length || 0,
-                model: data.model 
+            this.logger.info('Ollama response generated', {
+                responseLength: (data as any)?.message?.content?.length || 0,
+                model: (data as any)?.model
             });
 
             return {
-                response: data.message?.content || 'I apologize, but I could not generate a response.',
-                tokens: data.eval_count || 0
+                response: (data as any)?.message?.content || 'I apologize, but I could not generate a response.',
+                tokens: (data as any)?.eval_count || 0
             };
 
         } catch (error) {
-            this.logger.error('Error generating Ollama response', { error: error.message });
-            throw new Error(`Failed to generate response: ${error.message}`);
+            this.logger.error('Error generating Ollama response', { 
+                error: error instanceof Error ? error.message : String(error) 
+            });
+            throw new Error(`Failed to generate response: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 
@@ -168,9 +170,11 @@ export class OllamaService {
             }
 
         } catch (error) {
-            this.logger.error('Error analyzing intent with Ollama', { error: error.message });
+            this.logger.error('Error analyzing intent with Ollama', { 
+                error: error instanceof Error ? error.message : String(error) 
+            });
             
-            // Return fallback intent
+            // Return default intent on error
             return {
                 intent: 'general',
                 confidence: 0.5,
@@ -201,11 +205,13 @@ export class OllamaService {
             }
 
             const data = await response.json();
-            return data.embedding || [];
+            return (data as any)?.embedding || [];
 
         } catch (error) {
-            this.logger.error('Error generating embeddings', { error: error.message });
-            throw error;
+            this.logger.error('Error generating embeddings', { 
+                error: error instanceof Error ? error.message : String(error) 
+            });
+            return [];
         }
     }
 
@@ -217,7 +223,9 @@ export class OllamaService {
             const response = await fetch(`${this.baseUrl}/api/tags`);
             return response.ok;
         } catch (error) {
-            this.logger.error('Ollama health check failed', { error: error.message });
+            this.logger.error('Ollama health check failed', { 
+                error: error instanceof Error ? error.message : String(error) 
+            });
             return false;
         }
     }
@@ -244,8 +252,11 @@ export class OllamaService {
             return response.ok;
 
         } catch (error) {
-            this.logger.error('Error pulling Ollama model', { error: error.message, model: modelToPull });
-            return false;
+            this.logger.error('Error pulling Ollama model', { 
+                error: error instanceof Error ? error.message : String(error), 
+                model: modelToPull 
+            });
+            throw error;
         }
     }
 } 
