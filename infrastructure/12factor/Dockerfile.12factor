@@ -1,0 +1,146 @@
+# 12-Factor App Dockerfile for AgentCare
+# Factor 2: Dependencies explicitly declared and isolated
+# Factor 5: Strictly separate build and run stages
+# Factor 6: Execute app as stateless processes
+# Factor 7: Export services via port binding
+
+# ========================================
+# Stage 1: Base image with Node.js
+# ========================================
+FROM node:18-alpine AS base
+
+# Factor 2: System dependencies explicitly declared
+RUN apk add --no-cache \
+    ca-certificates \
+    curl \
+    dumb-init \
+    && rm -rf /var/cache/apk/*
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S agentcare && \
+    adduser -S agentcare -u 1001
+
+# Set working directory
+WORKDIR /app
+
+# ========================================
+# Stage 2: Dependencies installation
+# ========================================
+FROM base AS dependencies
+
+# Factor 2: Copy dependency files for caching
+COPY package*.json ./
+COPY backend/package*.json backend/
+
+# Factor 2: Install exact dependencies (no fuzzy matching)
+RUN npm ci --only=production --no-audit --no-fund && \
+    npm cache clean --force
+
+# Install development dependencies for build
+RUN npm ci --include=dev --no-audit --no-fund
+
+# ========================================
+# Stage 3: Build stage
+# ========================================
+FROM dependencies AS builder
+
+# Factor 1: Copy source code
+COPY . .
+
+# Factor 5: Build the application
+RUN npm run build
+
+# Factor 2: Prune development dependencies
+RUN npm prune --production
+
+# Remove unnecessary files
+RUN rm -rf \
+    backend/src \
+    backend/tsconfig.json \
+    frontend/src \
+    tests \
+    docs \
+    .git \
+    .github \
+    *.md
+
+# ========================================
+# Stage 4: Runtime stage
+# ========================================
+FROM base AS runtime
+
+# Factor 3: Configuration through environment variables
+ENV NODE_ENV=production \
+    PORT=3000 \
+    HOST=0.0.0.0 \
+    LOG_LEVEL=info \
+    LOG_FORMAT=json \
+    LOG_DESTINATION=stdout
+
+# Factor 9: Use proper init system for signal handling
+ENTRYPOINT ["dumb-init", "--"]
+
+# Copy built application and dependencies
+COPY --from=builder --chown=agentcare:agentcare /app/node_modules ./node_modules
+COPY --from=builder --chown=agentcare:agentcare /app/backend/dist ./backend/dist
+COPY --from=builder --chown=agentcare:agentcare /app/frontend ./frontend
+COPY --from=builder --chown=agentcare:agentcare /app/package.json ./
+
+# Factor 9: Health check for container orchestration
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
+
+# Factor 6: Run as non-root user
+USER agentcare
+
+# Factor 7: Expose port for service binding
+EXPOSE 3000
+
+# Factor 9: Graceful shutdown and fast startup
+CMD ["node", "backend/dist/index.js"]
+
+# ========================================
+# Multi-stage build for different targets
+# ========================================
+
+# Development stage
+FROM dependencies AS development
+ENV NODE_ENV=development
+COPY . .
+USER agentcare
+EXPOSE 3000
+CMD ["npm", "run", "start:dev"]
+
+# Test stage
+FROM dependencies AS test
+ENV NODE_ENV=test
+COPY . .
+RUN npm run test:ci
+USER agentcare
+
+# Production stage (default)
+FROM runtime AS production
+
+# Build arguments for Factor 1 (Codebase tracking)
+ARG APP_VERSION=unknown
+ARG GIT_COMMIT=unknown
+ARG GIT_BRANCH=unknown
+ARG BUILD_TIME=unknown
+
+# Factor 1: Store build metadata
+ENV APP_VERSION=${APP_VERSION} \
+    GIT_COMMIT=${GIT_COMMIT} \
+    GIT_BRANCH=${GIT_BRANCH} \
+    BUILD_TIME=${BUILD_TIME}
+
+# Factor 11: Logs to stdout (already configured in CMD)
+# Factor 12: Admin processes use same image with different command
+
+LABEL maintainer="AgentCare Team <dev@agentcare.com>" \
+      version="${APP_VERSION}" \
+      description="AgentCare - 12-Factor Healthcare Scheduling System" \
+      org.opencontainers.image.title="AgentCare" \
+      org.opencontainers.image.description="Multi-Agent Healthcare Scheduling System" \
+      org.opencontainers.image.version="${APP_VERSION}" \
+      org.opencontainers.image.source="https://github.com/vishalm/agentcare" \
+      org.opencontainers.image.revision="${GIT_COMMIT}" 

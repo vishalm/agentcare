@@ -1,0 +1,382 @@
+# 12-Factor App Docker Compose for AgentCare
+# Factor 4: Treat backing services as attached resources
+# Factor 10: Keep development, staging, and production as similar as possible
+
+version: '3.8'
+
+# Factor 4: Backing services as attached resources
+services:
+  # ========================================
+  # Application Services
+  # ========================================
+  
+  # Factor 6 & 8: Web processes (stateless, scalable)
+  agentcare-web:
+    build:
+      context: ../../
+      dockerfile: infrastructure/12factor/Dockerfile.12factor
+      target: production
+      args:
+        APP_VERSION: ${APP_VERSION:-development}
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+        GIT_BRANCH: ${GIT_BRANCH:-main}
+        BUILD_TIME: ${BUILD_TIME:-unknown}
+    
+    # Factor 7: Port binding
+    ports:
+      - "${PORT:-3000}:3000"
+    
+    # Factor 3: Config in environment
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3000
+      HOST: 0.0.0.0
+      
+      # Factor 4: Database as attached resource
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${DATABASE_NAME:-agentcare}
+      DATABASE_USER: ${DATABASE_USER:-agentcare}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-secure_password}
+      DATABASE_SSL: ${DATABASE_SSL:-false}
+      
+      # Factor 4: Redis as attached resource
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      
+      # Factor 4: Ollama as attached resource
+      OLLAMA_BASE_URL: http://ollama:11434
+      
+      # Authentication
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production}
+      
+      # Factor 11: Structured logging
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      LOG_FORMAT: json
+      LOG_DESTINATION: stdout
+      
+      # Factor 8: Process concurrency
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-2}
+      
+      # Factor 10: Feature flags for parity
+      ENABLE_DEBUG: ${ENABLE_DEBUG:-false}
+      ENABLE_METRICS: ${ENABLE_METRICS:-true}
+      ENABLE_TRACING: ${ENABLE_TRACING:-true}
+    
+    # Factor 4: Service dependencies
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    
+    # Factor 9: Health checks
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    
+    # Factor 8: Horizontal scaling
+    deploy:
+      replicas: ${WEB_REPLICAS:-2}
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    
+    # Factor 11: Log driver configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    networks:
+      - agentcare-network
+
+  # Factor 8: Worker processes
+  agentcare-worker:
+    build:
+      context: ../../
+      dockerfile: infrastructure/12factor/Dockerfile.12factor
+      target: production
+      args:
+        APP_VERSION: ${APP_VERSION:-development}
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+        GIT_BRANCH: ${GIT_BRANCH:-main}
+        BUILD_TIME: ${BUILD_TIME:-unknown}
+    
+    # Factor 12: Different command for different process type
+    command: ["node", "backend/dist/worker.js"]
+    
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PROCESS_TYPE: worker
+      
+      # Same backing services as web
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${DATABASE_NAME:-agentcare}
+      DATABASE_USER: ${DATABASE_USER:-agentcare}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-secure_password}
+      
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      
+      OLLAMA_BASE_URL: http://ollama:11434
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production}
+      
+      # Worker-specific config
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-5}
+      
+      # Logging
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      LOG_FORMAT: json
+      LOG_DESTINATION: stdout
+    
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    
+    deploy:
+      replicas: ${WORKER_REPLICAS:-2}
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    networks:
+      - agentcare-network
+
+  # ========================================
+  # Factor 4: Backing Services
+  # ========================================
+  
+  # Database service
+  postgres:
+    image: postgres:15-alpine
+    
+    # Factor 3: Configuration in environment
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-agentcare}
+      POSTGRES_USER: ${DATABASE_USER:-agentcare}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-secure_password}
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    
+    # Factor 10: Consistent data between environments
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../../database/init:/docker-entrypoint-initdb.d:ro
+    
+    # Factor 7: Port binding (internal only)
+    expose:
+      - "5432"
+    
+    # Health check for dependency management
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-agentcare} -d ${DATABASE_NAME:-agentcare}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    
+    # Performance tuning
+    command: >
+      postgres
+      -c max_connections=100
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+    
+    deploy:
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    
+    networks:
+      - agentcare-network
+
+  # Redis cache service
+  redis:
+    image: redis:7-alpine
+    
+    # Factor 3: Configuration through command
+    command: >
+      redis-server
+      --appendonly yes
+      --appendfsync everysec
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --tcp-keepalive 60
+      --timeout 300
+    
+    # Factor 10: Persistent data
+    volumes:
+      - redis_data:/data
+    
+    expose:
+      - "6379"
+    
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    
+    deploy:
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+    
+    networks:
+      - agentcare-network
+
+  # Ollama LLM service
+  ollama:
+    image: ollama/ollama:latest
+    
+    # GPU support if available
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    
+    volumes:
+      - ollama_data:/root/.ollama
+    
+    expose:
+      - "11434"
+    
+    # Pull required model on startup
+    command: >
+      sh -c "
+        ollama serve &
+        sleep 10 &&
+        ollama pull qwen2.5:latest &&
+        wait
+      "
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    networks:
+      - agentcare-network
+
+  # ========================================
+  # Observability Services (Factor 11)
+  # ========================================
+  
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    
+    volumes:
+      - ../../infrastructure/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    
+    ports:
+      - "9090:9090"
+    
+    networks:
+      - agentcare-network
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: false
+    
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ../../infrastructure/observability/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ../../infrastructure/observability/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    
+    ports:
+      - "3001:3000"
+    
+    depends_on:
+      - prometheus
+    
+    networks:
+      - agentcare-network
+
+# ========================================
+# Factor 10: Consistent volumes across environments
+# ========================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  ollama_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+# ========================================
+# Networking
+# ========================================
+networks:
+  agentcare-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16 
