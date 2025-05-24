@@ -3,7 +3,7 @@
  * Implements message queues, event sourcing, and CQRS patterns
  */
 
-import { EventEmitter } from 'events';
+import { EventEmitter } from "events";
 
 // Base Event Interface
 export interface DomainEvent {
@@ -18,7 +18,7 @@ export interface DomainEvent {
 
 // Healthcare-specific Events
 export interface AppointmentScheduledEvent extends DomainEvent {
-  eventType: 'AppointmentScheduled';
+  eventType: "AppointmentScheduled";
   data: {
     appointmentId: string;
     patientId: string;
@@ -30,7 +30,7 @@ export interface AppointmentScheduledEvent extends DomainEvent {
 }
 
 export interface AppointmentCancelledEvent extends DomainEvent {
-  eventType: 'AppointmentCancelled';
+  eventType: "AppointmentCancelled";
   data: {
     appointmentId: string;
     patientId: string;
@@ -42,7 +42,7 @@ export interface AppointmentCancelledEvent extends DomainEvent {
 }
 
 export interface PatientRegisteredEvent extends DomainEvent {
-  eventType: 'PatientRegistered';
+  eventType: "PatientRegistered";
   data: {
     patientId: string;
     firstName: string;
@@ -55,7 +55,7 @@ export interface PatientRegisteredEvent extends DomainEvent {
 }
 
 export interface DoctorAvailabilityUpdatedEvent extends DomainEvent {
-  eventType: 'DoctorAvailabilityUpdated';
+  eventType: "DoctorAvailabilityUpdated";
   data: {
     doctorId: string;
     availableSlots: Array<{
@@ -83,7 +83,7 @@ export class InMemoryEventStore implements EventStore {
 
   async save(event: DomainEvent): Promise<void> {
     this.events.push(event);
-    
+
     if (!this.eventsByAggregate.has(event.aggregateId)) {
       this.eventsByAggregate.set(event.aggregateId, []);
     }
@@ -95,12 +95,12 @@ export class InMemoryEventStore implements EventStore {
   }
 
   async getEventsByType(eventType: string): Promise<DomainEvent[]> {
-    return this.events.filter(event => event.eventType === eventType);
+    return this.events.filter((event) => event.eventType === eventType);
   }
 
   async getAllEvents(fromVersion?: number): Promise<DomainEvent[]> {
     if (fromVersion !== undefined) {
-      return this.events.filter(event => event.version >= fromVersion);
+      return this.events.filter((event) => event.version >= fromVersion);
     }
     return [...this.events];
   }
@@ -109,13 +109,20 @@ export class InMemoryEventStore implements EventStore {
 // Message Queue Interface
 export interface MessageQueue {
   publish(topic: string, message: any): Promise<void>;
-  subscribe(topic: string, handler: (message: any) => Promise<void>): Promise<void>;
-  unsubscribe(topic: string, handler: (message: any) => Promise<void>): Promise<void>;
+  subscribe(
+    topic: string,
+    handler: (message: any) => Promise<void>,
+  ): Promise<void>;
+  unsubscribe(
+    topic: string,
+    handler: (message: any) => Promise<void>,
+  ): Promise<void>;
 }
 
 // Redis-based Message Queue Implementation
 export class RedisMessageQueue implements MessageQueue {
-  private subscriptions: Map<string, Array<(message: any) => Promise<void>>> = new Map();
+  private subscriptions: Map<string, Array<(message: any) => Promise<void>>> =
+    new Map();
   private emitter = new EventEmitter();
 
   async publish(topic: string, message: any): Promise<void> {
@@ -123,12 +130,15 @@ export class RedisMessageQueue implements MessageQueue {
     this.emitter.emit(topic, message);
   }
 
-  async subscribe(topic: string, handler: (message: any) => Promise<void>): Promise<void> {
+  async subscribe(
+    topic: string,
+    handler: (message: any) => Promise<void>,
+  ): Promise<void> {
     if (!this.subscriptions.has(topic)) {
       this.subscriptions.set(topic, []);
     }
     this.subscriptions.get(topic)!.push(handler);
-    
+
     this.emitter.on(topic, async (message: any) => {
       try {
         await handler(message);
@@ -138,7 +148,10 @@ export class RedisMessageQueue implements MessageQueue {
     });
   }
 
-  async unsubscribe(topic: string, handler: (message: any) => Promise<void>): Promise<void> {
+  async unsubscribe(
+    topic: string,
+    handler: (message: any) => Promise<void>,
+  ): Promise<void> {
     const handlers = this.subscriptions.get(topic);
     if (handlers) {
       const index = handlers.indexOf(handler);
@@ -155,17 +168,25 @@ export class EventBus {
   private static instance: EventBus;
   private eventStore: EventStore;
   private messageQueue: MessageQueue;
-  private eventHandlers: Map<string, Array<(event: DomainEvent) => Promise<void>>> = new Map();
+  private eventHandlers: Map<
+    string,
+    Array<(event: DomainEvent) => Promise<void>>
+  > = new Map();
 
   constructor(eventStore: EventStore, messageQueue: MessageQueue) {
     this.eventStore = eventStore;
     this.messageQueue = messageQueue;
   }
 
-  static getInstance(eventStore?: EventStore, messageQueue?: MessageQueue): EventBus {
+  static getInstance(
+    eventStore?: EventStore,
+    messageQueue?: MessageQueue,
+  ): EventBus {
     if (!EventBus.instance) {
       if (!eventStore || !messageQueue) {
-        throw new Error('EventStore and MessageQueue are required for first instantiation');
+        throw new Error(
+          "EventStore and MessageQueue are required for first instantiation",
+        );
       }
       EventBus.instance = new EventBus(eventStore, messageQueue);
     }
@@ -175,21 +196,24 @@ export class EventBus {
   async publishEvent(event: DomainEvent): Promise<void> {
     // Store event
     await this.eventStore.save(event);
-    
+
     // Publish to message queue
     await this.messageQueue.publish(event.eventType, event);
-    
+
     // Execute local handlers
     const handlers = this.eventHandlers.get(event.eventType) || [];
-    await Promise.all(handlers.map(handler => handler(event)));
+    await Promise.all(handlers.map((handler) => handler(event)));
   }
 
-  subscribe(eventType: string, handler: (event: DomainEvent) => Promise<void>): void {
+  subscribe(
+    eventType: string,
+    handler: (event: DomainEvent) => Promise<void>,
+  ): void {
     if (!this.eventHandlers.has(eventType)) {
       this.eventHandlers.set(eventType, []);
     }
     this.eventHandlers.get(eventType)!.push(handler);
-    
+
     // Also subscribe to message queue
     this.messageQueue.subscribe(eventType, handler);
   }
@@ -210,7 +234,7 @@ export interface Command {
 
 // Healthcare-specific Commands
 export interface ScheduleAppointmentCommand extends Command {
-  type: 'ScheduleAppointment';
+  type: "ScheduleAppointment";
   data: {
     patientId: string;
     doctorId: string;
@@ -222,7 +246,7 @@ export interface ScheduleAppointmentCommand extends Command {
 }
 
 export interface CancelAppointmentCommand extends Command {
-  type: 'CancelAppointment';
+  type: "CancelAppointment";
   data: {
     appointmentId: string;
     cancelledBy: string;
@@ -244,18 +268,23 @@ export class CommandBus {
     this.eventBus = eventBus;
   }
 
-  registerHandler<T extends Command>(commandType: string, handler: CommandHandler<T>): void {
+  registerHandler<T extends Command>(
+    commandType: string,
+    handler: CommandHandler<T>,
+  ): void {
     this.handlers.set(commandType, handler);
   }
 
   async execute<T extends Command>(command: T): Promise<void> {
     const handler = this.handlers.get(command.type);
     if (!handler) {
-      throw new Error(`No handler registered for command type: ${command.type}`);
+      throw new Error(
+        `No handler registered for command type: ${command.type}`,
+      );
     }
 
     const events = await handler.handle(command);
-    
+
     // Publish all resulting events
     for (const event of events) {
       await this.eventBus.publishEvent(event);
@@ -272,7 +301,7 @@ export interface Query {
 
 // Healthcare-specific Queries
 export interface GetPatientAppointmentsQuery extends Query {
-  type: 'GetPatientAppointments';
+  type: "GetPatientAppointments";
   parameters: {
     patientId: string;
     startDate?: Date;
@@ -281,7 +310,7 @@ export interface GetPatientAppointmentsQuery extends Query {
 }
 
 export interface GetDoctorAvailabilityQuery extends Query {
-  type: 'GetDoctorAvailability';
+  type: "GetDoctorAvailability";
   parameters: {
     doctorId: string;
     date: Date;
@@ -298,7 +327,10 @@ export interface QueryHandler<T extends Query, R> {
 export class QueryBus {
   private handlers: Map<string, QueryHandler<any, any>> = new Map();
 
-  registerHandler<T extends Query, R>(queryType: string, handler: QueryHandler<T, R>): void {
+  registerHandler<T extends Query, R>(
+    queryType: string,
+    handler: QueryHandler<T, R>,
+  ): void {
     this.handlers.set(queryType, handler);
   }
 
@@ -338,7 +370,7 @@ export class Saga {
         try {
           await this.executedSteps[i].compensate();
         } catch (compensationError) {
-          console.error('Compensation failed:', compensationError);
+          console.error("Compensation failed:", compensationError);
         }
       }
       throw error;
@@ -352,7 +384,7 @@ export class AppointmentSchedulingSaga extends Saga {
     private patientId: string,
     private doctorId: string,
     private appointmentTime: Date,
-    private duration: number
+    private duration: number,
   ) {
     super();
     this.setupSteps();
@@ -367,7 +399,7 @@ export class AppointmentSchedulingSaga extends Saga {
       },
       compensate: async () => {
         // No compensation needed for check
-      }
+      },
     });
 
     // Step 2: Reserve time slot
@@ -377,7 +409,7 @@ export class AppointmentSchedulingSaga extends Saga {
       },
       compensate: async () => {
         console.log(`Releasing reserved time slot for ${this.appointmentTime}`);
-      }
+      },
     });
 
     // Step 3: Create appointment
@@ -387,7 +419,7 @@ export class AppointmentSchedulingSaga extends Saga {
       },
       compensate: async () => {
         console.log(`Cancelling appointment for patient ${this.patientId}`);
-      }
+      },
     });
 
     // Step 4: Send confirmation
@@ -397,7 +429,7 @@ export class AppointmentSchedulingSaga extends Saga {
       },
       compensate: async () => {
         console.log(`Sending cancellation notice to patient ${this.patientId}`);
-      }
+      },
     });
   }
 }
@@ -422,7 +454,7 @@ export class EventDrivenArchitectureFactory {
       commandBus,
       queryBus,
       eventStore,
-      messageQueue
+      messageQueue,
     };
   }
-} 
+}

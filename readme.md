@@ -9,6 +9,7 @@ A sophisticated appointment booking system built using multi-agent architecture 
 [![Version](https://img.shields.io/badge/Version-2.0.0--alpha-orange.svg)]()
 [![HIPAA](https://img.shields.io/badge/HIPAA-Compliant-green.svg)]()
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-blue.svg)]()
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=vishalm_agentcare&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=vishalm_agentcare)
 [![12-Factor](https://img.shields.io/badge/12--Factor-Compliant-brightgreen.svg)](https://12factor.net/)
 [![Cloud Native](https://img.shields.io/badge/Cloud--Native-Kubernetes-blue.svg)]()
 
@@ -517,8 +518,26 @@ kubectl get pods -n agentcare -w
 1. **Validation**: Linting, formatting, commit message validation
 2. **Security**: SAST, dependency scanning, secret detection
 3. **Testing**: Unit, integration, contract, E2E tests
-4. **Building**: Multi-arch Docker images with vulnerability scanning
-5. **Deployment**: Automated staging and production deployment
+4. **Code Quality**: SonarCloud analysis with quality gates
+5. **Building**: Multi-arch Docker images with vulnerability scanning
+6. **Deployment**: Automated staging and production deployment
+
+## 📊 Code Quality & Analysis
+
+### SonarCloud Integration
+- **Project**: [vishalm_agentcare](https://sonarcloud.io/project/overview?id=vishalm_agentcare)
+- **Organization**: [vishalm](https://sonarcloud.io/organizations/vishalm)
+- **Quality Gates**: Automatic quality and security checks
+- **Coverage Tracking**: Test coverage analysis and reporting
+- **Security Hotspots**: Healthcare-specific vulnerability detection
+- **Technical Debt**: Code maintainability and reliability metrics
+
+### Quality Metrics
+- **Code Coverage**: 80%+ requirement with detailed reporting
+- **Maintainability**: A-grade maintainability rating target
+- **Reliability**: Zero bugs in production code policy
+- **Security**: Healthcare-grade security vulnerability scanning
+- **Duplications**: <3% code duplication threshold
 
 ## 🌟 Production Deployment
 
@@ -559,6 +578,7 @@ npm run start:dev              # Start development server
 npm run test                   # Run all tests
 npm run lint                   # Code linting
 npm run format                 # Code formatting
+npm run sonar:analyze          # Run SonarCloud analysis locally
 
 # Docker
 npm run dev:docker             # Docker development environment

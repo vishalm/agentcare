@@ -3,8 +3,8 @@
  * Implements service discovery, load balancing, and inter-service communication
  */
 
-import { EventEmitter } from 'events';
-import { CircuitBreaker, CircuitBreakerRegistry } from './CircuitBreaker';
+import { EventEmitter } from "events";
+import { CircuitBreaker, CircuitBreakerRegistry } from "./CircuitBreaker";
 
 // Service Registry Interface
 export interface ServiceInstance {
@@ -17,7 +17,7 @@ export interface ServiceInstance {
   metadata: Record<string, any>;
   registeredAt: Date;
   lastHeartbeat: Date;
-  status: 'healthy' | 'unhealthy' | 'unknown';
+  status: "healthy" | "unhealthy" | "unknown";
 }
 
 export interface ServiceRegistry {
@@ -44,13 +44,15 @@ export class InMemoryServiceRegistry implements ServiceRegistry {
 
   async register(service: ServiceInstance): Promise<void> {
     this.services.set(service.id, service);
-    
+
     if (!this.servicesByName.has(service.name)) {
       this.servicesByName.set(service.name, new Set());
     }
     this.servicesByName.get(service.name)!.add(service.id);
-    
-    console.log(`Service registered: ${service.name} (${service.id}) at ${service.host}:${service.port}`);
+
+    console.log(
+      `Service registered: ${service.name} (${service.id}) at ${service.host}:${service.port}`,
+    );
   }
 
   async deregister(serviceId: string): Promise<void> {
@@ -65,27 +67,27 @@ export class InMemoryServiceRegistry implements ServiceRegistry {
   async discover(serviceName: string): Promise<ServiceInstance[]> {
     const serviceIds = this.servicesByName.get(serviceName) || new Set();
     const instances: ServiceInstance[] = [];
-    
+
     for (const serviceId of serviceIds) {
       const instance = this.services.get(serviceId);
       if (instance) {
         instances.push(instance);
       }
     }
-    
+
     return instances;
   }
 
   async getHealthyInstances(serviceName: string): Promise<ServiceInstance[]> {
     const instances = await this.discover(serviceName);
-    return instances.filter(instance => instance.status === 'healthy');
+    return instances.filter((instance) => instance.status === "healthy");
   }
 
   async updateHeartbeat(serviceId: string): Promise<void> {
     const service = this.services.get(serviceId);
     if (service) {
       service.lastHeartbeat = new Date();
-      service.status = 'healthy';
+      service.status = "healthy";
     }
   }
 
@@ -96,20 +98,22 @@ export class InMemoryServiceRegistry implements ServiceRegistry {
   private async performHealthChecks(): Promise<void> {
     const now = Date.now();
     const healthCheckTimeout = 60000; // 1 minute
-    
+
     for (const service of this.services.values()) {
       const timeSinceLastHeartbeat = now - service.lastHeartbeat.getTime();
-      
+
       if (timeSinceLastHeartbeat > healthCheckTimeout) {
-        service.status = 'unhealthy';
-        console.log(`Service marked unhealthy: ${service.name} (${service.id})`);
+        service.status = "unhealthy";
+        console.log(
+          `Service marked unhealthy: ${service.name} (${service.id})`,
+        );
       }
-      
+
       // Perform actual health check
       try {
         await this.checkServiceHealth(service);
       } catch (error) {
-        service.status = 'unhealthy';
+        service.status = "unhealthy";
         console.error(`Health check failed for ${service.name}: ${error}`);
       }
     }
@@ -120,9 +124,9 @@ export class InMemoryServiceRegistry implements ServiceRegistry {
     // For now, we'll simulate based on heartbeat
     const timeSinceHeartbeat = Date.now() - service.lastHeartbeat.getTime();
     if (timeSinceHeartbeat < 60000) {
-      service.status = 'healthy';
+      service.status = "healthy";
     } else {
-      service.status = 'unhealthy';
+      service.status = "unhealthy";
     }
   }
 
@@ -143,11 +147,11 @@ export class RoundRobinLoadBalancer implements LoadBalancer {
 
   selectInstance(instances: ServiceInstance[]): ServiceInstance | null {
     if (instances.length === 0) return null;
-    
+
     const serviceName = instances[0].name;
     const currentCounter = this.counters.get(serviceName) || 0;
     const selectedIndex = currentCounter % instances.length;
-    
+
     this.counters.set(serviceName, currentCounter + 1);
     return instances[selectedIndex];
   }
@@ -156,20 +160,20 @@ export class RoundRobinLoadBalancer implements LoadBalancer {
 export class WeightedLoadBalancer implements LoadBalancer {
   selectInstance(instances: ServiceInstance[]): ServiceInstance | null {
     if (instances.length === 0) return null;
-    
+
     // Use metadata.weight or default to 1
-    const weights = instances.map(instance => instance.metadata.weight || 1);
+    const weights = instances.map((instance) => instance.metadata.weight || 1);
     const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-    
+
     let random = Math.random() * totalWeight;
-    
+
     for (let i = 0; i < instances.length; i++) {
       random -= weights[i];
       if (random <= 0) {
         return instances[i];
       }
     }
-    
+
     return instances[instances.length - 1];
   }
 }
@@ -179,10 +183,10 @@ export class LeastConnectionsLoadBalancer implements LoadBalancer {
 
   selectInstance(instances: ServiceInstance[]): ServiceInstance | null {
     if (instances.length === 0) return null;
-    
+
     let selectedInstance = instances[0];
     let minConnections = this.connections.get(selectedInstance.id) || 0;
-    
+
     for (const instance of instances) {
       const connections = this.connections.get(instance.id) || 0;
       if (connections < minConnections) {
@@ -190,7 +194,7 @@ export class LeastConnectionsLoadBalancer implements LoadBalancer {
         selectedInstance = instance;
       }
     }
-    
+
     return selectedInstance;
   }
 
@@ -215,7 +219,7 @@ export class ServiceMeshGateway {
 
   constructor(
     serviceRegistry: ServiceRegistry,
-    loadBalancer: LoadBalancer = new RoundRobinLoadBalancer()
+    loadBalancer: LoadBalancer = new RoundRobinLoadBalancer(),
   ) {
     this.serviceRegistry = serviceRegistry;
     this.loadBalancer = loadBalancer;
@@ -229,15 +233,18 @@ export class ServiceMeshGateway {
       timeout?: number;
       retries?: number;
       fallback?: () => Promise<T>;
-    } = {}
+    } = {},
   ): Promise<T> {
-    const instances = await this.serviceRegistry.getHealthyInstances(serviceName);
-    
+    const instances =
+      await this.serviceRegistry.getHealthyInstances(serviceName);
+
     if (instances.length === 0) {
       if (options.fallback) {
         return options.fallback();
       }
-      throw new Error(`No healthy instances available for service: ${serviceName}`);
+      throw new Error(
+        `No healthy instances available for service: ${serviceName}`,
+      );
     }
 
     const selectedInstance = this.loadBalancer.selectInstance(instances);
@@ -252,10 +259,12 @@ export class ServiceMeshGateway {
       if (options.fallback) {
         return circuitBreaker.executeWithFallback(
           () => this.executeWithRetry(operation, serviceUrl, options),
-          options.fallback
+          options.fallback,
         );
       } else {
-        return circuitBreaker.execute(() => this.executeWithRetry(operation, serviceUrl, options));
+        return circuitBreaker.execute(() =>
+          this.executeWithRetry(operation, serviceUrl, options),
+        );
       }
     } else {
       return this.executeWithRetry(operation, serviceUrl, options);
@@ -265,7 +274,7 @@ export class ServiceMeshGateway {
   private async executeWithRetry<T>(
     operation: (serviceUrl: string) => Promise<T>,
     serviceUrl: string,
-    options: { timeout?: number; retries?: number }
+    options: { timeout?: number; retries?: number },
   ): Promise<T> {
     const maxRetries = options.retries || 3;
     let lastError: Error;
@@ -279,7 +288,7 @@ export class ServiceMeshGateway {
         }
       } catch (error) {
         lastError = error as Error;
-        
+
         if (attempt < maxRetries) {
           const delay = Math.pow(2, attempt) * 1000; // Exponential backoff
           await this.delay(delay);
@@ -290,17 +299,20 @@ export class ServiceMeshGateway {
     throw lastError!;
   }
 
-  private async withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  private async withTimeout<T>(
+    promise: Promise<T>,
+    timeoutMs: number,
+  ): Promise<T> {
     return Promise.race([
       promise,
-      new Promise<T>((_, reject) => 
-        setTimeout(() => reject(new Error('Operation timeout')), timeoutMs)
-      )
+      new Promise<T>((_, reject) =>
+        setTimeout(() => reject(new Error("Operation timeout")), timeoutMs),
+      ),
     ]);
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   setRetryPolicy(serviceName: string, policy: RetryPolicy): void {
@@ -332,24 +344,29 @@ export class ServiceMeshMiddleware {
   }
 
   // Express middleware for service registration
-  registerService(serviceConfig: Omit<ServiceInstance, 'registeredAt' | 'lastHeartbeat' | 'status'>) {
+  registerService(
+    serviceConfig: Omit<
+      ServiceInstance,
+      "registeredAt" | "lastHeartbeat" | "status"
+    >,
+  ) {
     return async (req: any, res: any, next: any) => {
       const service: ServiceInstance = {
         ...serviceConfig,
         registeredAt: new Date(),
         lastHeartbeat: new Date(),
-        status: 'healthy'
+        status: "healthy",
       };
 
       await this.serviceRegistry.register(service);
-      
+
       // Set up heartbeat
       const heartbeatInterval = setInterval(async () => {
         await this.serviceRegistry.updateHeartbeat(service.id);
       }, 15000); // Every 15 seconds
 
       // Cleanup on process exit
-      process.on('SIGTERM', async () => {
+      process.on("SIGTERM", async () => {
         clearInterval(heartbeatInterval);
         await this.serviceRegistry.deregister(service.id);
       });
@@ -361,21 +378,24 @@ export class ServiceMeshMiddleware {
   // Middleware for request tracing
   requestTracing() {
     return (req: any, res: any, next: any) => {
-      const traceId = req.headers['x-trace-id'] || this.generateTraceId();
+      const traceId = req.headers["x-trace-id"] || this.generateTraceId();
       const spanId = this.generateSpanId();
-      
+
       req.traceId = traceId;
       req.spanId = spanId;
-      
-      res.setHeader('X-Trace-ID', traceId);
-      res.setHeader('X-Span-ID', spanId);
-      
+
+      res.setHeader("X-Trace-ID", traceId);
+      res.setHeader("X-Span-ID", spanId);
+
       next();
     };
   }
 
   private generateTraceId(): string {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    return (
+      Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15)
+    );
   }
 
   private generateSpanId(): string {
@@ -397,61 +417,61 @@ export interface AgentCareService {
 }
 
 export const AGENTCARE_SERVICES: Record<string, AgentCareService> = {
-  'user-management': {
-    name: 'user-management',
+  "user-management": {
+    name: "user-management",
     port: 3001,
-    healthPath: '/health',
-    dependencies: ['database', 'redis'],
+    healthPath: "/health",
+    dependencies: ["database", "redis"],
     scaling: {
       minInstances: 2,
       maxInstances: 10,
-      targetCpuUtilization: 70
-    }
+      targetCpuUtilization: 70,
+    },
   },
-  'appointment-service': {
-    name: 'appointment-service',
+  "appointment-service": {
+    name: "appointment-service",
     port: 3002,
-    healthPath: '/health',
-    dependencies: ['database', 'user-management', 'notification-service'],
+    healthPath: "/health",
+    dependencies: ["database", "user-management", "notification-service"],
     scaling: {
       minInstances: 3,
       maxInstances: 15,
-      targetCpuUtilization: 60
-    }
+      targetCpuUtilization: 60,
+    },
   },
-  'llm-service': {
-    name: 'llm-service',
+  "llm-service": {
+    name: "llm-service",
     port: 3003,
-    healthPath: '/health',
-    dependencies: ['ollama'],
+    healthPath: "/health",
+    dependencies: ["ollama"],
     scaling: {
       minInstances: 1,
       maxInstances: 3,
-      targetCpuUtilization: 80
-    }
+      targetCpuUtilization: 80,
+    },
   },
-  'notification-service': {
-    name: 'notification-service',
+  "notification-service": {
+    name: "notification-service",
     port: 3004,
-    healthPath: '/health',
-    dependencies: ['database', 'email-service'],
+    healthPath: "/health",
+    dependencies: ["database", "email-service"],
     scaling: {
       minInstances: 2,
       maxInstances: 8,
-      targetCpuUtilization: 50
-    }
+      targetCpuUtilization: 50,
+    },
   },
-  'analytics-service': {
-    name: 'analytics-service',
+  "analytics-service": {
+    name: "analytics-service",
     port: 3005,
-    healthPath: '/health',
-    dependencies: ['database', 'appointment-service'],
+    healthPath: "/health",
+    dependencies: ["database", "appointment-service"],
     scaling: {
       minInstances: 1,
       maxInstances: 5,
-      targetCpuUtilization: 65
-    }
-  }
+      targetCpuUtilization: 65,
+    },
+  },
 };
 
 // Service Mesh Factory
@@ -468,21 +488,21 @@ export class ServiceMeshFactory {
 
     // Configure circuit breakers for AgentCare services
     const circuitBreakerRegistry = CircuitBreakerRegistry.getInstance();
-    
-    Object.keys(AGENTCARE_SERVICES).forEach(serviceName => {
+
+    Object.keys(AGENTCARE_SERVICES).forEach((serviceName) => {
       circuitBreakerRegistry.createBreaker(serviceName, {
         failureThreshold: 5,
         successThreshold: 3,
         timeout: 30000,
         monitoringPeriod: 60000,
-        expectedErrors: ['TimeoutError', 'NetworkError']
+        expectedErrors: ["TimeoutError", "NetworkError"],
       });
     });
 
     return {
       serviceRegistry,
       gateway,
-      middleware
+      middleware,
     };
   }
 }
@@ -496,7 +516,7 @@ export class HealthCheckAggregator {
   }
 
   async getOverallHealth(): Promise<{
-    status: 'healthy' | 'degraded' | 'unhealthy';
+    status: "healthy" | "degraded" | "unhealthy";
     services: Array<{
       name: string;
       status: string;
@@ -508,46 +528,54 @@ export class HealthCheckAggregator {
     const serviceGroups = new Map<string, ServiceInstance[]>();
 
     // Group services by name
-    allServices.forEach(service => {
+    allServices.forEach((service) => {
       if (!serviceGroups.has(service.name)) {
         serviceGroups.set(service.name, []);
       }
       serviceGroups.get(service.name)!.push(service);
     });
 
-    const serviceHealths = Array.from(serviceGroups.entries()).map(([name, instances]) => {
-      const healthyInstances = instances.filter(instance => instance.status === 'healthy').length;
-      const totalInstances = instances.length;
-      
-      let status = 'healthy';
-      if (healthyInstances === 0) {
-        status = 'unhealthy';
-      } else if (healthyInstances < totalInstances) {
-        status = 'degraded';
-      }
+    const serviceHealths = Array.from(serviceGroups.entries()).map(
+      ([name, instances]) => {
+        const healthyInstances = instances.filter(
+          (instance) => instance.status === "healthy",
+        ).length;
+        const totalInstances = instances.length;
 
-      return {
-        name,
-        status,
-        instances: totalInstances,
-        healthyInstances
-      };
-    });
+        let status = "healthy";
+        if (healthyInstances === 0) {
+          status = "unhealthy";
+        } else if (healthyInstances < totalInstances) {
+          status = "degraded";
+        }
+
+        return {
+          name,
+          status,
+          instances: totalInstances,
+          healthyInstances,
+        };
+      },
+    );
 
     // Determine overall status
-    const unhealthyServices = serviceHealths.filter(s => s.status === 'unhealthy').length;
-    const degradedServices = serviceHealths.filter(s => s.status === 'degraded').length;
+    const unhealthyServices = serviceHealths.filter(
+      (s) => s.status === "unhealthy",
+    ).length;
+    const degradedServices = serviceHealths.filter(
+      (s) => s.status === "degraded",
+    ).length;
 
-    let overallStatus: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
+    let overallStatus: "healthy" | "degraded" | "unhealthy" = "healthy";
     if (unhealthyServices > 0) {
-      overallStatus = 'unhealthy';
+      overallStatus = "unhealthy";
     } else if (degradedServices > 0) {
-      overallStatus = 'degraded';
+      overallStatus = "degraded";
     }
 
     return {
       status: overallStatus,
-      services: serviceHealths
+      services: serviceHealths,
     };
   }
-} 
+}

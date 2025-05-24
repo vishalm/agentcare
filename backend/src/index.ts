@@ -1,593 +1,633 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
-import { Logger } from './utils/Logger';
-import { MetricsCollector } from './utils/MetricsCollector';
-import { ErrorHandler } from './utils/ErrorHandler';
-import { Config } from './utils/Config';
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import { Logger } from "./utils/Logger";
+import { MetricsCollector } from "./utils/MetricsCollector";
+import { ErrorHandler } from "./utils/ErrorHandler";
+import { Config } from "./utils/Config";
 
 // Services
-import { DoctorService } from './services/DoctorService';
-import { AppointmentService } from './services/AppointmentService';
-import { FAQService } from './services/FAQService';
-import { NotificationService } from './services/NotificationService';
-import { EmailService } from './services/EmailService';
-import { ValidationService } from './services/ValidationService';
-import { OllamaService } from './services/OllamaService';
-import { UserManagementService } from './services/UserManagementService';
-import { RAGService } from './services/RAGService';
+import { DoctorService } from "./services/DoctorService";
+import { AppointmentService } from "./services/AppointmentService";
+import { FAQService } from "./services/FAQService";
+import { NotificationService } from "./services/NotificationService";
+import { EmailService } from "./services/EmailService";
+import { ValidationService } from "./services/ValidationService";
+import { OllamaService } from "./services/OllamaService";
+import { UserManagementService } from "./services/UserManagementService";
+import { RAGService } from "./services/RAGService";
 
 // Agents
-import { SupervisorAgent } from './agents/SupervisorAgent';
-import { AvailabilityAgent } from './agents/AvailabilityAgent';
-import { BookingAgent } from './agents/BookingAgent';
-import { FAQAgent } from './agents/FAQAgent';
+import { SupervisorAgent } from "./agents/SupervisorAgent";
+import { AvailabilityAgent } from "./agents/AvailabilityAgent";
+import { BookingAgent } from "./agents/BookingAgent";
+import { FAQAgent } from "./agents/FAQAgent";
 
 // Tools
-import { AvailabilityTools } from './tools/AvailabilityTools';
-import { BookingTools } from './tools/BookingTools';
-import { FAQTools } from './tools/FAQTools';
+import { AvailabilityTools } from "./tools/AvailabilityTools";
+import { BookingTools } from "./tools/BookingTools";
+import { FAQTools } from "./tools/FAQTools";
 
 /**
  * AgentCare Main Application with Enhanced LLM, UMS, and RAG capabilities
  */
 class AgentCareApplication {
-    private app: express.Application;
-    private logger: Logger;
-    private config: Config;
-    private metrics: MetricsCollector;
-    private errorHandler: ErrorHandler;
+  private app: express.Application;
+  private logger: Logger;
+  private config: Config;
+  private metrics: MetricsCollector;
+  private errorHandler: ErrorHandler;
 
-    // Services
-    private ollamaService: OllamaService;
-    private userService: UserManagementService;
-    private ragService: RAGService;
-    private doctorService: DoctorService;
-    private appointmentService: AppointmentService;
-    private faqService: FAQService;
-    private notificationService: NotificationService;
-    private emailService: EmailService;
-    private validationService: ValidationService;
+  // Services
+  private ollamaService: OllamaService;
+  private userService: UserManagementService;
+  private ragService: RAGService;
+  private doctorService: DoctorService;
+  private appointmentService: AppointmentService;
+  private faqService: FAQService;
+  private notificationService: NotificationService;
+  private emailService: EmailService;
+  private validationService: ValidationService;
 
-    // Agents
-    private supervisorAgent: SupervisorAgent;
-    private availabilityAgent: AvailabilityAgent;
-    private bookingAgent: BookingAgent;
-    private faqAgent: FAQAgent;
+  // Agents
+  private supervisorAgent: SupervisorAgent;
+  private availabilityAgent: AvailabilityAgent;
+  private bookingAgent: BookingAgent;
+  private faqAgent: FAQAgent;
 
-    constructor() {
-        this.app = express();
-        this.initializeCore();
-        this.initializeServices();
-        this.initializeAgents();
-        this.setupMiddleware();
-        this.setupRoutes();
-        this.setupErrorHandling();
+  constructor() {
+    this.app = express();
+    this.initializeCore();
+    this.initializeServices();
+    this.initializeAgents();
+    this.setupMiddleware();
+    this.setupRoutes();
+    this.setupErrorHandling();
+  }
+
+  private initializeCore(): void {
+    this.logger = new Logger();
+    this.config = Config.getInstance();
+    this.metrics = new MetricsCollector(this.logger);
+    this.errorHandler = new ErrorHandler(this.logger, this.metrics);
+
+    this.logger.info("AgentCare application initializing...");
+  }
+
+  private initializeServices(): void {
+    try {
+      // Initialize LLM and core services first
+      this.ollamaService = new OllamaService(this.logger, this.config);
+      this.userService = new UserManagementService(this.logger, this.config);
+      this.ragService = new RAGService(
+        this.logger,
+        this.ollamaService,
+        this.userService,
+      );
+
+      // Initialize traditional services
+      this.doctorService = new DoctorService(this.logger);
+      this.appointmentService = new AppointmentService(this.logger);
+      this.faqService = new FAQService(this.logger);
+      this.emailService = new EmailService(this.logger);
+      this.validationService = new ValidationService(this.logger);
+      this.notificationService = new NotificationService(this.logger);
+
+      this.logger.info("All services initialized successfully");
+    } catch (error) {
+      this.logger.error("Failed to initialize services", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
     }
+  }
 
-    private initializeCore(): void {
-        this.logger = new Logger();
-        this.config = Config.getInstance();
-        this.metrics = new MetricsCollector(this.logger);
-        this.errorHandler = new ErrorHandler(this.logger, this.metrics);
+  private initializeAgents(): void {
+    try {
+      // Create tools first
+      const availabilityTools = new AvailabilityTools(
+        this.logger,
+        this.doctorService,
+        this.appointmentService,
+      );
 
-        this.logger.info('AgentCare application initializing...');
+      const bookingTools = new BookingTools(
+        this.logger,
+        this.emailService,
+        this.appointmentService,
+        this.validationService,
+        this.notificationService,
+      );
+
+      const faqTools = new FAQTools(
+        this.logger,
+        this.doctorService,
+        this.faqService,
+      );
+
+      // Initialize agents with tools
+      this.availabilityAgent = new AvailabilityAgent(
+        this.logger,
+        this.metrics,
+        availabilityTools,
+      );
+
+      this.bookingAgent = new BookingAgent(
+        this.logger,
+        this.metrics,
+        bookingTools,
+      );
+
+      this.faqAgent = new FAQAgent(this.logger, this.metrics, faqTools);
+
+      // Initialize enhanced supervisor agent with all new capabilities
+      this.supervisorAgent = new SupervisorAgent(
+        this.logger,
+        this.metrics,
+        this.ollamaService,
+        this.userService,
+        this.ragService,
+        this.availabilityAgent,
+        this.bookingAgent,
+        this.faqAgent,
+      );
+
+      this.logger.info("All agents initialized successfully");
+    } catch (error) {
+      this.logger.error("Failed to initialize agents", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
     }
+  }
 
-    private initializeServices(): void {
-        try {
-            // Initialize LLM and core services first
-            this.ollamaService = new OllamaService(this.logger, this.config);
-            this.userService = new UserManagementService(this.logger, this.config);
-            this.ragService = new RAGService(this.logger, this.ollamaService, this.userService);
+  private setupMiddleware(): void {
+    // Security middleware
+    this.app.use(
+      helmet({
+        contentSecurityPolicy: {
+          directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"],
+            imgSrc: ["'self'", "data:", "https:"],
+          },
+        },
+      }),
+    );
 
-            // Initialize traditional services
-            this.doctorService = new DoctorService(this.logger);
-            this.appointmentService = new AppointmentService(this.logger);
-            this.faqService = new FAQService(this.logger);
-            this.emailService = new EmailService(this.logger);
-            this.validationService = new ValidationService(this.logger);
-            this.notificationService = new NotificationService(this.logger);
+    // CORS configuration
+    this.app.use(
+      cors({
+        origin: this.config.get("CORS_ORIGIN") || "*",
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true,
+      }),
+    );
 
-            this.logger.info('All services initialized successfully');
-        } catch (error) {
-            this.logger.error('Failed to initialize services', { 
-                error: error instanceof Error ? error.message : String(error) 
-            });
-            throw error;
+    // Rate limiting
+    const limiter = rateLimit({
+      windowMs: parseInt(this.config.get("API_RATE_WINDOW") || "900000"),
+      max: parseInt(this.config.get("API_RATE_LIMIT") || "100"),
+      message: "Too many requests from this IP, please try again later.",
+      standardHeaders: true,
+      legacyHeaders: false,
+    });
+    this.app.use("/api", limiter);
+
+    // Body parsing
+    this.app.use(express.json({ limit: "10mb" }));
+    this.app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+    // Request logging
+    this.app.use((req, res, next) => {
+      this.logger.info("Request received", {
+        method: req.method,
+        url: req.url,
+        ip: req.ip,
+        userAgent: req.get("User-Agent"),
+      });
+      next();
+    });
+  }
+
+  private setupRoutes(): void {
+    // Health check endpoint
+    this.app.get("/health", async (req, res) => {
+      try {
+        const health = await this.supervisorAgent.healthCheck();
+        res.json({
+          status: health.status,
+          timestamp: new Date().toISOString(),
+          version: "2.0.0-alpha",
+          services: health.services,
+          features: {
+            ollama: this.config.get("ENABLE_OLLAMA_LLM") === "true",
+            rag: this.config.get("ENABLE_RAG_SYSTEM") === "true",
+            userManagement:
+              this.config.get("ENABLE_USER_REGISTRATION") === "true",
+            guestBooking: this.config.get("ENABLE_GUEST_BOOKING") === "true",
+          },
+        });
+      } catch (error) {
+        res.status(500).json({
+          status: "error",
+          timestamp: new Date().toISOString(),
+          error: "Health check failed",
+        });
+      }
+    });
+
+    // Authentication endpoints
+    this.app.post("/api/v1/auth/register", async (req, res) => {
+      try {
+        const { email, password, name, phone } = req.body;
+
+        if (!email || !password || !name) {
+          return res.status(400).json({
+            error: "Email, password, and name are required",
+          });
         }
-    }
 
-    private initializeAgents(): void {
-        try {
-            // Create tools first
-            const availabilityTools = new AvailabilityTools(
-                this.logger,
-                this.doctorService,
-                this.appointmentService
-            );
+        const result = await this.userService.registerUser(
+          email,
+          password,
+          name,
+          phone,
+        );
 
-            const bookingTools = new BookingTools(
-                this.logger,
-                this.emailService,
-                this.appointmentService,
-                this.validationService,
-                this.notificationService
-            );
+        res.status(201).json({
+          message: "User registered successfully",
+          user: result.user,
+          token: result.token,
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        this.logger.error("Registration error", {
+          error: error instanceof Error ? error.message : String(error),
+        });
+        res.status(400).json({
+          error: error instanceof Error ? error.message : "Registration failed",
+          timestamp: new Date().toISOString(),
+        });
+      }
+    });
 
-            const faqTools = new FAQTools(
-                this.logger,
-                this.doctorService,
-                this.faqService
-            );
+    this.app.post("/api/v1/auth/login", async (req, res) => {
+      try {
+        const { email, password } = req.body;
 
-            // Initialize agents with tools
-            this.availabilityAgent = new AvailabilityAgent(
-                this.logger,
-                this.metrics,
-                availabilityTools
-            );
-
-            this.bookingAgent = new BookingAgent(
-                this.logger,
-                this.metrics,
-                bookingTools
-            );
-
-            this.faqAgent = new FAQAgent(
-                this.logger,
-                this.metrics,
-                faqTools
-            );
-
-            // Initialize enhanced supervisor agent with all new capabilities
-            this.supervisorAgent = new SupervisorAgent(
-                this.logger,
-                this.metrics,
-                this.ollamaService,
-                this.userService,
-                this.ragService,
-                this.availabilityAgent,
-                this.bookingAgent,
-                this.faqAgent
-            );
-
-            this.logger.info('All agents initialized successfully');
-        } catch (error) {
-            this.logger.error('Failed to initialize agents', { 
-                error: error instanceof Error ? error.message : String(error) 
-            });
-            throw error;
+        if (!email || !password) {
+          return res.status(400).json({
+            error: "Email and password are required",
+          });
         }
-    }
 
-    private setupMiddleware(): void {
-        // Security middleware
-        this.app.use(helmet({
-            contentSecurityPolicy: {
-                directives: {
-                    defaultSrc: ["'self'"],
-                    styleSrc: ["'self'", "'unsafe-inline'"],
-                    scriptSrc: ["'self'"],
-                    imgSrc: ["'self'", 'data:', 'https:'],
-                },
-            },
-        }));
+        const result = await this.userService.authenticateUser(email, password);
 
-        // CORS configuration
-        this.app.use(cors({
-            origin: this.config.get('CORS_ORIGIN') || '*',
-            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-            allowedHeaders: ['Content-Type', 'Authorization'],
-            credentials: true
-        }));
-
-        // Rate limiting
-        const limiter = rateLimit({
-            windowMs: parseInt(this.config.get('API_RATE_WINDOW') || '900000'),
-            max: parseInt(this.config.get('API_RATE_LIMIT') || '100'),
-            message: 'Too many requests from this IP, please try again later.',
-            standardHeaders: true,
-            legacyHeaders: false,
+        res.json({
+          message: "Login successful",
+          user: result.user,
+          token: result.token,
+          timestamp: new Date().toISOString(),
         });
-        this.app.use('/api', limiter);
-
-        // Body parsing
-        this.app.use(express.json({ limit: '10mb' }));
-        this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-        // Request logging
-        this.app.use((req, res, next) => {
-            this.logger.info('Request received', {
-                method: req.method,
-                url: req.url,
-                ip: req.ip,
-                userAgent: req.get('User-Agent')
-            });
-            next();
+      } catch (error) {
+        this.logger.error("Login error", {
+          error: error instanceof Error ? error.message : String(error),
         });
-    }
-
-    private setupRoutes(): void {
-        // Health check endpoint
-        this.app.get('/health', async (req, res) => {
-            try {
-                const health = await this.supervisorAgent.healthCheck();
-                res.json({
-                    status: health.status,
-                    timestamp: new Date().toISOString(),
-                    version: '2.0.0-alpha',
-                    services: health.services,
-                    features: {
-                        ollama: this.config.get('ENABLE_OLLAMA_LLM') === 'true',
-                        rag: this.config.get('ENABLE_RAG_SYSTEM') === 'true',
-                        userManagement: this.config.get('ENABLE_USER_REGISTRATION') === 'true',
-                        guestBooking: this.config.get('ENABLE_GUEST_BOOKING') === 'true'
-                    }
-                });
-            } catch (error) {
-                res.status(500).json({
-                    status: 'error',
-                    timestamp: new Date().toISOString(),
-                    error: 'Health check failed'
-                });
-            }
+        res.status(401).json({
+          error: "Invalid credentials",
+          timestamp: new Date().toISOString(),
         });
+      }
+    });
 
-        // Authentication endpoints
-        this.app.post('/api/v1/auth/register', async (req, res) => {
-            try {
-                const { email, password, name, phone } = req.body;
+    this.app.post("/api/v1/auth/logout", async (req, res) => {
+      try {
+        const token = req.headers.authorization?.replace("Bearer ", "");
 
-                if (!email || !password || !name) {
-                    return res.status(400).json({
-                        error: 'Email, password, and name are required'
-                    });
-                }
-
-                const result = await this.userService.registerUser(email, password, name, phone);
-                
-                res.status(201).json({
-                    message: 'User registered successfully',
-                    user: result.user,
-                    token: result.token,
-                    timestamp: new Date().toISOString()
-                });
-
-            } catch (error) {
-                this.logger.error('Registration error', { 
-                    error: error instanceof Error ? error.message : String(error) 
-                });
-                res.status(400).json({
-                    error: error instanceof Error ? error.message : 'Registration failed',
-                    timestamp: new Date().toISOString()
-                });
-            }
-        });
-
-        this.app.post('/api/v1/auth/login', async (req, res) => {
-            try {
-                const { email, password } = req.body;
-
-                if (!email || !password) {
-                    return res.status(400).json({
-                        error: 'Email and password are required'
-                    });
-                }
-
-                const result = await this.userService.authenticateUser(email, password);
-                
-                res.json({
-                    message: 'Login successful',
-                    user: result.user,
-                    token: result.token,
-                    timestamp: new Date().toISOString()
-                });
-
-            } catch (error) {
-                this.logger.error('Login error', { 
-                    error: error instanceof Error ? error.message : String(error) 
-                });
-                res.status(401).json({
-                    error: 'Invalid credentials',
-                    timestamp: new Date().toISOString()
-                });
-            }
-        });
-
-        this.app.post('/api/v1/auth/logout', async (req, res) => {
-            try {
-                const token = req.headers.authorization?.replace('Bearer ', '');
-                
-                if (token) {
-                    const { session } = await this.userService.validateToken(token);
-                    await this.userService.logout(session.sessionId);
-                }
-
-                res.json({
-                    message: 'Logout successful',
-                    timestamp: new Date().toISOString()
-                });
-
-            } catch (error) {
-                res.json({
-                    message: 'Logout completed',
-                    timestamp: new Date().toISOString()
-                });
-            }
-        });
-
-        // Enhanced agent processing endpoint
-        this.app.post('/api/v1/agents/process', async (req, res) => {
-            try {
-                const { message } = req.body;
-                const token = req.headers.authorization?.replace('Bearer ', '');
-
-                if (!message || typeof message !== 'string' || message.trim().length === 0) {
-                    return res.status(400).json({
-                        error: 'Message is required and must be a non-empty string',
-                        timestamp: new Date().toISOString()
-                    });
-                }
-
-                // Process with enhanced supervisor agent
-                const response = await this.supervisorAgent.process(message, token ? { token } : undefined);
-
-                this.metrics.incrementCounter('api_agent_requests');
-
-                res.json({
-                    response,
-                    timestamp: new Date().toISOString(),
-                    authenticated: !!token
-                });
-
-            } catch (error) {
-                this.errorHandler.handleError(error instanceof Error ? error : new Error(String(error)));
-                res.status(500).json({
-                    error: 'Failed to process request',
-                    timestamp: new Date().toISOString()
-                });
-            }
-        });
-
-        // User profile endpoints
-        this.app.get('/api/v1/user/profile', async (req, res) => {
-            try {
-                const token = req.headers.authorization?.replace('Bearer ', '');
-                
-                if (!token) {
-                    return res.status(401).json({ error: 'Authentication required' });
-                }
-
-                const { user } = await this.userService.validateToken(token);
-                
-                res.json({
-                    user,
-                    timestamp: new Date().toISOString()
-                });
-
-            } catch (error) {
-                res.status(401).json({
-                    error: 'Invalid or expired token',
-                    timestamp: new Date().toISOString()
-                });
-            }
-        });
-
-        this.app.put('/api/v1/user/preferences', async (req, res) => {
-            try {
-                const token = req.headers.authorization?.replace('Bearer ', '');
-                
-                if (!token) {
-                    return res.status(401).json({ error: 'Authentication required' });
-                }
-
-                const { user } = await this.userService.validateToken(token);
-                const updatedUser = await this.userService.updateUserPreferences(user.id, req.body);
-                
-                res.json({
-                    user: updatedUser,
-                    message: 'Preferences updated successfully',
-                    timestamp: new Date().toISOString()
-                });
-
-            } catch (error) {
-                res.status(400).json({
-                    error: error instanceof Error ? error.message : 'Failed to update preferences',
-                    timestamp: new Date().toISOString()
-                });
-            }
-        });
-
-        // Conversation management
-        this.app.post('/api/v1/conversation/reset', async (req, res) => {
-            try {
-                const token = req.headers.authorization?.replace('Bearer ', '');
-                
-                if (!token) {
-                    return res.status(401).json({ error: 'Authentication required' });
-                }
-
-                const { user, session } = await this.userService.validateToken(token);
-                await this.supervisorAgent.resetConversation(user.id, session.sessionId);
-                
-                res.json({
-                    message: 'Conversation reset successfully',
-                    timestamp: new Date().toISOString()
-                });
-
-            } catch (error) {
-                res.status(400).json({
-                    error: error instanceof Error ? error.message : 'Failed to reset conversation',
-                    timestamp: new Date().toISOString()
-                });
-            }
-        });
-
-        // Agent status endpoint
-        this.app.get('/api/v1/agents/status', async (req, res) => {
-            try {
-                const health = await this.supervisorAgent.healthCheck();
-                
-                res.json({
-                    supervisor: {
-                        active: this.supervisorAgent.isAgentActive(),
-                        status: health.status
-                    },
-                    services: health.services,
-                    metrics: this.metrics.exportMetrics(),
-                    timestamp: new Date().toISOString()
-                });
-            } catch (error) {
-                res.status(500).json({
-                    error: 'Failed to get agent status',
-                    timestamp: new Date().toISOString()
-                });
-            }
-        });
-
-        // Metrics endpoint
-        this.app.get('/api/v1/metrics', (req, res) => {
-            try {
-                res.json({
-                    metrics: this.metrics.exportMetrics(),
-                    timestamp: new Date().toISOString()
-                });
-            } catch (error) {
-                res.status(500).json({
-                    error: 'Failed to export metrics',
-                    timestamp: new Date().toISOString()
-                });
-            }
-        });
-
-        // Ollama service endpoints
-        this.app.get('/api/v1/ollama/status', async (req, res) => {
-            try {
-                const isHealthy = await this.ollamaService.healthCheck();
-                res.json({
-                    status: isHealthy ? 'healthy' : 'unhealthy',
-                    model: this.config.get('OLLAMA_MODEL'),
-                    timestamp: new Date().toISOString()
-                });
-            } catch (error) {
-                res.status(500).json({
-                    status: 'error',
-                    error: error instanceof Error ? error.message : 'Ollama status check failed',
-                    timestamp: new Date().toISOString()
-                });
-            }
-        });
-
-        // Serve static files
-        this.app.use(express.static('frontend/public'));
-
-        // Fallback for SPA routing
-        this.app.get('*', (req, res) => {
-            if (req.path.startsWith('/api/')) {
-                res.status(404).json({
-                    error: 'API endpoint not found',
-                    timestamp: new Date().toISOString()
-                });
-            } else {
-                res.sendFile('index.html', { root: 'frontend/public' });
-            }
-        });
-    }
-
-    private setupErrorHandling(): void {
-        // 404 handler for API routes
-        this.app.use('/api/*', (req, res) => {
-            res.status(404).json({
-                error: 'API endpoint not found',
-                timestamp: new Date().toISOString()
-            });
-        });
-
-        // Global error handler
-        this.app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-            this.errorHandler.handleError(error instanceof Error ? error : new Error(String(error)));
-            
-            res.status(error.status || 500).json({
-                error: (error instanceof Error ? error.message : String(error)) || 'Internal server error',
-                timestamp: new Date().toISOString()
-            });
-        });
-
-        // Graceful shutdown
-        process.on('SIGTERM', () => this.gracefulShutdown());
-        process.on('SIGINT', () => this.gracefulShutdown());
-    }
-
-    private async gracefulShutdown(): Promise<void> {
-        this.logger.info('Graceful shutdown initiated...');
-        
-        try {
-            // Cleanup sessions
-            await this.userService.cleanupExpiredSessions();
-            
-            this.logger.info('Graceful shutdown completed');
-            process.exit(0);
-        } catch (error) {
-            this.logger.error('Error during graceful shutdown', { 
-                error: error instanceof Error ? error.message : String(error) 
-            });
-            process.exit(1);
+        if (token) {
+          const { session } = await this.userService.validateToken(token);
+          await this.userService.logout(session.sessionId);
         }
+
+        res.json({
+          message: "Logout successful",
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        res.json({
+          message: "Logout completed",
+          timestamp: new Date().toISOString(),
+        });
+      }
+    });
+
+    // Enhanced agent processing endpoint
+    this.app.post("/api/v1/agents/process", async (req, res) => {
+      try {
+        const { message } = req.body;
+        const token = req.headers.authorization?.replace("Bearer ", "");
+
+        if (
+          !message ||
+          typeof message !== "string" ||
+          message.trim().length === 0
+        ) {
+          return res.status(400).json({
+            error: "Message is required and must be a non-empty string",
+            timestamp: new Date().toISOString(),
+          });
+        }
+
+        // Process with enhanced supervisor agent
+        const response = await this.supervisorAgent.process(
+          message,
+          token ? { token } : undefined,
+        );
+
+        this.metrics.incrementCounter("api_agent_requests");
+
+        res.json({
+          response,
+          timestamp: new Date().toISOString(),
+          authenticated: !!token,
+        });
+      } catch (error) {
+        this.errorHandler.handleError(
+          error instanceof Error ? error : new Error(String(error)),
+        );
+        res.status(500).json({
+          error: "Failed to process request",
+          timestamp: new Date().toISOString(),
+        });
+      }
+    });
+
+    // User profile endpoints
+    this.app.get("/api/v1/user/profile", async (req, res) => {
+      try {
+        const token = req.headers.authorization?.replace("Bearer ", "");
+
+        if (!token) {
+          return res.status(401).json({ error: "Authentication required" });
+        }
+
+        const { user } = await this.userService.validateToken(token);
+
+        res.json({
+          user,
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        res.status(401).json({
+          error: "Invalid or expired token",
+          timestamp: new Date().toISOString(),
+        });
+      }
+    });
+
+    this.app.put("/api/v1/user/preferences", async (req, res) => {
+      try {
+        const token = req.headers.authorization?.replace("Bearer ", "");
+
+        if (!token) {
+          return res.status(401).json({ error: "Authentication required" });
+        }
+
+        const { user } = await this.userService.validateToken(token);
+        const updatedUser = await this.userService.updateUserPreferences(
+          user.id,
+          req.body,
+        );
+
+        res.json({
+          user: updatedUser,
+          message: "Preferences updated successfully",
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        res.status(400).json({
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to update preferences",
+          timestamp: new Date().toISOString(),
+        });
+      }
+    });
+
+    // Conversation management
+    this.app.post("/api/v1/conversation/reset", async (req, res) => {
+      try {
+        const token = req.headers.authorization?.replace("Bearer ", "");
+
+        if (!token) {
+          return res.status(401).json({ error: "Authentication required" });
+        }
+
+        const { user, session } = await this.userService.validateToken(token);
+        await this.supervisorAgent.resetConversation(
+          user.id,
+          session.sessionId,
+        );
+
+        res.json({
+          message: "Conversation reset successfully",
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        res.status(400).json({
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to reset conversation",
+          timestamp: new Date().toISOString(),
+        });
+      }
+    });
+
+    // Agent status endpoint
+    this.app.get("/api/v1/agents/status", async (req, res) => {
+      try {
+        const health = await this.supervisorAgent.healthCheck();
+
+        res.json({
+          supervisor: {
+            active: this.supervisorAgent.isAgentActive(),
+            status: health.status,
+          },
+          services: health.services,
+          metrics: this.metrics.exportMetrics(),
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        res.status(500).json({
+          error: "Failed to get agent status",
+          timestamp: new Date().toISOString(),
+        });
+      }
+    });
+
+    // Metrics endpoint
+    this.app.get("/api/v1/metrics", (req, res) => {
+      try {
+        res.json({
+          metrics: this.metrics.exportMetrics(),
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        res.status(500).json({
+          error: "Failed to export metrics",
+          timestamp: new Date().toISOString(),
+        });
+      }
+    });
+
+    // Ollama service endpoints
+    this.app.get("/api/v1/ollama/status", async (req, res) => {
+      try {
+        const isHealthy = await this.ollamaService.healthCheck();
+        res.json({
+          status: isHealthy ? "healthy" : "unhealthy",
+          model: this.config.get("OLLAMA_MODEL"),
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        res.status(500).json({
+          status: "error",
+          error:
+            error instanceof Error
+              ? error.message
+              : "Ollama status check failed",
+          timestamp: new Date().toISOString(),
+        });
+      }
+    });
+
+    // Serve static files
+    this.app.use(express.static("frontend/public"));
+
+    // Fallback for SPA routing
+    this.app.get("*", (req, res) => {
+      if (req.path.startsWith("/api/")) {
+        res.status(404).json({
+          error: "API endpoint not found",
+          timestamp: new Date().toISOString(),
+        });
+      } else {
+        res.sendFile("index.html", { root: "frontend/public" });
+      }
+    });
+  }
+
+  private setupErrorHandling(): void {
+    // 404 handler for API routes
+    this.app.use("/api/*", (req, res) => {
+      res.status(404).json({
+        error: "API endpoint not found",
+        timestamp: new Date().toISOString(),
+      });
+    });
+
+    // Global error handler
+    this.app.use(
+      (
+        error: any,
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction,
+      ) => {
+        this.errorHandler.handleError(
+          error instanceof Error ? error : new Error(String(error)),
+        );
+
+        res.status(error.status || 500).json({
+          error:
+            (error instanceof Error ? error.message : String(error)) ||
+            "Internal server error",
+          timestamp: new Date().toISOString(),
+        });
+      },
+    );
+
+    // Graceful shutdown
+    process.on("SIGTERM", () => this.gracefulShutdown());
+    process.on("SIGINT", () => this.gracefulShutdown());
+  }
+
+  private async gracefulShutdown(): Promise<void> {
+    this.logger.info("Graceful shutdown initiated...");
+
+    try {
+      // Cleanup sessions
+      await this.userService.cleanupExpiredSessions();
+
+      this.logger.info("Graceful shutdown completed");
+      process.exit(0);
+    } catch (error) {
+      this.logger.error("Error during graceful shutdown", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      process.exit(1);
     }
+  }
 
-    public async start(): Promise<void> {
-        try {
-            const port = this.config.get('API_PORT') || 3000;
+  public async start(): Promise<void> {
+    try {
+      const port = this.config.get("API_PORT") || 3000;
 
-            // Check Ollama connection
-            if (this.config.get('ENABLE_OLLAMA_LLM') === 'true') {
-                const ollamaHealthy = await this.ollamaService.healthCheck();
-                if (!ollamaHealthy) {
-                    this.logger.warn('Ollama service is not available. Some features may be limited.');
-                } else {
-                    this.logger.info('Ollama service connected successfully');
-                }
-            }
+      // Check Ollama connection
+      if (this.config.get("ENABLE_OLLAMA_LLM") === "true") {
+        const ollamaHealthy = await this.ollamaService.healthCheck();
+        if (!ollamaHealthy) {
+          this.logger.warn(
+            "Ollama service is not available. Some features may be limited.",
+          );
+        } else {
+          this.logger.info("Ollama service connected successfully");
+        }
+      }
 
-            this.app.listen(port, () => {
-                this.logger.info('🚀 AgentCare server started successfully', {
-                    port,
-                    environment: this.config.get('NODE_ENV'),
-                    features: {
-                        ollama: this.config.get('ENABLE_OLLAMA_LLM') === 'true',
-                        rag: this.config.get('ENABLE_RAG_SYSTEM') === 'true',
-                        userManagement: this.config.get('ENABLE_USER_REGISTRATION') === 'true'
-                    }
-                });
+      this.app.listen(port, () => {
+        this.logger.info("🚀 AgentCare server started successfully", {
+          port,
+          environment: this.config.get("NODE_ENV"),
+          features: {
+            ollama: this.config.get("ENABLE_OLLAMA_LLM") === "true",
+            rag: this.config.get("ENABLE_RAG_SYSTEM") === "true",
+            userManagement:
+              this.config.get("ENABLE_USER_REGISTRATION") === "true",
+          },
+        });
 
-                console.log(`
+        console.log(`
 🏥 AgentCare - Enhanced Multi-Agent Healthcare Scheduling System
 
 🌐 Server: http://localhost:${port}
 📚 API Docs: http://localhost:${port}/api/v1
 🔒 Authentication: JWT-based user management
-🤖 LLM: Ollama with ${this.config.get('OLLAMA_MODEL')}
+🤖 LLM: Ollama with ${this.config.get("OLLAMA_MODEL")}
 🧠 RAG: Vector-based conversation memory
 💬 Features: ChatGPT-like conversation experience
 
-Environment: ${this.config.get('NODE_ENV')}
+Environment: ${this.config.get("NODE_ENV")}
                 `);
-            });
-
-        } catch (error) {
-            this.logger.error('Failed to start server', { 
-                error: error instanceof Error ? error.message : String(error) 
-            });
-            process.exit(1);
-        }
+      });
+    } catch (error) {
+      this.logger.error("Failed to start server", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      process.exit(1);
     }
+  }
 }
 
 // Start the application
 const app = new AgentCareApplication();
-app.start().catch(error => {
-    console.error('Failed to start AgentCare application:', error);
-    process.exit(1);
-}); 
+app.start().catch((error) => {
+  console.error("Failed to start AgentCare application:", error);
+  process.exit(1);
+});

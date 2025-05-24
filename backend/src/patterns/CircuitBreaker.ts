@@ -4,17 +4,17 @@
  */
 
 export enum CircuitState {
-  CLOSED = 'CLOSED',
-  OPEN = 'OPEN',
-  HALF_OPEN = 'HALF_OPEN'
+  CLOSED = "CLOSED",
+  OPEN = "OPEN",
+  HALF_OPEN = "HALF_OPEN",
 }
 
 export interface CircuitBreakerConfig {
-  failureThreshold: number;      // Number of failures to trigger open state
-  successThreshold: number;      // Number of successes to close circuit
-  timeout: number;              // Time to wait before trying again (ms)
-  monitoringPeriod: number;     // Time window for failure counting (ms)
-  expectedErrors?: string[];    // Expected error types that don't count as failures
+  failureThreshold: number; // Number of failures to trigger open state
+  successThreshold: number; // Number of successes to close circuit
+  timeout: number; // Time to wait before trying again (ms)
+  monitoringPeriod: number; // Time window for failure counting (ms)
+  expectedErrors?: string[]; // Expected error types that don't count as failures
 }
 
 export interface CircuitBreakerMetrics {
@@ -41,7 +41,7 @@ export class CircuitBreaker {
 
   constructor(
     private name: string,
-    private config: CircuitBreakerConfig
+    private config: CircuitBreakerConfig,
   ) {}
 
   /**
@@ -52,7 +52,9 @@ export class CircuitBreaker {
 
     if (this.state === CircuitState.OPEN) {
       if (Date.now() < this.nextAttempt) {
-        throw new Error(`Circuit breaker '${this.name}' is OPEN. Try again later.`);
+        throw new Error(
+          `Circuit breaker '${this.name}' is OPEN. Try again later.`,
+        );
       }
       // Move to half-open state
       this.state = CircuitState.HALF_OPEN;
@@ -74,7 +76,7 @@ export class CircuitBreaker {
    */
   async executeWithFallback<T>(
     operation: () => Promise<T>,
-    fallback: () => Promise<T>
+    fallback: () => Promise<T>,
   ): Promise<T> {
     try {
       return await this.execute(operation);
@@ -123,12 +125,14 @@ export class CircuitBreaker {
 
   private isExpectedError(error: any): boolean {
     if (!this.config.expectedErrors) return false;
-    
+
     const errorType = error.constructor.name;
-    const errorMessage = error.message || '';
-    
-    return this.config.expectedErrors.some(expectedError => 
-      errorType.includes(expectedError) || errorMessage.includes(expectedError)
+    const errorMessage = error.message || "";
+
+    return this.config.expectedErrors.some(
+      (expectedError) =>
+        errorType.includes(expectedError) ||
+        errorMessage.includes(expectedError),
     );
   }
 
@@ -144,7 +148,7 @@ export class CircuitBreaker {
       lastSuccessTime: this.lastSuccessTime,
       totalCalls: this.totalCalls,
       totalFailures: this.totalFailures,
-      totalSuccesses: this.totalSuccesses
+      totalSuccesses: this.totalSuccesses,
     };
   }
 
@@ -204,7 +208,7 @@ export class CircuitBreakerRegistry {
   }
 
   resetAll(): void {
-    this.breakers.forEach(breaker => breaker.reset());
+    this.breakers.forEach((breaker) => breaker.reset());
   }
 }
 
@@ -213,40 +217,40 @@ export const createAgentCareCircuitBreakers = () => {
   const registry = CircuitBreakerRegistry.getInstance();
 
   // Ollama LLM Service Circuit Breaker
-  registry.createBreaker('ollama-llm', {
+  registry.createBreaker("ollama-llm", {
     failureThreshold: 3,
     successThreshold: 2,
     timeout: 30000, // 30 seconds
     monitoringPeriod: 60000, // 1 minute
-    expectedErrors: ['NetworkError', 'TimeoutError']
+    expectedErrors: ["NetworkError", "TimeoutError"],
   });
 
   // Database Circuit Breaker
-  registry.createBreaker('database', {
+  registry.createBreaker("database", {
     failureThreshold: 5,
     successThreshold: 3,
     timeout: 15000, // 15 seconds
     monitoringPeriod: 30000, // 30 seconds
-    expectedErrors: ['ConnectionTimeoutError']
+    expectedErrors: ["ConnectionTimeoutError"],
   });
 
   // External API Circuit Breaker
-  registry.createBreaker('external-api', {
+  registry.createBreaker("external-api", {
     failureThreshold: 4,
     successThreshold: 2,
     timeout: 20000, // 20 seconds
     monitoringPeriod: 45000, // 45 seconds
-    expectedErrors: ['HTTPError']
+    expectedErrors: ["HTTPError"],
   });
 
   // Email Service Circuit Breaker
-  registry.createBreaker('email-service', {
+  registry.createBreaker("email-service", {
     failureThreshold: 3,
     successThreshold: 2,
     timeout: 10000, // 10 seconds
     monitoringPeriod: 60000, // 1 minute
-    expectedErrors: ['SMTPError']
+    expectedErrors: ["SMTPError"],
   });
 
   return registry;
-}; 
+};
