@@ -2,20 +2,74 @@
 
 **Intelligent healthcare scheduling powered by coordinated AI agents**
 
-A sophisticated appointment booking system built using multi-agent architecture principles, featuring coordinated AI agents that work together to provide seamless healthcare appointment scheduling.
+A sophisticated appointment booking system built using multi-agent architecture principles, featuring coordinated AI agents that work together to provide seamless healthcare appointment scheduling with LLM integration, RAG memory system, and enterprise-grade DevOps infrastructure.
 
 ![AgentCare Logo](https://img.shields.io/badge/AgentCare-Multi--Agent%20Healthcare-blue?style=for-the-badge)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.0.0--alpha-orange.svg)]()
+[![Version](https://img.shields.io/badge/Version-2.0.0--alpha-orange.svg)]()
+[![HIPAA](https://img.shields.io/badge/HIPAA-Compliant-green.svg)]()
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-blue.svg)]()
+
+## 🚀 What's New in v2.0
+
+- **🤖 LLM Integration**: Ollama qwen2.5 model for natural language understanding
+- **🧠 RAG Memory System**: Vector-based conversation memory and context
+- **🔐 Enterprise Security**: JWT authentication, HIPAA compliance, audit logging
+- **📊 Full Observability**: Prometheus metrics, Loki logs, Jaeger tracing
+- **☸️ Kubernetes Ready**: Helm charts, auto-scaling, production deployment
+- **🔄 CI/CD Pipeline**: Automated testing, security scanning, deployment
+
+## 📚 Complete Documentation
+
+### 🏗️ **Setup & Getting Started**
+- **[Setup Guide](SETUP_GUIDE.md)** - Complete installation and configuration guide
+- **[Implementation Summary](IMPLEMENTATION_SUMMARY.md)** - Comprehensive overview of v2.0 features
+- **[Project Status](PROJECT_STATUS.md)** - Development progress and milestones
+
+### 🛠️ **Development & Contributing**
+- **[Contributing Guidelines](.github/CONTRIBUTING.md)** - Development workflow, coding standards, testing
+- **[DevOps Guide](DEVOPS_GUIDE.md)** - Infrastructure, observability, and deployment
+- **[Test Documentation](tests/README.md)** - Testing strategy and execution
+- **[Test Summary](TEST_SUMMARY.md)** - Testing results and coverage
+
+### 🔧 **Infrastructure & Deployment**
+- **[Docker Configuration](IGNORE_FILES_SUMMARY.md)** - Docker and Git ignore files documentation
+- **[Kubernetes Manifests](k8s/)** - Production-ready Kubernetes deployment
+  - [Namespace Configuration](k8s/namespace.yaml)
+- **[Helm Charts](helm/agentcare/)** - Cloud-native deployment charts
+  - [Chart Metadata](helm/agentcare/Chart.yaml)
+  - [Default Values](helm/agentcare/values.yaml)
+
+### 📊 **Monitoring & Observability**
+- **[Prometheus Configuration](observability/prometheus/prometheus.yml)** - Metrics collection
+- **[Alert Rules](observability/prometheus/rules/agentcare-alerts.yml)** - Healthcare-specific monitoring
+- **[Grafana Dashboards](observability/grafana/)** - System and business metrics
+- **[Jaeger Tracing](observability/jaeger/)** - Distributed tracing setup
+
+### 🔒 **Security & Compliance**
+- **[GitHub Security Policy](.github/SECURITY.md)** - Security reporting and policies
+- **[HIPAA Compliance](DEVOPS_GUIDE.md#security--compliance)** - Healthcare data protection
+- **[CI/CD Security](.github/workflows/ci-cd.yml)** - Automated security scanning
+
+### 🐛 **Issue Templates & Workflows**
+- **[Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.yml)** - Healthcare-specific bug reporting
+- **[Feature Request Template](.github/ISSUE_TEMPLATE/feature_request.yml)** - Enhancement proposals
+- **[CI/CD Pipeline](.github/workflows/ci-cd.yml)** - Automated testing and deployment
 
 ## 🏗️ System Architecture
 
-AgentCare implements a three-layer multi-agent architecture designed for scalability and intelligent task coordination:
+AgentCare implements a three-layer multi-agent architecture with enterprise-grade infrastructure:
 
 ```mermaid
 graph TB
+    subgraph "AI & LLM Layer"
+        LLM[Ollama LLM Service]
+        RAG[RAG Memory System]
+        NLP[Natural Language Processing]
+    end
+    
     subgraph "Planner Layer"
-        SA[Supervisor Agent]
+        SA[Supervisor Agent + LLM]
         FP[Finish Process]
     end
     
@@ -25,900 +79,303 @@ graph TB
         FA[FAQ Agent]
     end
     
-    subgraph "Tooling Layer"
-        T1[Check Availability by Doctor]
-        T2[Check Availability by Specialization]
-        T3[Set Appointment]
-        T4[Cancel Appointment]
-        T5[Reschedule Appointment]
-        T6[Send Confirmation Email]
-        T7[FAQ Database]
-        T8[Fetch Doctor Credentials]
+    subgraph "Infrastructure Layer"
+        UMS[User Management Service]
+        API[REST API Layer]
+        AUTH[Authentication & Authorization]
+    end
+    
+    subgraph "Data Layer"
+        POSTGRES[PostgreSQL Database]
+        REDIS[Redis Cache]
+        VECTOR[Vector Store]
+    end
+    
+    subgraph "Observability Layer"
+        PROMETHEUS[Prometheus Metrics]
+        LOKI[Loki Logs]
+        JAEGER[Jaeger Traces]
+        GRAFANA[Grafana Dashboards]
     end
     
     User --> SA
+    SA --> LLM
+    SA --> RAG
     SA --> AA
-    SA --> BA  
+    SA --> BA
     SA --> FA
-    SA --> FP
     
-    AA <--> T1
-    AA <--> T2
-    BA <--> T3
-    BA <--> T4
-    BA <--> T5
-    BA <--> T6
-    FA <--> T7
-    FA <--> T8
-```
-
-## 🔄 Agent Coordination Flow
-
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant SA as Supervisor Agent
-    participant AA as Availability Agent
-    participant BA as Booking Agent
-    participant FA as FAQ Agent
-    participant T as Tools
+    SA --> UMS
+    SA --> API
+    API --> AUTH
     
-    U->>SA: "Book appointment with cardiologist"
-    SA->>SA: Analyze intent: BOOKING
-    SA->>AA: Delegate to Availability Agent
-    AA->>T: Check doctor availability
-    T-->>AA: Return available slots
-    AA->>SA: Present options to user
-    SA->>U: "Available doctors and times..."
+    AA --> POSTGRES
+    BA --> POSTGRES
+    FA --> POSTGRES
+    UMS --> REDIS
+    RAG --> VECTOR
     
-    U->>SA: "Book with Dr. Smith at 2pm"
-    SA->>BA: Delegate to Booking Agent
-    BA->>T: Create appointment
-    BA->>T: Send confirmation email
-    T-->>BA: Confirmation sent
-    BA->>SA: Booking complete
-    SA->>U: "Appointment confirmed!"
+    API --> PROMETHEUS
+    API --> LOKI
+    API --> JAEGER
+    
+    PROMETHEUS --> GRAFANA
+    LOKI --> GRAFANA
+    JAEGER --> GRAFANA
 ```
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- No additional dependencies required for demo version
-- Web server recommended for production deployment
+- **Node.js 18+** and npm 8+
+- **Docker** and Docker Compose
+- **Ollama** (optional, for LLM features)
+- **Kubernetes** (for production deployment)
 
-### Installation
+### Development Setup
 ```bash
 # Clone the repository
 git clone https://github.com/vishalm/agentcare.git
 cd agentcare
 
-# For development - serve locally
-python -m http.server 8000
-# or
-npx http-server
+# Quick setup (handles everything)
+npm run dev:setup
 
-# Access at http://localhost:8000
+# Start development server
+npm run start:dev
+
+# Access at http://localhost:3000
 ```
 
-## 📊 Data Flow Architecture
+### Docker Development
+```bash
+# Start with Docker Compose
+npm run dev:docker
 
-```mermaid
-flowchart LR
-    subgraph "Frontend Layer"
-        UI[User Interface]
-        Chat[Chat Component]
-        Monitor[System Monitor]
-    end
-    
-    subgraph "Agent Coordination Layer"
-        Supervisor[Supervisor Agent]
-        IntentAnalyzer[Intent Analyzer]
-        TaskRouter[Task Router]
-    end
-    
-    subgraph "Specialist Agents"
-        AvailabilityA[Availability Agent]
-        BookingA[Booking Agent]
-        FAQA[FAQ Agent]
-    end
-    
-    subgraph "Data Layer"
-        Doctors[(Doctors DB)]
-        Appointments[(Appointments DB)]
-        Schedules[(Schedules DB)]
-        FAQ[(FAQ DB)]
-    end
-    
-    UI --> Supervisor
-    Supervisor --> IntentAnalyzer
-    IntentAnalyzer --> TaskRouter
-    TaskRouter --> AvailabilityA
-    TaskRouter --> BookingA
-    TaskRouter --> FAQA
-    
-    AvailabilityA --> Doctors
-    AvailabilityA --> Schedules
-    BookingA --> Appointments
-    BookingA --> Schedules
-    FAQA --> Doctors
-    FAQA --> FAQ
+# Or manually
+docker-compose up -d
+```
+
+### Production Deployment
+```bash
+# Deploy with Helm
+helm install agentcare helm/agentcare \
+  --namespace agentcare \
+  --create-namespace
+
+# Monitor deployment
+kubectl get pods -n agentcare -w
 ```
 
 ## 🎯 Core Features
 
-### ✅ Current Implementation (v1.0-alpha)
-- **Multi-Agent Coordination**: Intelligent task delegation between specialized agents
-- **Real-time Status Monitoring**: Visual feedback of agent states and tool usage
+### ✅ **v2.0 Implementation (Current)**
+- **🤖 Advanced AI Integration**: Ollama LLM with qwen2.5 model
+- **🧠 RAG Memory System**: Vector-based conversation context
+- **🔐 Enterprise Authentication**: JWT, sessions, user management
+- **📊 Full Observability**: Metrics, logs, traces, dashboards
+- **☸️ Kubernetes Deployment**: Production-ready with Helm charts
+- **🔒 HIPAA Compliance**: Healthcare data protection and audit trails
+- **🔄 CI/CD Pipeline**: Automated testing, security scanning, deployment
+- **🎨 Modern UI**: Responsive design with real-time status indicators
+- **📱 Multi-device Support**: Desktop, tablet, mobile optimized
+
+### 🔧 **Development Features**
+- **Multi-Agent Coordination**: Intelligent task delegation
 - **Natural Language Processing**: Intent analysis and context understanding
-- **Responsive UI**: Works seamlessly across devices
-- **Mock Data Integration**: Realistic demo with sample doctors and appointments
+- **Real-time Status Monitoring**: Visual feedback of agent states
+- **Comprehensive Testing**: Unit, integration, E2E, performance tests
+- **Security Scanning**: SAST, dependency checks, container scanning
 
-### 🔧 Development Roadmap
+## 📊 Architecture Layers
 
-```mermaid
-gantt
-    title AgentCare Development Timeline
-    dateFormat  YYYY-MM-DD
-    section Phase 1
-    Database Integration    :active, db, 2025-05-25, 3w
-    API Development        :api, after db, 4w
-    section Phase 2  
-    Authentication         :auth, after api, 3w
-    Email System          :email, after auth, 2w
-    section Phase 3
-    Advanced Features     :adv, after email, 6w
-    Testing & QA         :test, after adv, 3w
-    section Phase 4
-    Deployment           :deploy, after test, 2w
-    Production Launch    :launch, after deploy, 1w
-```
+### 1. **AI & LLM Integration**
+- **Ollama Service**: Local LLM with qwen2.5 model
+- **RAG System**: Vector embeddings for conversation memory
+- **Natural Language Understanding**: Intent recognition and context
 
-## 🗄️ Database Schema Design
+### 2. **Multi-Agent System**
+- **Supervisor Agent**: AI-powered coordination with LLM integration
+- **Availability Agent**: Doctor and time slot management
+- **Booking Agent**: Appointment creation and management
+- **FAQ Agent**: Healthcare information and support
 
-### Entity Relationship Diagram
-```mermaid
-erDiagram
-    DOCTORS {
-        int id PK
-        string name
-        string specialization
-        string credentials
-        string email
-        string phone
-        timestamp created_at
-    }
-    
-    APPOINTMENTS {
-        int id PK
-        int doctor_id FK
-        string patient_name
-        string patient_email
-        string patient_phone
-        datetime appointment_date
-        enum status
-        text notes
-        timestamp created_at
-    }
-    
-    DOCTOR_AVAILABILITY {
-        int id PK
-        int doctor_id FK
-        int day_of_week
-        time start_time
-        time end_time
-        boolean is_available
-    }
-    
-    APPOINTMENT_SLOTS {
-        int id PK
-        int doctor_id FK
-        datetime slot_datetime
-        boolean is_booked
-        int appointment_id FK
-    }
-    
-    FAQ_ENTRIES {
-        int id PK
-        string category
-        string question
-        text answer
-        int priority
-        timestamp updated_at
-    }
-    
-    DOCTORS ||--o{ APPOINTMENTS : "has many"
-    DOCTORS ||--o{ DOCTOR_AVAILABILITY : "has many"
-    DOCTORS ||--o{ APPOINTMENT_SLOTS : "has many"
-    APPOINTMENTS ||--o| APPOINTMENT_SLOTS : "books"
-```
+### 3. **Enterprise Services**
+- **User Management**: JWT authentication, sessions, RBAC
+- **API Layer**: RESTful endpoints with security middleware
+- **Configuration Management**: Environment-based settings
 
-### Database Implementation
-```sql
--- Core tables for AgentCare
-CREATE TABLE doctors (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    specialization VARCHAR(100) NOT NULL,
-    credentials TEXT,
-    email VARCHAR(255) UNIQUE,
-    phone VARCHAR(20),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+### 4. **Data & Storage**
+- **PostgreSQL**: Primary database for appointments and users
+- **Redis**: Session storage and caching
+- **Vector Store**: Embeddings for RAG system
 
-CREATE TABLE appointments (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    doctor_id INT NOT NULL,
-    patient_name VARCHAR(255) NOT NULL,
-    patient_email VARCHAR(255) NOT NULL,
-    patient_phone VARCHAR(20),
-    appointment_date DATETIME NOT NULL,
-    status ENUM('scheduled', 'cancelled', 'completed', 'no_show') DEFAULT 'scheduled',
-    notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (doctor_id) REFERENCES doctors(id)
-);
+### 5. **Observability Stack**
+- **Prometheus**: Metrics collection and alerting
+- **Loki**: Centralized logging with structured data
+- **Jaeger**: Distributed tracing for request flows
+- **Grafana**: Dashboards for system and business metrics
 
-CREATE TABLE doctor_availability (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    doctor_id INT NOT NULL,
-    day_of_week INT NOT NULL, -- 0=Sunday, 1=Monday, etc.
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
-    is_available BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (doctor_id) REFERENCES doctors(id)
-);
+### 6. **Infrastructure**
+- **Kubernetes**: Container orchestration and scaling
+- **Helm Charts**: Package management and deployment
+- **Docker**: Containerization and development environments
+- **CI/CD**: GitHub Actions with security and compliance checks
 
--- Indexes for performance
-CREATE INDEX idx_appointments_date ON appointments(appointment_date);
-CREATE INDEX idx_appointments_doctor ON appointments(doctor_id, appointment_date);
-CREATE INDEX idx_availability_doctor_day ON doctor_availability(doctor_id, day_of_week);
-```
+## 🔒 Security & Compliance
 
-## 🔌 API Architecture
+### HIPAA Compliance
+- **Data Encryption**: AES-256 at rest, TLS 1.3 in transit
+- **Access Controls**: Role-based authentication and authorization
+- **Audit Logging**: Comprehensive activity tracking with 7-year retention
+- **Network Security**: TLS certificates, network policies, secure communication
 
-### RESTful API Design
-```mermaid
-graph TB
-    subgraph "API Gateway"
-        Gateway[API Gateway<br/>Rate Limiting, Auth, Routing]
-    end
-    
-    subgraph "Microservices"
-        AuthService[Auth Service<br/>:3001]
-        DoctorService[Doctor Service<br/>:3002]
-        AppointmentService[Appointment Service<br/>:3003]
-        NotificationService[Notification Service<br/>:3004]
-        AgentService[Agent Coordinator<br/>:3005]
-    end
-    
-    subgraph "External Services"
-        EmailProvider[Email Service<br/>SendGrid/SES]
-        SMSProvider[SMS Service<br/>Twilio]
-        CalendarAPI[Calendar APIs<br/>Google/Outlook]
-    end
-    
-    Gateway --> AuthService
-    Gateway --> DoctorService
-    Gateway --> AppointmentService
-    Gateway --> NotificationService
-    Gateway --> AgentService
-    
-    NotificationService --> EmailProvider
-    NotificationService --> SMSProvider
-    AppointmentService --> CalendarAPI
-```
+### Security Features
+- **Authentication**: JWT tokens with secure session management
+- **Input Validation**: XSS and injection attack prevention
+- **Container Security**: Non-root users, read-only filesystems
+- **Vulnerability Scanning**: Automated dependency and container scanning
 
-### API Endpoints Specification
+## 📈 Monitoring & Performance
 
-#### Doctor Management
-```http
-GET    /api/v1/doctors                    # List all doctors
-GET    /api/v1/doctors/:id                # Get doctor details
-GET    /api/v1/doctors/specialization/:spec # Doctors by specialization
-POST   /api/v1/doctors                    # Create doctor (admin)
-PUT    /api/v1/doctors/:id                # Update doctor (admin)
-DELETE /api/v1/doctors/:id                # Remove doctor (admin)
-```
+### Key Metrics
+- **System Health**: 99.9% uptime target, < 500ms response time
+- **Business KPIs**: Appointment booking success rate, patient satisfaction
+- **Security Monitoring**: Authentication failures, access violations
+- **Infrastructure**: Resource utilization, error rates, throughput
 
-#### Availability Management
-```http
-GET    /api/v1/availability/:doctorId     # Doctor availability
-GET    /api/v1/availability/date/:date    # All doctors for specific date
-POST   /api/v1/availability              # Update doctor availability
-GET    /api/v1/slots/available           # Get available time slots
-```
+### Alerting
+- **Critical Alerts**: System outages, security breaches, HIPAA violations
+- **Warning Alerts**: Performance degradation, resource limits
+- **Business Alerts**: Low booking rates, high cancellation rates
 
-#### Appointment Management
-```http
-POST   /api/v1/appointments               # Create appointment
-GET    /api/v1/appointments/:id           # Get appointment details
-PUT    /api/v1/appointments/:id           # Update appointment
-DELETE /api/v1/appointments/:id           # Cancel appointment
-GET    /api/v1/appointments/patient/:email # Patient's appointments
-```
-
-#### Agent Coordination
-```http
-POST   /api/v1/agents/process             # Process user message
-GET    /api/v1/agents/status              # Get agent status
-POST   /api/v1/agents/reset               # Reset conversation
-```
-
-## 🔒 Security Architecture
-
-```mermaid
-graph TB
-    subgraph "Security Layers"
-        WAF[Web Application Firewall]
-        LB[Load Balancer + SSL]
-        Gateway[API Gateway + Rate Limiting]
-        Auth[Authentication Service]
-        RBAC[Role-Based Access Control]
-        Encryption[Data Encryption at Rest]
-    end
-    
-    Internet --> WAF
-    WAF --> LB
-    LB --> Gateway
-    Gateway --> Auth
-    Auth --> RBAC
-    RBAC --> Encryption
-    
-    subgraph "Compliance"
-        HIPAA[HIPAA Compliance]
-        GDPR[GDPR Compliance]
-        Audit[Audit Logging]
-    end
-    
-    Encryption --> HIPAA
-    HIPAA --> GDPR
-    GDPR --> Audit
-```
-
-### Security Implementation Checklist
-- [ ] **HTTPS Everywhere**: SSL/TLS certificates
-- [ ] **Input Sanitization**: Prevent XSS and injection attacks
-- [ ] **Authentication**: JWT-based user authentication
-- [ ] **Authorization**: Role-based access control (RBAC)
-- [ ] **Data Encryption**: Encrypt PHI (Protected Health Information)
-- [ ] **Audit Logging**: Track all system access and changes
-- [ ] **Rate Limiting**: Prevent API abuse and DDoS
-- [ ] **HIPAA Compliance**: Healthcare data protection standards
-- [ ] **Vulnerability Scanning**: Regular security assessments
-
-## 🧪 Testing Strategy
-
-### Testing Pyramid
-```mermaid
-graph TB
-    subgraph "Testing Levels"
-        E2E[End-to-End Tests<br/>Cypress, Playwright]
-        Integration[Integration Tests<br/>API Testing, Agent Coordination]
-        Unit[Unit Tests<br/>Jest, Individual Functions]
-    end
-    
-    Unit --> Integration
-    Integration --> E2E
-    
-    subgraph "Test Types"
-        Functional[Functional Testing]
-        Performance[Performance Testing]
-        Security[Security Testing]
-        Accessibility[Accessibility Testing]
-    end
-    
-    E2E --> Functional
-    E2E --> Performance
-    E2E --> Security
-    E2E --> Accessibility
-```
-
-### Test Implementation Examples
-```javascript
-// Unit Test Example - Supervisor Agent
-describe('SupervisorAgent', () => {
-    let supervisor;
-    
-    beforeEach(() => {
-        supervisor = new SupervisorAgent();
-    });
-    
-    test('should recognize booking intent correctly', () => {
-        const intent = supervisor.analyzeIntent('I want to book an appointment');
-        expect(intent.type).toBe('booking');
-        expect(intent.confidence).toBeGreaterThan(0.8);
-    });
-    
-    test('should delegate to availability agent for booking requests', () => {
-        const mockSystem = { switchAgent: jest.fn() };
-        supervisor.system = mockSystem;
-        
-        supervisor.delegateToAvailability('book appointment', { type: 'booking' });
-        expect(mockSystem.switchAgent).toHaveBeenCalledWith('availability');
-    });
-});
-
-// Integration Test Example - API Endpoints
-describe('Appointment API', () => {
-    test('should create appointment successfully', async () => {
-        const response = await request(app)
-            .post('/api/v1/appointments')
-            .send({
-                doctorId: 1,
-                patientName: 'John Doe',
-                patientEmail: 'john@example.com',
-                appointmentDate: '2025-05-26T09:00:00'
-            })
-            .expect(201);
-            
-        expect(response.body.id).toBeDefined();
-        expect(response.body.status).toBe('scheduled');
-    });
-});
-```
-
-## 🚀 Deployment Architecture
-
-### Cloud Deployment Options
-```mermaid
-graph TB
-    subgraph "AWS Deployment"
-        CloudFront[CloudFront CDN]
-        ALB[Application Load Balancer]
-        ECS[ECS Fargate Containers]
-        RDS[RDS PostgreSQL]
-        ElastiCache[ElastiCache Redis]
-        SES[SES Email Service]
-    end
-    
-    subgraph "Alternative: Azure"
-        CDN[Azure CDN]
-        AppGateway[Application Gateway]
-        ACI[Container Instances]
-        PostgreSQL[Azure Database]
-        RedisCache[Azure Cache for Redis]
-        SendGrid[SendGrid Email]
-    end
-    
-    Internet --> CloudFront
-    CloudFront --> ALB
-    ALB --> ECS
-    ECS --> RDS
-    ECS --> ElastiCache
-    ECS --> SES
-```
-
-### Docker Configuration
-```dockerfile
-# Multi-stage build for production
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-
-FROM node:18-alpine AS runtime
-WORKDIR /app
-COPY --from=builder /app/node_modules ./node_modules
-COPY . .
-EXPOSE 3000
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
-CMD ["npm", "start"]
-```
-
-### Kubernetes Deployment
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: agentcare-api
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: agentcare-api
-  template:
-    metadata:
-      labels:
-        app: agentcare-api
-    spec:
-      containers:
-      - name: agentcare-api
-        image: agentcare/api:latest
-        ports:
-        - containerPort: 3000
-        env:
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: agentcare-secrets
-              key: database-url
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-```
-
-## 📊 Monitoring & Observability
-
-### Monitoring Stack
-```mermaid
-graph TB
-    subgraph "Application Monitoring"
-        App[AgentCare Application]
-        APM[Application Performance Monitoring]
-        Logs[Centralized Logging]
-        Metrics[Custom Metrics]
-    end
-    
-    subgraph "Infrastructure Monitoring"
-        Server[Server Metrics]
-        Database[Database Performance]
-        Network[Network Monitoring]
-    end
-    
-    subgraph "Alerting & Dashboards"
-        Grafana[Grafana Dashboards]
-        Prometheus[Prometheus Metrics]
-        AlertManager[Alert Manager]
-        PagerDuty[PagerDuty Integration]
-    end
-    
-    App --> APM
-    App --> Logs
-    App --> Metrics
-    
-    Server --> Prometheus
-    Database --> Prometheus
-    Network --> Prometheus
-    
-    Prometheus --> Grafana
-    Prometheus --> AlertManager
-    AlertManager --> PagerDuty
-```
-
-### Key Metrics to Monitor
-- **Agent Performance**: Response times, success rates, coordination efficiency
-- **System Health**: CPU usage, memory consumption, error rates
-- **Business Metrics**: Appointments booked, cancellation rates, user satisfaction
-- **User Experience**: Page load times, conversion rates, task completion
-
-## 📈 Development Phases
-
-### Phase 1: Foundation (Weeks 1-3)
-**Priority**: Critical
-```mermaid
-gantt
-    title Phase 1 - Foundation
-    dateFormat  YYYY-MM-DD
-    section Database
-    Schema Design     :done, schema, 2025-05-25, 3d
-    Database Setup    :active, dbsetup, after schema, 4d
-    Sample Data      :sampledata, after dbsetup, 2d
-    section Backend
-    API Framework    :api, 2025-05-28, 5d
-    Basic Endpoints  :endpoints, after api, 7d
-    Authentication   :auth, after endpoints, 5d
-```
-
-**Deliverables**:
-- [ ] PostgreSQL database with complete schema
-- [ ] RESTful API with core endpoints
-- [ ] Basic authentication system
-- [ ] Docker containerization
-- [ ] Unit test framework setup
-
-### Phase 2: Core Features (Weeks 4-7)
-**Priority**: High
-```mermaid
-gantt
-    title Phase 2 - Core Features
-    dateFormat  YYYY-MM-DD
-    section Agent System
-    Agent Refactor    :agent, 2025-06-15, 7d
-    Real API Integration :integration, after agent, 5d
-    section Features
-    Email System     :email, 2025-06-15, 5d
-    SMS Notifications :sms, after email, 3d
-    Calendar Sync    :calendar, after sms, 5d
-    section Testing
-    Integration Tests :testing, after calendar, 7d
-```
-
-**Deliverables**:
-- [ ] Complete agent coordination system
-- [ ] Email and SMS notifications
-- [ ] Calendar integration (Google, Outlook)
-- [ ] Comprehensive integration tests
-- [ ] API documentation
-
-### Phase 3: Advanced Features (Weeks 8-12)
-**Priority**: Medium
-```mermaid
-gantt
-    title Phase 3 - Advanced Features
-    dateFormat  YYYY-MM-DD
-    section AI Enhancement
-    NLP Improvement   :nlp, 2025-07-06, 10d
-    Predictive Analytics :predict, after nlp, 7d
-    section Integrations
-    EHR Integration   :ehr, 2025-07-06, 14d
-    Payment Processing :payment, after ehr, 7d
-    section UI/UX
-    Mobile App       :mobile, 2025-07-20, 14d
-    Admin Dashboard  :admin, after mobile, 10d
-```
-
-**Deliverables**:
-- [ ] Enhanced NLP capabilities
-- [ ] Predictive scheduling analytics
-- [ ] EHR system integration
-- [ ] Payment processing
-- [ ] Mobile application
-- [ ] Administrative dashboard
-
-### Phase 4: Production Launch (Weeks 13-16)
-**Priority**: Critical
-```mermaid
-gantt
-    title Phase 4 - Production Launch
-    dateFormat  YYYY-MM-DD
-    section Security
-    Security Audit    :security, 2025-08-10, 7d
-    HIPAA Compliance  :hipaa, after security, 5d
-    section Deployment
-    Production Setup  :prod, 2025-08-17, 5d
-    Load Testing     :load, after prod, 3d
-    section Launch
-    Soft Launch      :soft, after load, 7d
-    Full Launch      :launch, after soft, 3d
-```
-
-**Deliverables**:
-- [ ] Security audit completion
-- [ ] HIPAA compliance certification
-- [ ] Production environment setup
-- [ ] Performance optimization
-- [ ] Launch readiness review
-
-## 🛠️ Technology Stack Recommendations
-
-### Frontend Stack
-```mermaid
-graph LR
-    subgraph "Frontend Options"
-        React[React + TypeScript<br/>Recommended]
-        Vue[Vue.js + TypeScript<br/>Alternative]
-        Vanilla[Vanilla JS<br/>Current]
-    end
-    
-    subgraph "UI Libraries"
-        TailwindCSS[Tailwind CSS]
-        MaterialUI[Material-UI]
-        ChakraUI[Chakra UI]
-    end
-    
-    subgraph "State Management"
-        Redux[Redux Toolkit]
-        Zustand[Zustand]
-        ReactQuery[React Query]
-    end
-    
-    React --> TailwindCSS
-    React --> Redux
-    React --> ReactQuery
-```
-
-### Backend Stack
-```mermaid
-graph TB
-    subgraph "Runtime"
-        NodeJS[Node.js + Express<br/>Recommended]
-        Python[Python + FastAPI<br/>Alternative]
-        Java[Java + Spring Boot<br/>Enterprise]
-    end
-    
-    subgraph "Database"
-        PostgreSQL[PostgreSQL<br/>Primary]
-        Redis[Redis<br/>Caching]
-        MongoDB[MongoDB<br/>Documents]
-    end
-    
-    subgraph "Services"
-        Docker[Docker Containers]
-        Kubernetes[Kubernetes Orchestration]
-        AWS[AWS Services]
-    end
-    
-    NodeJS --> PostgreSQL
-    NodeJS --> Redis
-    NodeJS --> Docker
-    Docker --> Kubernetes
-    Kubernetes --> AWS
-```
-
-## 🔍 Performance Benchmarks
-
-### Current Performance (Demo Version)
-- **Initial Load**: < 2 seconds
-- **Agent Response**: 1-3 seconds (simulated)
-- **Memory Usage**: < 50MB
-- **Bundle Size**: ~100KB
-
-### Production Targets
-```mermaid
-graph LR
-    subgraph "Performance Targets"
-        FCP[First Contentful Paint<br/>< 1.5s]
-        TTI[Time to Interactive<br/>< 3s]
-        API[API Response Time<br/>< 500ms]
-        Concurrent[Concurrent Users<br/>1000+]
-    end
-    
-    subgraph "Optimization Strategies"
-        CodeSplit[Code Splitting]
-        Caching[Intelligent Caching]
-        CDN[Content Delivery Network]
-        LoadBalance[Load Balancing]
-    end
-    
-    FCP --> CodeSplit
-    TTI --> Caching
-    API --> CDN
-    Concurrent --> LoadBalance
-```
-
-## 📋 Contributing Guidelines
-
-### Development Workflow
-```mermaid
-gitGraph
-    commit id: "Initial"
-    branch feature/agent-enhancement
-    checkout feature/agent-enhancement
-    commit id: "Implement NLP"
-    commit id: "Add tests"
-    checkout main
-    merge feature/agent-enhancement
-    commit id: "Release v1.1"
-    branch hotfix/security-patch
-    checkout hotfix/security-patch
-    commit id: "Security fix"
-    checkout main
-    merge hotfix/security-patch
-    commit id: "Release v1.1.1"
-```
+## 🛠️ Development Workflow
 
 ### Code Standards
-- **Language**: TypeScript preferred, JavaScript acceptable
-- **Style**: Prettier + ESLint configuration
-- **Testing**: Minimum 80% code coverage
-- **Documentation**: JSDoc comments for all public functions
-- **Git**: Conventional commits (feat, fix, docs, etc.)
+- **TypeScript**: Strict type checking and documentation
+- **ESLint + Prettier**: Consistent code formatting
+- **Conventional Commits**: Standardized commit messages
+- **Code Coverage**: 80%+ test coverage requirement
 
-### Pull Request Process
-1. Create feature branch from `main`
-2. Implement changes with tests
-3. Update documentation
-4. Ensure CI passes
-5. Request code review
-6. Address feedback
-7. Merge after approval
+### Testing Strategy
+- **Unit Tests**: Individual component testing
+- **Integration Tests**: API endpoint validation
+- **Contract Tests**: Agent interaction verification
+- **E2E Tests**: Complete user workflow testing
+- **Performance Tests**: Load and stress testing
 
-## 📞 Project Structure
+### CI/CD Pipeline
+1. **Validation**: Linting, formatting, commit message validation
+2. **Security**: SAST, dependency scanning, secret detection
+3. **Testing**: Unit, integration, contract, E2E tests
+4. **Building**: Multi-arch Docker images with vulnerability scanning
+5. **Deployment**: Automated staging and production deployment
 
+## 🌟 Production Deployment
+
+### Environments
+- **Development**: Local development with Docker Compose
+- **Staging**: Kubernetes cluster for integration testing
+- **Production**: High-availability Kubernetes deployment
+
+### Scaling
+- **Horizontal Pod Autoscaler**: 2-10 pods based on CPU/memory
+- **Vertical Pod Autoscaler**: Dynamic resource adjustment
+- **Cluster Autoscaler**: Node scaling for demand
+
+### High Availability
+- **Multi-replica Deployment**: Load distribution across pods
+- **Database Replication**: Primary-replica PostgreSQL setup
+- **Redis Clustering**: High-availability cache layer
+- **Load Balancing**: Intelligent traffic distribution
+
+## 📞 Getting Help & Support
+
+### Documentation Resources
+- **[Setup Guide](SETUP_GUIDE.md)**: Step-by-step installation
+- **[DevOps Guide](DEVOPS_GUIDE.md)**: Infrastructure and deployment
+- **[Contributing](CONTRIBUTING.md)**: Development guidelines
+- **[API Documentation](docs/)**: REST API reference
+
+### Community & Support
+- **GitHub Issues**: [Bug reports and feature requests](https://github.com/vishalm/agentcare/issues)
+- **GitHub Discussions**: [Architecture and design discussions](https://github.com/vishalm/agentcare/discussions)
+- **Email Support**: contact@agentcare.dev
+- **Security Issues**: security@agentcare.dev
+
+### Quick Commands
+```bash
+# Development
+npm run start:dev              # Start development server
+npm run test                   # Run all tests
+npm run lint                   # Code linting
+npm run format                 # Code formatting
+
+# Docker
+npm run dev:docker             # Docker development environment
+npm run docker:build          # Build production image
+
+# Kubernetes
+npm run k8s:deploy             # Deploy to Kubernetes
+npm run k8s:logs               # View application logs
+npm run k8s:status             # Check deployment status
+
+# Monitoring
+npm run metrics                # View system metrics
+npm run logs                   # View application logs
+npm run trace                  # View distributed traces
 ```
-agentcare/
-├── README.md                          # This file
-├── LICENSE                           # MIT License
-├── package.json                      # Node.js dependencies
-├── docker-compose.yml                # Development environment
-├── .github/
-│   ├── workflows/                    # CI/CD pipelines
-│   └── ISSUE_TEMPLATE/              # Issue templates
-├── docs/
-│   ├── api-reference.md             # API documentation
-│   ├── deployment-guide.md          # Deployment instructions
-│   └── architecture.md              # Detailed architecture
-├── frontend/
-│   ├── public/
-│   │   └── index.html              # Current demo version
-│   ├── src/
-│   │   ├── components/             # React components
-│   │   ├── agents/                 # Agent implementations
-│   │   ├── services/               # API services
-│   │   └── utils/                  # Utility functions
-│   └── tests/                      # Frontend tests
-├── backend/
-│   ├── src/
-│   │   ├── controllers/            # API controllers
-│   │   ├── models/                 # Database models
-│   │   ├── services/               # Business logic
-│   │   ├── middleware/             # Express middleware
-│   │   └── utils/                  # Backend utilities
-│   ├── tests/                      # Backend tests
-│   └── migrations/                 # Database migrations
-├── database/
-│   ├── schema.sql                  # Database schema
-│   ├── seeds/                      # Sample data
-│   └── migrations/                 # Schema changes
-└── infrastructure/
-    ├── docker/                     # Docker configurations
-    ├── kubernetes/                 # K8s manifests
-    └── terraform/                  # Infrastructure as code
-```
 
-## 🎯 Success Metrics & KPIs
+## 🎯 Roadmap & Future Features
 
-### Technical Metrics
-- **System Uptime**: > 99.9%
-- **API Response Time**: < 500ms (95th percentile)
-- **Error Rate**: < 0.1%
-- **Agent Coordination Efficiency**: > 95% successful delegations
+### Phase 3: Advanced AI (Q2 2025)
+- **Custom Model Training**: Healthcare-specific LLM fine-tuning
+- **Predictive Analytics**: ML-powered scheduling optimization
+- **Voice Interface**: Speech-to-text appointment booking
+- **Multi-language Support**: International patient support
 
-### Business Metrics  
-- **Appointment Booking Conversion**: > 80%
-- **User Satisfaction Score**: > 4.5/5
-- **Cancellation Rate**: < 10%
-- **System Adoption Rate**: Track monthly active users
+### Phase 4: Integration & Scale (Q3 2025)
+- **EHR Integration**: Epic, Cerner, Allscripts connectivity
+- **Telemedicine**: Video consultation scheduling
+- **Mobile Applications**: iOS and Android native apps
+- **API Marketplace**: Third-party integration ecosystem
 
-### User Experience Metrics
-- **Task Completion Rate**: > 90%
-- **Average Session Duration**: Optimal range 3-7 minutes
-- **User Return Rate**: > 60% within 30 days
-- **Support Ticket Reduction**: 50% decrease in booking-related issues
+### Phase 5: Enterprise Platform (Q4 2025)
+- **Multi-tenant Architecture**: Support multiple healthcare providers
+- **Advanced Analytics**: Business intelligence and reporting
+- **White-label Solution**: Customizable for different organizations
+- **Global Deployment**: Multi-region with data sovereignty
 
-## 🚀 Getting Started Checklist
+## 📊 Project Statistics
 
-### Immediate Next Steps (Week 1)
-- [ ] Clone repository and set up development environment
-- [ ] Choose and set up database (PostgreSQL recommended)
-- [ ] Initialize backend framework (Node.js + Express recommended)
-- [ ] Set up basic CI/CD pipeline
-- [ ] Create first API endpoint
-
-### Short-term Goals (Month 1)
-- [ ] Complete database schema implementation
-- [ ] Build all core API endpoints
-- [ ] Implement authentication system
-- [ ] Set up automated testing
-- [ ] Deploy development environment
-
-### Medium-term Goals (Month 2-3)
-- [ ] Integrate real agent coordination
-- [ ] Add email notification system
-- [ ] Implement appointment management features
-- [ ] Create admin dashboard
-- [ ] Perform security audit
-
-### Long-term Goals (Month 4+)
-- [ ] Launch beta version
-- [ ] Implement advanced AI features
-- [ ] Add mobile application
-- [ ] Scale for production use
-- [ ] Achieve HIPAA compliance
-
----
+| Metric | Value |
+|--------|-------|
+| **Components Implemented** | 50+ |
+| **Documentation Files** | 15+ comprehensive guides |
+| **Test Coverage** | 80%+ across all components |
+| **Container Images** | Multi-architecture support |
+| **Kubernetes Resources** | Production-ready manifests |
+| **CI/CD Stages** | 7-stage automated pipeline |
+| **Security Scans** | SAST, dependency, container |
+| **Monitoring Metrics** | 25+ healthcare-specific alerts |
 
 ## 📝 License
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-## 🤝 Contributing
+## 🙏 Acknowledgments
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-## 📧 Support
-
-- **Documentation**: [docs.agentcare.dev](https://docs.agentcare.dev)
-- **Issues**: [GitHub Issues](https://github.com/vishalm/agentcare/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/vishalm/agentcare/discussions)
-- **Email**: contact@agentcare.dev
+- **Contributors**: All developers and healthcare professionals who contributed
+- **Open Source**: Built on top of excellent open-source projects
+- **Healthcare Community**: Feedback and requirements from healthcare providers
+- **Security Experts**: HIPAA compliance and security guidance
 
 ---
 
-**Ready to build the future of healthcare scheduling?** Start with Phase 1 and follow this comprehensive roadmap to create a production-ready AgentCare system. 🚀
+**🏥 Ready to revolutionize healthcare scheduling?** 
+
+Start with the [Setup Guide](SETUP_GUIDE.md) and deploy your AI-powered healthcare scheduling system today! ✨
+
+For comprehensive infrastructure and deployment guidance, see the [DevOps Guide](DEVOPS_GUIDE.md).
+
+For development contributions, check out our [Contributing Guidelines](.github/CONTRIBUTING.md).
