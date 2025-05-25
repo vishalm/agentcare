@@ -49,7 +49,7 @@ export interface PatientRegisteredEvent extends DomainEvent {
     lastName: string;
     email: string;
     phone: string;
-    dateOfBirth: Date;
+    birthDate: Date;
     registeredAt: Date;
   };
 }

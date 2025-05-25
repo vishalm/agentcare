@@ -412,9 +412,9 @@ export class CacheWarmingService {
       try {
         const data = await dataLoader();
         await this.cacheManager.set(key, data);
-        console.log(`Cache warmed for key: ${key}`);
+        console.log(`Cache warmed for operation type: ${key.split(':')[0]}`);
       } catch (error) {
-        console.error(`Cache warming failed for key ${key}:`, error);
+        console.error(`Cache warming failed for operation type ${key.split(':')[0]}:`, error instanceof Error ? error.message : String(error));
       }
     }, interval);
 
@@ -562,11 +562,11 @@ export class AgentCareCacheFactory {
 
     // Setup cache event logging
     cacheManager.onCacheEvent("cache-hit", (data) => {
-      console.log(`Cache hit on ${data.tier}: ${data.key}`);
+      console.log(`Cache hit on ${data.tier}: ${data.key?.split(':')[0] || 'unknown'}`);
     });
 
     cacheManager.onCacheEvent("cache-miss", (data) => {
-      console.log(`Cache miss: ${data.key}`);
+      console.log(`Cache miss: ${data.key?.split(':')[0] || 'unknown'}`);
     });
 
     return {
