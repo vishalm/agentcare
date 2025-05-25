@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: './frontend/package-lock.json'
+          cache-dependency-path: 'frontend/package-lock.json'
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -43,13 +43,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build application
-        run: npm run build
+      - name: Build application for GitHub Pages
+        run: npm run build:pages
         env:
-          # Configure for GitHub Pages deployment
-          PUBLIC_URL: /agentcare
-          REACT_APP_API_BASE_URL: https://api.agentcare.dev
-          REACT_APP_ENVIRONMENT: production
+          # Vite environment variables for GitHub Pages
+          VITE_APP_ENVIRONMENT: production
+          VITE_APP_API_BASE_URL: https://api.agentcare.dev
+          VITE_APP_GITHUB_PAGES: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
