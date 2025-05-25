@@ -150,7 +150,7 @@ graph TB
         <span class="link-icon">🏠</span>
         <span class="link-text">Home</span>
       </a>
-      <a href="/agentcare/PROJECT_STRUCTURE/" class="footer-link">
+      <a href="https://github.com/vishalm/agentcare#quick-start" class="footer-link">
         <span class="link-icon">🚀</span>
         <span class="link-text">Quick Start</span>
       </a>
