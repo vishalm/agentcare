@@ -12,7 +12,7 @@ services:
       - "5433:5432"
     volumes:
       - postgres_staging_data:/var/lib/postgresql/data
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/staging-schema.sql:/docker-entrypoint-initdb.d/01-staging-schema.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U staging -d agentcare_staging"]
       interval: 10s

@@ -429,7 +429,7 @@ jobs:
 
       - name: "Verify SonarCloud Token"
         run: |
-          if [ -z "{{ secrets.SONAR_TOKEN.SONAR_TOKEN }}" ]; then
+          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
             echo "❌ SONAR_TOKEN is not set. Please add it to GitHub Secrets."
             exit 1
           else
