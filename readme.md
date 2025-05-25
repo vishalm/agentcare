@@ -365,4 +365,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 </div>
 
-[🏠 Home](/agentcare/) • [🚀 Quick Start](/agentcare/docs/setup/QUICK_START.html) • [🏗️ Architecture](/agentcare/docs/architecture/ARCHITECTURE_GUIDE.html) • [🔧 API](/agentcare/docs/api-reference.html) 
+**[🏠 Home](https://vishalm.github.io/agentcare/) • [🚀 Quick Start](https://vishalm.github.io/agentcare/docs/setup/QUICK_START.html) • [🏗️ Architecture](https://vishalm.github.io/agentcare/docs/architecture/ARCHITECTURE_GUIDE.html) • [🔧 API](https://vishalm.github.io/agentcare/docs/api-reference.html)** 
