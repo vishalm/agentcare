@@ -363,4 +363,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 [Live Demo](https://vishalm.github.io/agentcare/) • [Documentation](docs/) • [API Reference](docs/api-reference.md) • [Contributing](CONTRIBUTING.md)
 
-</div> 
+</div>
+
+[🏠 Home](/agentcare/) • [🚀 Quick Start](/agentcare/docs/setup/QUICK_START.html) • [🏗️ Architecture](/agentcare/docs/architecture/ARCHITECTURE_GUIDE.html) • [🔧 API](/agentcare/docs/api-reference.html) 
