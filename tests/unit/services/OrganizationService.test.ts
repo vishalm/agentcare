@@ -40,7 +40,7 @@ describe('OrganizationService', () => {
 
     // Mock pool and client
     mockClient = {
-      query: jest.fn() as jest.MockedFunction<any>,
+      query: jest.fn(),
       release: jest.fn(),
     } as any;
 
