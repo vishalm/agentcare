@@ -55,6 +55,11 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Fix Rollup optional dependencies issue
+RUN rm -rf node_modules package-lock.json && \
+    npm install && \
+    npm ci --production=false
+
 # Build the application
 RUN npm run build
 
