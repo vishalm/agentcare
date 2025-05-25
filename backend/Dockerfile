@@ -1,4 +1,4 @@
-# AgentCare Backend Service Dockerfile
+# AgentCare Backend Dockerfile
 # Multi-Agent Healthcare Scheduling API
 
 # Build stage
@@ -17,24 +17,16 @@ RUN apk add --no-cache \
 # Set working directory
 WORKDIR /app
 
-# Copy root package.json and backend package.json
-COPY package*.json ./
-COPY backend/package*.json ./backend/
+# Copy backend package.json
+COPY backend/package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production --no-audit --no-fund
-RUN cd backend && npm ci --only=production --no-audit --no-fund
+RUN npm ci --include=dev --no-audit --no-fund
 
 # Copy backend source code
-COPY backend/ ./backend/
-
-# Copy necessary shared files
-COPY database/ ./database/
-COPY scripts/ ./scripts/
-COPY env.example ./
+COPY backend/ .
 
 # Build the backend application
-WORKDIR /app/backend
 RUN npm run build
 
 # Production stage
@@ -58,16 +50,10 @@ RUN addgroup -g 1001 -S agentcare && \
 WORKDIR /app
 
 # Copy production dependencies from build stage
-COPY --from=build /app/backend/node_modules ./backend/node_modules
 COPY --from=build /app/node_modules ./node_modules
 
 # Copy built application
-COPY --from=build /app/backend/dist ./backend/dist
-COPY --from=build /app/backend/package*.json ./backend/
-
-# Copy runtime files
-COPY --from=build /app/database ./database
-COPY --from=build /app/scripts ./scripts
+COPY --from=build /app/dist ./dist
 COPY --from=build /app/package*.json ./
 
 # Create required directories and set permissions
@@ -89,7 +75,7 @@ EXPOSE ${PORT}
 ENTRYPOINT ["tini", "--"]
 
 # Start the backend service
-CMD ["node", "backend/dist/server.js"]
+CMD ["node", "dist/server.js"]
 
 # Development stage (for development builds)
 FROM node:18-alpine AS development
@@ -103,19 +89,14 @@ RUN apk add --no-cache \
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-COPY backend/package*.json ./backend/
+# Copy backend package.json
+COPY backend/package*.json ./
 
 # Install all dependencies (including dev)
 RUN npm ci --include=dev
-RUN cd backend && npm ci --include=dev
 
-# Copy source code
-COPY backend/ ./backend/
-COPY database/ ./database/
-COPY scripts/ ./scripts/
-COPY env.example ./
+# Copy backend source code
+COPY backend/ .
 
 # Create directories
 RUN mkdir -p /app/logs && chmod 755 /app/logs
@@ -124,4 +105,4 @@ RUN mkdir -p /app/logs && chmod 755 /app/logs
 EXPOSE 3000 9090
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["npm", "run", "dev:backend"] 
+CMD ["npm", "run", "dev"] 

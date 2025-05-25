@@ -16,8 +16,8 @@ RUN apk add --no-cache \
 # Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy package files from frontend directory
+COPY frontend/package*.json ./
 
 # Development stage
 FROM base AS development
@@ -26,8 +26,8 @@ ENV NODE_ENV=development
 # Install all dependencies
 RUN npm ci --include=dev
 
-# Copy source code
-COPY . .
+# Copy frontend source code
+COPY frontend/ .
 
 # Create user for security
 RUN addgroup -g 1001 -S agentcare && \
@@ -52,8 +52,8 @@ ENV NODE_ENV=production
 # Install all dependencies for building
 RUN npm ci --include=dev
 
-# Copy source code
-COPY . .
+# Copy frontend source code
+COPY frontend/ .
 
 # Build the application
 RUN npm run build
@@ -63,23 +63,34 @@ FROM nginx:alpine AS production
 ENV NODE_ENV=production
 
 # Install curl for health checks
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl tini
 
 # Copy built assets from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Create default nginx configuration for SPA
+RUN echo 'server { \
+    listen 80; \
+    server_name localhost; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    location / { \
+        try_files $uri $uri/ /index.html; \
+    } \
+    location /health { \
+        access_log off; \
+        return 200 "healthy\n"; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
 
 # Create nginx user and set permissions
 RUN addgroup -g 1001 -S agentcare && \
     adduser -S agentcare -u 1001 -G agentcare && \
     chown -R agentcare:agentcare /usr/share/nginx/html && \
-    chown -R agentcare:agentcare /var/cache/nginx && \
-    chown -R agentcare:agentcare /var/log/nginx && \
-    chown -R agentcare:agentcare /etc/nginx/conf.d && \
+    mkdir -p /var/cache/nginx /var/log/nginx /var/run && \
+    chown -R agentcare:agentcare /var/cache/nginx /var/log/nginx /var/run && \
     touch /var/run/nginx.pid && \
-    chown -R agentcare:agentcare /var/run/nginx.pid
+    chown agentcare:agentcare /var/run/nginx.pid
 
 # Switch to non-root user
 USER agentcare
@@ -90,6 +101,9 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 
 # Expose port
 EXPOSE 80
+
+# Use tini as init system
+ENTRYPOINT ["tini", "--"]
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"] 
