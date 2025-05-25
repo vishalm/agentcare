@@ -25,7 +25,8 @@
     "db:seed": "../scripts/db-setup.sh",
     "health": "curl -s http://localhost:3000/health | jq .",
     "status": "curl -s http://localhost:3000/api/v1/agents/status | jq .",
-    "metrics": "curl -s http://localhost:3000/api/v1/metrics | jq ."
+    "metrics": "curl -s http://localhost:3000/api/v1/metrics | jq .",
+    "security:deps": "npm audit --audit-level moderate"
   },
   "keywords": [
     "healthcare",

@@ -18,13 +18,13 @@ RUN apk add --no-cache \
 WORKDIR /app
 
 # Copy backend package.json
-COPY backend/package*.json ./
+COPY package*.json ./
 
 # Install dependencies
 RUN npm ci --include=dev --no-audit --no-fund
 
 # Copy backend source code
-COPY backend/ .
+COPY . .
 
 # Build the backend application
 RUN npm run build
@@ -90,13 +90,13 @@ RUN apk add --no-cache \
 WORKDIR /app
 
 # Copy backend package.json
-COPY backend/package*.json ./
+COPY package*.json ./
 
 # Install all dependencies (including dev)
 RUN npm ci --include=dev
 
 # Copy backend source code
-COPY backend/ .
+COPY . .
 
 # Create directories
 RUN mkdir -p /app/logs && chmod 755 /app/logs

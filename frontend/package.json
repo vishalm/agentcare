@@ -13,7 +13,8 @@
     "test": "echo 'Frontend tests not yet implemented' && exit 0",
     "test:unit": "echo 'Frontend unit tests not yet implemented' && exit 0",
     "test:watch": "echo 'Frontend test watch not yet implemented' && exit 0",
-    "test:coverage": "echo 'Frontend test coverage not yet implemented' && exit 0"
+    "test:coverage": "echo 'Frontend test coverage not yet implemented' && exit 0",
+    "security:deps": "npm audit --audit-level moderate"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
