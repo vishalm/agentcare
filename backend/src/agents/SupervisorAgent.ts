@@ -530,7 +530,7 @@ export class SupervisorAgent implements IAgent {
     };
 
     // Count critical services (those needed for core functionality)
-    const criticalServices = ['supervisor', 'availability', 'booking', 'faq'];
+    const criticalServices: (keyof typeof services)[] = ['supervisor', 'availability', 'booking', 'faq'];
     const criticalHealthy = criticalServices.every(service => services[service] === true);
     
     // Ollama is optional - system can work without it

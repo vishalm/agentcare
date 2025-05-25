@@ -9,7 +9,11 @@
     "build:with-types": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "echo 'Frontend tests not yet implemented' && exit 0",
+    "test:unit": "echo 'Frontend unit tests not yet implemented' && exit 0",
+    "test:watch": "echo 'Frontend test watch not yet implemented' && exit 0",
+    "test:coverage": "echo 'Frontend test coverage not yet implemented' && exit 0"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",

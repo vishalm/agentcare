@@ -39,6 +39,7 @@
         "test:integration": "jest --config=jest.config.js --testPathPattern=tests/integration",
         "test:contract": "jest --config=jest.config.js --testPathPattern=tests/contract",
         "test:ui": "playwright test",
+        "test:e2e": "playwright test",
         "test:backend": "cd backend && npm test",
         "test:frontend": "cd frontend && npm test",
         "test:watch": "jest --watch --config=jest.config.js",
