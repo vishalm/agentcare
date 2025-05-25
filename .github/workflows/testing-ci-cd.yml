@@ -82,9 +82,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend-changed == 'true' || needs.detect-changes.outputs.component == 'all' || needs.detect-changes.outputs.component == 'frontend' || github.event_name == 'workflow_dispatch'
-    defaults:
-      run:
-        working-directory: ./frontend
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -94,19 +91,19 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'frontend/package-lock.json'
+          cache-dependency-path: 'package-lock.json'
 
-      - name: "Install frontend dependencies"
+      - name: "Install dependencies"
         run: npm ci
 
       - name: "Lint frontend code"
-        run: npm run lint
+        run: npm run lint:frontend
 
       - name: "Type check frontend"
-        run: npm run type-check
+        run: npm run type-check:frontend
 
       - name: "Build frontend"
-        run: npm run build
+        run: npm run build:frontend
 
       - name: "Upload frontend build artifacts"
         uses: actions/upload-artifact@v4
@@ -121,9 +118,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changes
     if: needs.detect-changes.outputs.backend-changed == 'true' || needs.detect-changes.outputs.component == 'all' || needs.detect-changes.outputs.component == 'backend' || github.event_name == 'workflow_dispatch'
-    defaults:
-      run:
-        working-directory: ./backend
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -133,19 +127,19 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'backend/package-lock.json'
+          cache-dependency-path: 'package-lock.json'
 
-      - name: "Install backend dependencies"
+      - name: "Install dependencies"
         run: npm ci
 
       - name: "Lint backend code"
-        run: npm run lint
+        run: npm run lint:backend
 
       - name: "Type check backend"
-        run: npm run type-check
+        run: npm run type-check:backend
 
       - name: "Build backend"
-        run: npm run build
+        run: npm run build:backend
 
       - name: "Upload backend build artifacts"
         uses: actions/upload-artifact@v4
@@ -160,9 +154,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [detect-changes, frontend-preflight]
     if: needs.frontend-preflight.result == 'success' && (needs.detect-changes.outputs.test-level == 'all' || needs.detect-changes.outputs.test-level == 'unit')
-    defaults:
-      run:
-        working-directory: ./frontend
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -172,13 +163,13 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'frontend/package-lock.json'
+          cache-dependency-path: 'package-lock.json'
 
-      - name: "Install frontend dependencies"
+      - name: "Install dependencies"
         run: npm ci
 
       - name: "Run frontend unit tests with coverage"
-        run: npm run test:unit -- --coverage --ci --watchAll=false
+        run: npm run test:frontend
 
       - name: "Upload frontend unit test coverage"
         uses: actions/upload-artifact@v4
@@ -193,9 +184,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [detect-changes, backend-preflight]
     if: needs.backend-preflight.result == 'success' && (needs.detect-changes.outputs.test-level == 'all' || needs.detect-changes.outputs.test-level == 'unit')
-    defaults:
-      run:
-        working-directory: ./backend
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -205,13 +193,13 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'backend/package-lock.json'
+          cache-dependency-path: 'package-lock.json'
 
-      - name: "Install backend dependencies"
+      - name: "Install dependencies"
         run: npm ci
 
       - name: "Run backend unit tests with coverage"
-        run: npm run test:unit -- --coverage --ci --watchAll=false
+        run: npm run test:backend
 
       - name: "Upload backend unit test coverage"
         uses: actions/upload-artifact@v4
@@ -252,10 +240,6 @@ jobs:
         ports:
           - 6379:6379
 
-    defaults:
-      run:
-        working-directory: ./backend
-
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -265,9 +249,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'backend/package-lock.json'
+          cache-dependency-path: 'package-lock.json'
 
-      - name: "Install backend dependencies"
+      - name: "Install dependencies"
         run: npm ci
 
       - name: "Wait for services"
@@ -278,13 +262,13 @@ jobs:
           timeout 30s bash -c 'until nc -z localhost 6379; do sleep 1; done'
 
       - name: "Setup test database"
-        run: npm run db:migrate
+        run: cd backend && npm run db:migrate
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/agentcare_test
           REDIS_URL: redis://localhost:6379
 
       - name: "Run backend integration tests"
-        run: npm run test:integration -- --ci --watchAll=false
+        run: cd backend && npm run test:integration -- --ci --watchAll=false
         env:
           NODE_ENV: test
           DATABASE_URL: postgresql://test:test@localhost:5432/agentcare_test
@@ -556,16 +540,6 @@ jobs:
     strategy:
       matrix:
         component: [frontend, backend]
-        include:
-          - component: frontend
-            working-directory: ./frontend
-            package-lock: frontend/package-lock.json
-          - component: backend
-            working-directory: ./backend
-            package-lock: backend/package-lock.json
-    defaults:
-      run:
-        working-directory: ${{ matrix.working-directory }}
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -575,16 +549,17 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: ${{ matrix.package-lock }}
+          cache-dependency-path: 'package-lock.json'
 
-      - name: "Install ${{ matrix.component }} dependencies"
+      - name: "Install dependencies"
         run: npm ci
 
       - name: "Run ${{ matrix.component }} security audit"
-        run: npm audit --audit-level moderate
+        run: cd ${{ matrix.component }} && npm audit --audit-level moderate
 
       - name: "Run ${{ matrix.component }} dependency check"
         run: |
+          cd ${{ matrix.component }}
           if [ -f package.json ] && grep -q "security:deps" package.json; then
             npm run security:deps
           else
