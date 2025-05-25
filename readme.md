@@ -1,4 +1,4 @@
-# 🏥 AgentCare - Multi-Agent Healthcare Scheduling System
+# AgentCare - Multi-Agent Healthcare Scheduling System
 
 **Enterprise-grade multi-agent healthcare scheduling platform with AI-powered coordination, full observability stack, and production-ready Docker infrastructure**
 
