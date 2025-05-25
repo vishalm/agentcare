@@ -10,11 +10,11 @@
     "build:watch": "tsc --watch",
     "start": "node dist/server.js",
     "start:dev": "tsx src/server.ts",
-    "test": "jest",
-    "test:unit": "jest --testPathPattern=unit",
-    "test:integration": "jest --testPathPattern=integration",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test": "jest --config=jest.config.cjs",
+    "test:unit": "jest --config=jest.config.cjs --testPathPattern=unit",
+    "test:integration": "jest --config=jest.config.cjs --testPathPattern=integration",
+    "test:watch": "jest --config=jest.config.cjs --watch",
+    "test:coverage": "jest --config=jest.config.cjs --coverage",
     "lint": "eslint src --ext .ts,.js --quiet",
     "lint:fix": "eslint src --ext .ts,.js --fix",
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
@@ -42,8 +42,8 @@
   "author": "Vishal Mishra",
   "license": "MIT",
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

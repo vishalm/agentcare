@@ -1,11 +1,11 @@
 import { Pool, PoolClient } from 'pg';
-import { OrganizationService } from '../../../backend/src/services/OrganizationService';
-import { Logger } from '../../../backend/src/utils/Logger';
-import { Organization, OrganizationUser, PatientCaregiver, OrganizationType } from '../../../backend/src/types/MultiTenant';
+import { OrganizationService } from '../../../src/services/OrganizationService';
+import { Logger } from '../../../src/utils/Logger';
+import { Organization, OrganizationUser, PatientCaregiver, OrganizationType } from '../../../src/types/MultiTenant';
 
 // Mock dependencies
 jest.mock('pg');
-jest.mock('../../../backend/src/utils/Logger');
+jest.mock('../../../src/utils/Logger');
 
 describe.skip('OrganizationService', () => {
   let organizationService: OrganizationService;

@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="214" failures="0" errors="0" time="1.387">
+  <testsuite name="Data Isolation Security Tests" errors="0" failures="0" skipped="19" timestamp="2025-05-25T14:24:01" time="0.058" tests="19">
+    <testcase classname="Data Isolation Security Tests Cross-Tenant Data Access Prevention should prevent accessing other organization users without tenant context" name="Data Isolation Security Tests Cross-Tenant Data Access Prevention should prevent accessing other organization users without tenant context" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Cross-Tenant Data Access Prevention should strictly isolate patient data between organizations" name="Data Isolation Security Tests Cross-Tenant Data Access Prevention should strictly isolate patient data between organizations" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Cross-Tenant Data Access Prevention should prevent cross-tenant patient medical record access" name="Data Isolation Security Tests Cross-Tenant Data Access Prevention should prevent cross-tenant patient medical record access" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Cross-Tenant Data Access Prevention should prevent cross-tenant appointment access" name="Data Isolation Security Tests Cross-Tenant Data Access Prevention should prevent cross-tenant appointment access" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Email and Identity Isolation should allow same email addresses in different organizations" name="Data Isolation Security Tests Email and Identity Isolation should allow same email addresses in different organizations" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Email and Identity Isolation should prevent duplicate emails within same organization" name="Data Isolation Security Tests Email and Identity Isolation should prevent duplicate emails within same organization" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Email and Identity Isolation should maintain medical record number uniqueness per organization" name="Data Isolation Security Tests Email and Identity Isolation should maintain medical record number uniqueness per organization" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Caregiver Relationship Isolation should isolate caregiver relationships by organization" name="Data Isolation Security Tests Caregiver Relationship Isolation should isolate caregiver relationships by organization" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Caregiver Relationship Isolation should prevent cross-organization caregiver access to patient data" name="Data Isolation Security Tests Caregiver Relationship Isolation should prevent cross-organization caregiver access to patient data" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Organization User Role Isolation should isolate user roles and permissions by organization" name="Data Isolation Security Tests Organization User Role Isolation should isolate user roles and permissions by organization" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Tenant Context Security should prevent SQL injection in tenant context setting" name="Data Isolation Security Tests Tenant Context Security should prevent SQL injection in tenant context setting" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Tenant Context Security should validate tenant context UUID format" name="Data Isolation Security Tests Tenant Context Security should validate tenant context UUID format" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Tenant Context Security should handle null tenant context gracefully" name="Data Isolation Security Tests Tenant Context Security should handle null tenant context gracefully" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Tenant Context Security should maintain tenant context isolation between connections" name="Data Isolation Security Tests Tenant Context Security should maintain tenant context isolation between connections" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Data Leakage Prevention should never leak sensitive data across organizations" name="Data Isolation Security Tests Data Leakage Prevention should never leak sensitive data across organizations" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Data Leakage Prevention should prevent accidental cross-tenant queries" name="Data Isolation Security Tests Data Leakage Prevention should prevent accidental cross-tenant queries" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Data Leakage Prevention should audit potential data access violations" name="Data Isolation Security Tests Data Leakage Prevention should audit potential data access violations" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests HIPAA Compliance Validation should enforce minimum necessary principle for data access" name="Data Isolation Security Tests HIPAA Compliance Validation should enforce minimum necessary principle for data access" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests HIPAA Compliance Validation should maintain audit trail for all data access" name="Data Isolation Security Tests HIPAA Compliance Validation should maintain audit trail for all data access" time="0">
+      <skipped/>
+    </testcase>
+  </testsuite>
+  <testsuite name="Multi-Tenant Database Integration Tests" errors="0" failures="0" skipped="21" timestamp="2025-05-25T14:24:01" time="0.023" tests="21">
+    <testcase classname="Multi-Tenant Database Integration Tests Organization Creation and Management should create organizations with different types" name="Multi-Tenant Database Integration Tests Organization Creation and Management should create organizations with different types" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Organization Creation and Management should enforce unique slugs" name="Multi-Tenant Database Integration Tests Organization Creation and Management should enforce unique slugs" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Organization Creation and Management should create default departments for different organization types" name="Multi-Tenant Database Integration Tests Organization Creation and Management should create default departments for different organization types" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests User Registration and Role Management should allow same email in different organizations" name="Multi-Tenant Database Integration Tests User Registration and Role Management should allow same email in different organizations" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests User Registration and Role Management should prevent duplicate emails within same organization" name="Multi-Tenant Database Integration Tests User Registration and Role Management should prevent duplicate emails within same organization" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests User Registration and Role Management should create organization user records with roles" name="Multi-Tenant Database Integration Tests User Registration and Role Management should create organization user records with roles" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests User Registration and Role Management should generate unique medical record numbers per organization" name="Multi-Tenant Database Integration Tests User Registration and Role Management should generate unique medical record numbers per organization" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Patient-Caregiver Relationships should create patient-caregiver relationships" name="Multi-Tenant Database Integration Tests Patient-Caregiver Relationships should create patient-caregiver relationships" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Patient-Caregiver Relationships should prevent duplicate patient-caregiver relationships in same organization" name="Multi-Tenant Database Integration Tests Patient-Caregiver Relationships should prevent duplicate patient-caregiver relationships in same organization" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Tenant Context and Data Isolation should set and retrieve tenant context" name="Multi-Tenant Database Integration Tests Tenant Context and Data Isolation should set and retrieve tenant context" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Tenant Context and Data Isolation should isolate data based on tenant context" name="Multi-Tenant Database Integration Tests Tenant Context and Data Isolation should isolate data based on tenant context" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Tenant Context and Data Isolation should prevent cross-tenant data access without proper context" name="Multi-Tenant Database Integration Tests Tenant Context and Data Isolation should prevent cross-tenant data access without proper context" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Appointments and Medical Records Multi-Tenancy should isolate appointments by organization" name="Multi-Tenant Database Integration Tests Appointments and Medical Records Multi-Tenancy should isolate appointments by organization" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Appointments and Medical Records Multi-Tenancy should isolate medical records by organization" name="Multi-Tenant Database Integration Tests Appointments and Medical Records Multi-Tenancy should isolate medical records by organization" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Data Migration and Default Organization should have default organization for legacy data" name="Multi-Tenant Database Integration Tests Data Migration and Default Organization should have default organization for legacy data" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Data Migration and Default Organization should allow migration of existing data to default organization" name="Multi-Tenant Database Integration Tests Data Migration and Default Organization should allow migration of existing data to default organization" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Performance and Indexing should have proper indexes for multi-tenant queries" name="Multi-Tenant Database Integration Tests Performance and Indexing should have proper indexes for multi-tenant queries" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Performance and Indexing should perform efficiently with large datasets" name="Multi-Tenant Database Integration Tests Performance and Indexing should perform efficiently with large datasets" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Security and Data Validation should validate email formats" name="Multi-Tenant Database Integration Tests Security and Data Validation should validate email formats" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Security and Data Validation should enforce foreign key constraints" name="Multi-Tenant Database Integration Tests Security and Data Validation should enforce foreign key constraints" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="Multi-Tenant Database Integration Tests Security and Data Validation should maintain referential integrity on cascade deletes" name="Multi-Tenant Database Integration Tests Security and Data Validation should maintain referential integrity on cascade deletes" time="0">
+      <skipped/>
+    </testcase>
+  </testsuite>
+  <testsuite name="Organization Routes Integration Tests" errors="0" failures="0" skipped="1" timestamp="2025-05-25T14:24:01" time="0.22" tests="26">
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations should successfully create a new organization" name="Organization Routes Integration Tests POST /api/v1/organizations should successfully create a new organization" time="0.037">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations should create organization with admin user when provided" name="Organization Routes Integration Tests POST /api/v1/organizations should create organization with admin user when provided" time="0.006">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations should return 400 for missing required fields" name="Organization Routes Integration Tests POST /api/v1/organizations should return 400 for missing required fields" time="0.004">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations should handle service errors gracefully" name="Organization Routes Integration Tests POST /api/v1/organizations should handle service errors gracefully" time="0.005">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations/:id/providers should successfully register a healthcare provider" name="Organization Routes Integration Tests POST /api/v1/organizations/:id/providers should successfully register a healthcare provider" time="0.005">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations/:id/providers should return 400 for missing required fields" name="Organization Routes Integration Tests POST /api/v1/organizations/:id/providers should return 400 for missing required fields" time="0.005">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations/:id/providers should return 400 for invalid provider role" name="Organization Routes Integration Tests POST /api/v1/organizations/:id/providers should return 400 for invalid provider role" time="0.004">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations/:id/providers should handle duplicate provider registration" name="Organization Routes Integration Tests POST /api/v1/organizations/:id/providers should handle duplicate provider registration" time="0.005">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations/:id/patients should successfully register a patient" name="Organization Routes Integration Tests POST /api/v1/organizations/:id/patients should successfully register a patient" time="0.006">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations/:id/patients should return 400 for missing required fields" name="Organization Routes Integration Tests POST /api/v1/organizations/:id/patients should return 400 for missing required fields" time="0.005">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations/:id/patients should return 400 for invalid date format" name="Organization Routes Integration Tests POST /api/v1/organizations/:id/patients should return 400 for invalid date format" time="0.003">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations/:id/patients/:patientId/caregivers should successfully add a caregiver" name="Organization Routes Integration Tests POST /api/v1/organizations/:id/patients/:patientId/caregivers should successfully add a caregiver" time="0.003">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations/:id/patients/:patientId/caregivers should return 400 for invalid relationship type" name="Organization Routes Integration Tests POST /api/v1/organizations/:id/patients/:patientId/caregivers should return 400 for invalid relationship type" time="0.004">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations/:id/staff should successfully register support staff" name="Organization Routes Integration Tests POST /api/v1/organizations/:id/staff should successfully register support staff" time="0.003">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations/:id/staff should return 400 for invalid staff role" name="Organization Routes Integration Tests POST /api/v1/organizations/:id/staff should return 400 for invalid staff role" time="0.003">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations/:id/bulk/providers should handle bulk provider registration with mixed results" name="Organization Routes Integration Tests POST /api/v1/organizations/:id/bulk/providers should handle bulk provider registration with mixed results" time="0.003">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests POST /api/v1/organizations/:id/bulk/providers should return 400 for empty providers array" name="Organization Routes Integration Tests POST /api/v1/organizations/:id/bulk/providers should return 400 for empty providers array" time="0.003">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests GET /api/v1/organizations/:id should successfully get organization details" name="Organization Routes Integration Tests GET /api/v1/organizations/:id should successfully get organization details" time="0.003">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests GET /api/v1/organizations/:id should return 404 for non-existent organization" name="Organization Routes Integration Tests GET /api/v1/organizations/:id should return 404 for non-existent organization" time="0.004">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests GET /api/v1/organizations/:id/stats should return organization statistics" name="Organization Routes Integration Tests GET /api/v1/organizations/:id/stats should return organization statistics" time="0.003">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests GET /api/v1/organizations/:id/onboarding should return onboarding status" name="Organization Routes Integration Tests GET /api/v1/organizations/:id/onboarding should return onboarding status" time="0.003">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests GET /api/v1/organizations/:id/roles should return available user roles" name="Organization Routes Integration Tests GET /api/v1/organizations/:id/roles should return available user roles" time="0.004">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests GET /api/v1/organizations/:id/departments should return organization departments" name="Organization Routes Integration Tests GET /api/v1/organizations/:id/departments should return organization departments" time="0.003">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests Multi-Tenant Middleware should call tenant resolution middleware for protected routes" name="Organization Routes Integration Tests Multi-Tenant Middleware should call tenant resolution middleware for protected routes" time="0.003">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests Error Handling should handle service errors with proper status codes" name="Organization Routes Integration Tests Error Handling should handle service errors with proper status codes" time="0.004">
+    </testcase>
+    <testcase classname="Organization Routes Integration Tests Error Handling should log all API operations" name="Organization Routes Integration Tests Error Handling should log all API operations" time="0">
+      <skipped/>
+    </testcase>
+  </testsuite>
+  <testsuite name="SupervisorAgent" errors="0" failures="0" skipped="12" timestamp="2025-05-25T14:24:01" time="0.229" tests="23">
+    <testcase classname="SupervisorAgent constructor should create a SupervisorAgent instance" name="SupervisorAgent constructor should create a SupervisorAgent instance" time="0">
+    </testcase>
+    <testcase classname="SupervisorAgent isAgentActive should return false initially" name="SupervisorAgent isAgentActive should return false initially" time="0.001">
+    </testcase>
+    <testcase classname="SupervisorAgent healthCheck should return health status for all services" name="SupervisorAgent healthCheck should return health status for all services" time="0.001">
+    </testcase>
+    <testcase classname="SupervisorAgent healthCheck should return healthy status when all services are available" name="SupervisorAgent healthCheck should return healthy status when all services are available" time="0">
+    </testcase>
+    <testcase classname="SupervisorAgent process should process message and return response" name="SupervisorAgent process should process message and return response" time="0.001">
+    </testcase>
+    <testcase classname="SupervisorAgent process should handle invalid token by creating guest session" name="SupervisorAgent process should handle invalid token by creating guest session" time="0.001">
+    </testcase>
+    <testcase classname="SupervisorAgent process should handle no token by creating guest session" name="SupervisorAgent process should handle no token by creating guest session" time="0">
+    </testcase>
+    <testcase classname="SupervisorAgent process should handle errors gracefully" name="SupervisorAgent process should handle errors gracefully" time="0.003">
+    </testcase>
+    <testcase classname="SupervisorAgent resetConversation should reset conversation successfully" name="SupervisorAgent resetConversation should reset conversation successfully" time="0.001">
+    </testcase>
+    <testcase classname="SupervisorAgent resetConversation should handle reset errors gracefully" name="SupervisorAgent resetConversation should handle reset errors gracefully" time="0">
+    </testcase>
+    <testcase classname="SupervisorAgent Intent Analysis should recognize booking intent" name="SupervisorAgent Intent Analysis should recognize booking intent" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="SupervisorAgent Intent Analysis should recognize availability intent" name="SupervisorAgent Intent Analysis should recognize availability intent" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="SupervisorAgent Intent Analysis should recognize information intent" name="SupervisorAgent Intent Analysis should recognize information intent" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="SupervisorAgent Intent Analysis should handle general/unknown intents" name="SupervisorAgent Intent Analysis should handle general/unknown intents" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="SupervisorAgent Agent State Management should track active state during processing" name="SupervisorAgent Agent State Management should track active state during processing" time="0.001">
+    </testcase>
+    <testcase classname="SupervisorAgent Agent State Management should reset active state on error" name="SupervisorAgent Agent State Management should reset active state on error" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="SupervisorAgent Metrics Collection should track operation metrics" name="SupervisorAgent Metrics Collection should track operation metrics" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="SupervisorAgent Metrics Collection should record error metrics on failure" name="SupervisorAgent Metrics Collection should record error metrics on failure" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="SupervisorAgent Error Handling should handle booking agent errors" name="SupervisorAgent Error Handling should handle booking agent errors" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="SupervisorAgent Error Handling should handle availability agent errors" name="SupervisorAgent Error Handling should handle availability agent errors" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="SupervisorAgent Error Handling should handle FAQ agent errors" name="SupervisorAgent Error Handling should handle FAQ agent errors" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="SupervisorAgent Logging should log processing start" name="SupervisorAgent Logging should log processing start" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="SupervisorAgent Logging should log delegation actions" name="SupervisorAgent Logging should log delegation actions" time="0">
+      <skipped/>
+    </testcase>
+  </testsuite>
+  <testsuite name="API Contract Tests" errors="0" failures="0" skipped="0" timestamp="2025-05-25T14:24:01" time="0.316" tests="13">
+    <testcase classname="API Contract Tests Health Endpoint Contract should follow health response contract" name="API Contract Tests Health Endpoint Contract should follow health response contract" time="0.016">
+    </testcase>
+    <testcase classname="API Contract Tests Agent Processing Endpoint Contract should follow successful processing response contract" name="API Contract Tests Agent Processing Endpoint Contract should follow successful processing response contract" time="0.006">
+    </testcase>
+    <testcase classname="API Contract Tests Agent Processing Endpoint Contract should follow error response contract for missing message" name="API Contract Tests Agent Processing Endpoint Contract should follow error response contract for missing message" time="0.003">
+    </testcase>
+    <testcase classname="API Contract Tests Agent Processing Endpoint Contract should reject requests without proper content-type" name="API Contract Tests Agent Processing Endpoint Contract should reject requests without proper content-type" time="0.003">
+    </testcase>
+    <testcase classname="API Contract Tests Agent Status Endpoint Contract should follow status response contract" name="API Contract Tests Agent Status Endpoint Contract should follow status response contract" time="0.003">
+    </testcase>
+    <testcase classname="API Contract Tests Metrics Endpoint Contract should follow metrics response contract" name="API Contract Tests Metrics Endpoint Contract should follow metrics response contract" time="0.003">
+    </testcase>
+    <testcase classname="API Contract Tests Reset Endpoint Contract should follow reset response contract" name="API Contract Tests Reset Endpoint Contract should follow reset response contract" time="0.004">
+    </testcase>
+    <testcase classname="API Contract Tests Error Handling Contract should follow 404 error contract" name="API Contract Tests Error Handling Contract should follow 404 error contract" time="0.003">
+    </testcase>
+    <testcase classname="API Contract Tests Response Header Contracts all JSON endpoints should return proper content-type" name="API Contract Tests Response Header Contracts all JSON endpoints should return proper content-type" time="0.009">
+    </testcase>
+    <testcase classname="API Contract Tests Response Header Contracts all endpoints should include security headers" name="API Contract Tests Response Header Contracts all endpoints should include security headers" time="0.002">
+    </testcase>
+    <testcase classname="API Contract Tests Timestamp Consistency Contract all endpoints should return ISO 8601 timestamps" name="API Contract Tests Timestamp Consistency Contract all endpoints should return ISO 8601 timestamps" time="0.011">
+    </testcase>
+    <testcase classname="API Contract Tests Request Validation Contracts POST endpoints should validate required fields" name="API Contract Tests Request Validation Contracts POST endpoints should validate required fields" time="0.002">
+    </testcase>
+    <testcase classname="API Contract Tests Request Validation Contracts endpoints should handle large payloads appropriately" name="API Contract Tests Request Validation Contracts endpoints should handle large payloads appropriately" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="API Integration Tests" errors="0" failures="0" skipped="0" timestamp="2025-05-25T14:24:01" time="0.115" tests="15">
+    <testcase classname="API Integration Tests Health Endpoint GET /health should return health status" name="API Integration Tests Health Endpoint GET /health should return health status" time="0.009">
+    </testcase>
+    <testcase classname="API Integration Tests Agent Processing Endpoint POST /api/v1/agents/process should process booking request" name="API Integration Tests Agent Processing Endpoint POST /api/v1/agents/process should process booking request" time="0.004">
+    </testcase>
+    <testcase classname="API Integration Tests Agent Processing Endpoint POST /api/v1/agents/process should process availability request" name="API Integration Tests Agent Processing Endpoint POST /api/v1/agents/process should process availability request" time="0.004">
+    </testcase>
+    <testcase classname="API Integration Tests Agent Processing Endpoint POST /api/v1/agents/process should process doctor information request" name="API Integration Tests Agent Processing Endpoint POST /api/v1/agents/process should process doctor information request" time="0.002">
+    </testcase>
+    <testcase classname="API Integration Tests Agent Processing Endpoint POST /api/v1/agents/process should return 400 for missing message" name="API Integration Tests Agent Processing Endpoint POST /api/v1/agents/process should return 400 for missing message" time="0.003">
+    </testcase>
+    <testcase classname="API Integration Tests Agent Processing Endpoint POST /api/v1/agents/process should handle empty message" name="API Integration Tests Agent Processing Endpoint POST /api/v1/agents/process should handle empty message" time="0.003">
+    </testcase>
+    <testcase classname="API Integration Tests Agent Status Endpoint GET /api/v1/agents/status should return agent status" name="API Integration Tests Agent Status Endpoint GET /api/v1/agents/status should return agent status" time="0.003">
+    </testcase>
+    <testcase classname="API Integration Tests Metrics Endpoint GET /api/v1/metrics should return metrics" name="API Integration Tests Metrics Endpoint GET /api/v1/metrics should return metrics" time="0.002">
+    </testcase>
+    <testcase classname="API Integration Tests Reset Endpoint POST /api/v1/agents/reset should reset conversation" name="API Integration Tests Reset Endpoint POST /api/v1/agents/reset should reset conversation" time="0.002">
+    </testcase>
+    <testcase classname="API Integration Tests Error Handling should return 404 for unknown endpoints" name="API Integration Tests Error Handling should return 404 for unknown endpoints" time="0.003">
+    </testcase>
+    <testcase classname="API Integration Tests Error Handling should handle malformed JSON" name="API Integration Tests Error Handling should handle malformed JSON" time="0.004">
+    </testcase>
+    <testcase classname="API Integration Tests Content-Type Validation should accept application/json content type" name="API Integration Tests Content-Type Validation should accept application/json content type" time="0.003">
+    </testcase>
+    <testcase classname="API Integration Tests Content-Type Validation should handle missing content-type header" name="API Integration Tests Content-Type Validation should handle missing content-type header" time="0.003">
+    </testcase>
+    <testcase classname="API Integration Tests Response Format Validation all endpoints should return proper timestamp format" name="API Integration Tests Response Format Validation all endpoints should return proper timestamp format" time="0.009">
+    </testcase>
+    <testcase classname="API Integration Tests Response Format Validation agent process endpoint should include response and timestamp" name="API Integration Tests Response Format Validation agent process endpoint should include response and timestamp" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="Logger" errors="0" failures="0" skipped="0" timestamp="2025-05-25T14:24:01" time="0.04" tests="7">
+    <testcase classname="Logger Logging Methods should log info messages" name="Logger Logging Methods should log info messages" time="0.004">
+    </testcase>
+    <testcase classname="Logger Logging Methods should log error messages" name="Logger Logging Methods should log error messages" time="0.005">
+    </testcase>
+    <testcase classname="Logger Logging Methods should log warning messages" name="Logger Logging Methods should log warning messages" time="0.001">
+    </testcase>
+    <testcase classname="Logger Logging Methods should log debug messages" name="Logger Logging Methods should log debug messages" time="0.001">
+    </testcase>
+    <testcase classname="Logger Logger Configuration should create logger instance" name="Logger Logger Configuration should create logger instance" time="0.001">
+    </testcase>
+    <testcase classname="Logger Logger Configuration should handle messages without metadata" name="Logger Logger Configuration should handle messages without metadata" time="0.003">
+    </testcase>
+    <testcase classname="Logger Logger Configuration should handle empty messages" name="Logger Logger Configuration should handle empty messages" time="0.004">
+    </testcase>
+  </testsuite>
+  <testsuite name="Health API Integration Tests" errors="0" failures="0" skipped="0" timestamp="2025-05-25T14:24:02" time="0.05" tests="5">
+    <testcase classname="Health API Integration Tests GET /health should return health status" name="Health API Integration Tests GET /health should return health status" time="0.008">
+    </testcase>
+    <testcase classname="Health API Integration Tests GET /health should include version information" name="Health API Integration Tests GET /health should include version information" time="0.002">
+    </testcase>
+    <testcase classname="Health API Integration Tests GET /api/v1/health should return detailed health status" name="Health API Integration Tests GET /api/v1/health should return detailed health status" time="0.003">
+    </testcase>
+    <testcase classname="Health API Integration Tests GET /api/v1/health should include timestamp in response" name="Health API Integration Tests GET /api/v1/health should include timestamp in response" time="0.004">
+    </testcase>
+    <testcase classname="Health API Integration Tests Error handling should handle non-existent routes" name="Health API Integration Tests Error handling should handle non-existent routes" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="OllamaService" errors="0" failures="0" skipped="0" timestamp="2025-05-25T14:24:02" time="0.03" tests="15">
+    <testcase classname="OllamaService generateResponse should generate a response successfully" name="OllamaService generateResponse should generate a response successfully" time="0.002">
+    </testcase>
+    <testcase classname="OllamaService generateResponse should handle API errors gracefully" name="OllamaService generateResponse should handle API errors gracefully" time="0.007">
+    </testcase>
+    <testcase classname="OllamaService generateResponse should handle network errors" name="OllamaService generateResponse should handle network errors" time="0">
+    </testcase>
+    <testcase classname="OllamaService generateResponse should format messages correctly with context and system prompt" name="OllamaService generateResponse should format messages correctly with context and system prompt" time="0.001">
+    </testcase>
+    <testcase classname="OllamaService analyzeIntent should analyze intent successfully" name="OllamaService analyzeIntent should analyze intent successfully" time="0">
+    </testcase>
+    <testcase classname="OllamaService analyzeIntent should use fallback intent analysis for invalid JSON" name="OllamaService analyzeIntent should use fallback intent analysis for invalid JSON" time="0.001">
+    </testcase>
+    <testcase classname="OllamaService analyzeIntent should handle intent analysis errors" name="OllamaService analyzeIntent should handle intent analysis errors" time="0">
+    </testcase>
+    <testcase classname="OllamaService generateEmbeddings should generate embeddings successfully" name="OllamaService generateEmbeddings should generate embeddings successfully" time="0.002">
+    </testcase>
+    <testcase classname="OllamaService generateEmbeddings should handle embedding generation errors" name="OllamaService generateEmbeddings should handle embedding generation errors" time="0.001">
+    </testcase>
+    <testcase classname="OllamaService healthCheck should return true when Ollama is healthy" name="OllamaService healthCheck should return true when Ollama is healthy" time="0">
+    </testcase>
+    <testcase classname="OllamaService healthCheck should return false when Ollama is unhealthy" name="OllamaService healthCheck should return false when Ollama is unhealthy" time="0.001">
+    </testcase>
+    <testcase classname="OllamaService healthCheck should return false on network errors" name="OllamaService healthCheck should return false on network errors" time="0">
+    </testcase>
+    <testcase classname="OllamaService pullModel should pull model successfully" name="OllamaService pullModel should pull model successfully" time="0.002">
+    </testcase>
+    <testcase classname="OllamaService pullModel should use default model when none specified" name="OllamaService pullModel should use default model when none specified" time="0">
+    </testcase>
+    <testcase classname="OllamaService pullModel should handle pull errors" name="OllamaService pullModel should handle pull errors" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="MetricsCollector" errors="0" failures="0" skipped="0" timestamp="2025-05-25T14:24:02" time="0.029" tests="12">
+    <testcase classname="MetricsCollector Counter Metrics should increment counter with default value" name="MetricsCollector Counter Metrics should increment counter with default value" time="0.001">
+    </testcase>
+    <testcase classname="MetricsCollector Counter Metrics should increment counter with custom value" name="MetricsCollector Counter Metrics should increment counter with custom value" time="0">
+    </testcase>
+    <testcase classname="MetricsCollector Counter Metrics should accumulate counter values" name="MetricsCollector Counter Metrics should accumulate counter values" time="0.001">
+    </testcase>
+    <testcase classname="MetricsCollector Timing Metrics should record timing metric" name="MetricsCollector Timing Metrics should record timing metric" time="0">
+    </testcase>
+    <testcase classname="MetricsCollector Timing Metrics should track operation start and end" name="MetricsCollector Timing Metrics should track operation start and end" time="0.012">
+    </testcase>
+    <testcase classname="MetricsCollector Error Metrics should record error for operation" name="MetricsCollector Error Metrics should record error for operation" time="0">
+    </testcase>
+    <testcase classname="MetricsCollector Error Metrics should accumulate error counts" name="MetricsCollector Error Metrics should accumulate error counts" time="0">
+    </testcase>
+    <testcase classname="MetricsCollector Metric Retrieval should return 0 for non-existent metric" name="MetricsCollector Metric Retrieval should return 0 for non-existent metric" time="0.001">
+    </testcase>
+    <testcase classname="MetricsCollector Metric Retrieval should return all metrics" name="MetricsCollector Metric Retrieval should return all metrics" time="0">
+    </testcase>
+    <testcase classname="MetricsCollector Metric Retrieval should export metrics as object" name="MetricsCollector Metric Retrieval should export metrics as object" time="0.001">
+    </testcase>
+    <testcase classname="MetricsCollector Metric Reset should reset all metrics" name="MetricsCollector Metric Reset should reset all metrics" time="0">
+    </testcase>
+    <testcase classname="MetricsCollector Metric Reset should log reset action" name="MetricsCollector Metric Reset should log reset action" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="ValidationService" errors="0" failures="0" skipped="0" timestamp="2025-05-25T14:24:02" time="0.025" tests="21">
+    <testcase classname="ValidationService Email Validation should validate correct email formats" name="ValidationService Email Validation should validate correct email formats" time="0.002">
+    </testcase>
+    <testcase classname="ValidationService Email Validation should reject invalid email formats" name="ValidationService Email Validation should reject invalid email formats" time="0">
+    </testcase>
+    <testcase classname="ValidationService Email Validation should validate email using validation service" name="ValidationService Email Validation should validate email using validation service" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService Phone Validation should validate correct phone formats" name="ValidationService Phone Validation should validate correct phone formats" time="0">
+    </testcase>
+    <testcase classname="ValidationService Phone Validation should reject invalid phone formats" name="ValidationService Phone Validation should reject invalid phone formats" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService Phone Validation should validate phone using validation service" name="ValidationService Phone Validation should validate phone using validation service" time="0">
+    </testcase>
+    <testcase classname="ValidationService Booking Validation should validate complete booking details" name="ValidationService Booking Validation should validate complete booking details" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService Booking Validation should reject booking with missing required fields" name="ValidationService Booking Validation should reject booking with missing required fields" time="0">
+    </testcase>
+    <testcase classname="ValidationService Booking Validation should reject booking with invalid email" name="ValidationService Booking Validation should reject booking with invalid email" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService Booking Validation should reject booking with past date" name="ValidationService Booking Validation should reject booking with past date" time="0">
+    </testcase>
+    <testcase classname="ValidationService Booking Validation should reject booking outside business hours" name="ValidationService Booking Validation should reject booking outside business hours" time="0">
+    </testcase>
+    <testcase classname="ValidationService Booking Validation should reject weekend bookings" name="ValidationService Booking Validation should reject weekend bookings" time="0">
+    </testcase>
+    <testcase classname="ValidationService Doctor Validation should validate complete doctor data" name="ValidationService Doctor Validation should validate complete doctor data" time="0">
+    </testcase>
+    <testcase classname="ValidationService Doctor Validation should reject doctor with missing name" name="ValidationService Doctor Validation should reject doctor with missing name" time="0">
+    </testcase>
+    <testcase classname="ValidationService Doctor Validation should reject doctor with invalid email" name="ValidationService Doctor Validation should reject doctor with invalid email" time="0">
+    </testcase>
+    <testcase classname="ValidationService FAQ Validation should validate complete FAQ data" name="ValidationService FAQ Validation should validate complete FAQ data" time="0.002">
+    </testcase>
+    <testcase classname="ValidationService FAQ Validation should reject FAQ with short question" name="ValidationService FAQ Validation should reject FAQ with short question" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService FAQ Validation should reject FAQ with short answer" name="ValidationService FAQ Validation should reject FAQ with short answer" time="0">
+    </testcase>
+    <testcase classname="ValidationService Input Sanitization should remove HTML tags" name="ValidationService Input Sanitization should remove HTML tags" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService Input Sanitization should trim whitespace" name="ValidationService Input Sanitization should trim whitespace" time="0">
+    </testcase>
+    <testcase classname="ValidationService Input Sanitization should handle empty input" name="ValidationService Input Sanitization should handle empty input" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="Agent Contract Tests" errors="0" failures="0" skipped="0" timestamp="2025-05-25T14:24:02" time="0.019" tests="9">
+    <testcase classname="Agent Contract Tests Agent Implementation Contract should ensure all agents implement required process method" name="Agent Contract Tests Agent Implementation Contract should ensure all agents implement required process method" time="0">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Implementation Contract should ensure all agents implement isAgentActive method" name="Agent Contract Tests Agent Implementation Contract should ensure all agents implement isAgentActive method" time="0.001">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Implementation Contract should ensure process method returns a Promise" name="Agent Contract Tests Agent Implementation Contract should ensure process method returns a Promise" time="0">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Implementation Contract should ensure isAgentActive method returns boolean" name="Agent Contract Tests Agent Implementation Contract should ensure isAgentActive method returns boolean" time="0.002">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Method Signatures should have consistent process method signature" name="Agent Contract Tests Agent Method Signatures should have consistent process method signature" time="0">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Method Signatures should have consistent isAgentActive method signature" name="Agent Contract Tests Agent Method Signatures should have consistent isAgentActive method signature" time="0.001">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Constructor Requirements should have constructors that accept required dependencies" name="Agent Contract Tests Agent Constructor Requirements should have constructors that accept required dependencies" time="0">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Interface Compliance should ensure all agents can be instantiated with proper dependencies" name="Agent Contract Tests Agent Interface Compliance should ensure all agents can be instantiated with proper dependencies" time="0">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Interface Compliance should ensure all agents are classes" name="Agent Contract Tests Agent Interface Compliance should ensure all agents are classes" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="ErrorHandler" errors="0" failures="0" skipped="0" timestamp="2025-05-25T14:24:02" time="0.021" tests="10">
+    <testcase classname="ErrorHandler Custom Error Types should create AgentError correctly" name="ErrorHandler Custom Error Types should create AgentError correctly" time="0">
+    </testcase>
+    <testcase classname="ErrorHandler Custom Error Types should create ToolError correctly" name="ErrorHandler Custom Error Types should create ToolError correctly" time="0.001">
+    </testcase>
+    <testcase classname="ErrorHandler Custom Error Types should create ValidationError correctly" name="ErrorHandler Custom Error Types should create ValidationError correctly" time="0.001">
+    </testcase>
+    <testcase classname="ErrorHandler Error Handling should handle AgentError" name="ErrorHandler Error Handling should handle AgentError" time="0.003">
+    </testcase>
+    <testcase classname="ErrorHandler Error Handling should handle ToolError" name="ErrorHandler Error Handling should handle ToolError" time="0">
+    </testcase>
+    <testcase classname="ErrorHandler Error Handling should handle ValidationError" name="ErrorHandler Error Handling should handle ValidationError" time="0.001">
+    </testcase>
+    <testcase classname="ErrorHandler Error Handling should handle generic Error" name="ErrorHandler Error Handling should handle generic Error" time="0">
+    </testcase>
+    <testcase classname="ErrorHandler Error Retry Logic should identify retryable errors" name="ErrorHandler Error Retry Logic should identify retryable errors" time="0">
+    </testcase>
+    <testcase classname="ErrorHandler Error Retry Logic should identify non-retryable errors" name="ErrorHandler Error Retry Logic should identify non-retryable errors" time="0">
+    </testcase>
+    <testcase classname="ErrorHandler Error Type Classification should classify error types correctly" name="ErrorHandler Error Type Classification should classify error types correctly" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="OrganizationService" errors="0" failures="0" skipped="18" timestamp="2025-05-25T14:24:02" time="0.015" tests="18">
+    <testcase classname="OrganizationService createOrganization should successfully create a new healthcare organization" name="OrganizationService createOrganization should successfully create a new healthcare organization" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService createOrganization should throw error for duplicate slug" name="OrganizationService createOrganization should throw error for duplicate slug" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService createOrganization should throw error for missing required fields" name="OrganizationService createOrganization should throw error for missing required fields" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService createOrganization should handle database errors gracefully" name="OrganizationService createOrganization should handle database errors gracefully" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService registerProvider should successfully register a healthcare provider" name="OrganizationService registerProvider should successfully register a healthcare provider" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService registerProvider should throw error for duplicate provider email in same organization" name="OrganizationService registerProvider should throw error for duplicate provider email in same organization" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService registerProvider should throw error for invalid role" name="OrganizationService registerProvider should throw error for invalid role" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService registerPatient should successfully register a patient" name="OrganizationService registerPatient should successfully register a patient" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService registerPatient should throw error for duplicate patient email in same organization" name="OrganizationService registerPatient should throw error for duplicate patient email in same organization" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService registerPatient should generate medical record number if not provided" name="OrganizationService registerPatient should generate medical record number if not provided" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService addCaregiver should successfully add a caregiver relationship" name="OrganizationService addCaregiver should successfully add a caregiver relationship" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService addCaregiver should use existing caregiver if already exists" name="OrganizationService addCaregiver should use existing caregiver if already exists" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService getOnboardingStatus should return correct onboarding status" name="OrganizationService getOnboardingStatus should return correct onboarding status" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService getOnboardingStatus should mark as complete when all steps are done" name="OrganizationService getOnboardingStatus should mark as complete when all steps are done" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService getOrganizationStats should return organization statistics" name="OrganizationService getOrganizationStats should return organization statistics" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService Data Isolation should set tenant context for all operations" name="OrganizationService Data Isolation should set tenant context for all operations" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService Error Handling should rollback transaction on any error" name="OrganizationService Error Handling should rollback transaction on any error" time="0">
+      <skipped/>
+    </testcase>
+    <testcase classname="OrganizationService Error Handling should release client connection in finally block" name="OrganizationService Error Handling should release client connection in finally block" time="0">
+      <skipped/>
+    </testcase>
+  </testsuite>
+</testsuites>

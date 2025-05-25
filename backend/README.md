@@ -13,7 +13,7 @@ This is the backend API for the AgentCare healthcare scheduling system, built us
 - **FAQ Agent**: Provides healthcare information and answers
 
 ### Technology Stack
-- **Runtime**: Node.js 18+
+- **Runtime**: Node.js 22+
 - **Framework**: Express.js
 - **Language**: TypeScript
 - **Database**: PostgreSQL
@@ -24,7 +24,7 @@ This is the backend API for the AgentCare healthcare scheduling system, built us
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ and npm 8+
+- Node.js 22+ and npm 10+
 - PostgreSQL 13+
 - Redis 6+
 - Ollama (for LLM functionality)

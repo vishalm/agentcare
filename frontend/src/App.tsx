@@ -16,7 +16,7 @@ import DashboardPage from './pages/DashboardPage';
 import ChatPage from './pages/ChatPage';
 import AdminPage from './pages/AdminPage';
 import ProfilePage from './pages/ProfilePage';
-import LoadingSpinner from './components/UI/LoadingSpinner';
+// import LoadingSpinner from './components/UI/LoadingSpinner';
 
 // Create a React Query client
 const queryClient = new QueryClient({
@@ -59,7 +59,7 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 const App: React.FC = () => {
-  const { user, theme, getThemeForUser } = useAuthStore();
+  const { getThemeForUser } = useAuthStore();
   
   // Get the current theme based on user role or selected theme
   const currentTheme = useMemo(() => {
@@ -70,6 +70,7 @@ const App: React.FC = () => {
   // Initialize app on mount
   useEffect(() => {
     // Any app initialization logic here
+    // eslint-disable-next-line no-console
     console.log('🏥 AgentCare Frontend Initialized');
   }, []);
 

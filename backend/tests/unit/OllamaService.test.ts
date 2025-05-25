@@ -1,6 +1,6 @@
-import { OllamaService } from '../../backend/src/services/OllamaService';
-import { Logger } from '../../backend/src/utils/Logger';
-import { Config } from '../../backend/src/utils/Config';
+import { OllamaService } from '../../src/services/OllamaService';
+import { Logger } from '../../src/utils/Logger';
+import { Config } from '../../src/utils/Config';
 
 // Mock fetch globally
 global.fetch = jest.fn();

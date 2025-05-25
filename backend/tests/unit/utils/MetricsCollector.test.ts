@@ -1,5 +1,5 @@
-import { MetricsCollector } from '../../../backend/src/utils/MetricsCollector';
-import { Logger } from '../../../backend/src/utils/Logger';
+import { MetricsCollector } from '../../../src/utils/MetricsCollector';
+import { Logger } from '../../../src/utils/Logger';
 
 describe('MetricsCollector', () => {
   let metricsCollector: MetricsCollector;

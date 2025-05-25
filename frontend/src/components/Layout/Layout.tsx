@@ -23,20 +23,20 @@ import {
   Logout,
   Brightness4,
   Brightness7,
-  Dashboard,
-  Chat,
-  AdminPanelSettings,
+  // Dashboard,
+  // Chat,
+  // AdminPanelSettings,
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useAuthStore } from '../../store/authStore';
-import { themesByRole } from '../../theme/themes';
+// import { themesByRole } from '../../theme/themes';
 import Sidebar from './Sidebar';
 import ThemeSelector from '../UI/ThemeSelector';
 
 const Layout: React.FC = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  // const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { user, logout, setTheme, getThemeForUser } = useAuthStore();
   
   const [mobileOpen, setMobileOpen] = useState(false);

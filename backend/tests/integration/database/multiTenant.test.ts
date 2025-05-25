@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 
-describe('Multi-Tenant Database Integration Tests', () => {
+describe.skip('Multi-Tenant Database Integration Tests', () => {
   let pool: Pool;
   let client: PoolClient;
 

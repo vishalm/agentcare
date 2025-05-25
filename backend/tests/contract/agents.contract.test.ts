@@ -1,7 +1,7 @@
-import { SupervisorAgent } from '../../backend/src/agents/SupervisorAgent';
-import { AvailabilityAgent } from '../../backend/src/agents/AvailabilityAgent';
-import { BookingAgent } from '../../backend/src/agents/BookingAgent';
-import { FAQAgent } from '../../backend/src/agents/FAQAgent';
+import { SupervisorAgent } from '../../src/agents/SupervisorAgent';
+import { AvailabilityAgent } from '../../src/agents/AvailabilityAgent';
+import { BookingAgent } from '../../src/agents/BookingAgent';
+import { FAQAgent } from '../../src/agents/FAQAgent';
 
 describe('Agent Contract Tests', () => {
   describe('Agent Implementation Contract', () => {

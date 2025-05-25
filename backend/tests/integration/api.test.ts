@@ -1,12 +1,12 @@
 import request from 'supertest';
 import express from 'express';
-import { Logger } from '../../backend/src/utils/Logger';
-import { MetricsCollector } from '../../backend/src/utils/MetricsCollector';
-import { Config } from '../../backend/src/utils/Config';
-import { SupervisorAgent } from '../../backend/src/agents/SupervisorAgent';
+import { Logger } from '../../src/utils/Logger';
+import { MetricsCollector } from '../../src/utils/MetricsCollector';
+import { Config } from '../../src/utils/Config';
+import { SupervisorAgent } from '../../src/agents/SupervisorAgent';
 
 // Mock config to avoid file system dependencies
-jest.mock('../../backend/src/utils/Config');
+jest.mock('../../src/utils/Config');
 
 describe('API Integration Tests', () => {
   let app: express.Application;

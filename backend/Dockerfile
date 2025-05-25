@@ -2,7 +2,7 @@
 # Multi-Agent Healthcare Scheduling API
 
 # Build stage
-FROM node:18-alpine AS build
+FROM node:22-alpine AS build
 LABEL maintainer="AgentCare Team <dev@agentcare.com>"
 LABEL description="AgentCare Backend API Service"
 LABEL version="3.0.0"
@@ -30,7 +30,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine AS production
+FROM node:22-alpine AS production
 ENV NODE_ENV=production
 ENV PORT=3000
 
@@ -78,7 +78,7 @@ ENTRYPOINT ["tini", "--"]
 CMD ["node", "dist/server.js"]
 
 # Development stage (for development builds)
-FROM node:18-alpine AS development
+FROM node:22-alpine AS development
 ENV NODE_ENV=development
 
 RUN apk add --no-cache \

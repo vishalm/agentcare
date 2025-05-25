@@ -1,5 +1,5 @@
-import { ValidationService } from '../../../backend/src/services/ValidationService';
-import { Logger } from '../../../backend/src/utils/Logger';
+import { ValidationService } from '../../../src/services/ValidationService';
+import { Logger } from '../../../src/utils/Logger';
 
 describe('ValidationService', () => {
   let validationService: ValidationService;

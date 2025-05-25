@@ -1,6 +1,6 @@
-import { ErrorHandler, AgentError, ToolError, ValidationError } from '../../../backend/src/utils/ErrorHandler';
-import { Logger } from '../../../backend/src/utils/Logger';
-import { MetricsCollector } from '../../../backend/src/utils/MetricsCollector';
+import { ErrorHandler, AgentError, ToolError, ValidationError } from '../../../src/utils/ErrorHandler';
+import { Logger } from '../../../src/utils/Logger';
+import { MetricsCollector } from '../../../src/utils/MetricsCollector';
 
 describe('ErrorHandler', () => {
   let errorHandler: ErrorHandler;
