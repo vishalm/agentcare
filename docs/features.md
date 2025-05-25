@@ -2,6 +2,7 @@
 layout: default
 title: "Platform Features"
 description: "Comprehensive healthcare platform features including multi-tenant architecture, AI coordination, HIPAA compliance, and enterprise integrations."
+permalink: /features/
 ---
 
 {% include doc-header.html %}

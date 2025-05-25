@@ -8,28 +8,28 @@ Welcome to the comprehensive documentation for AgentCare - the AI-powered health
 ## 🚀 Quick Navigation
 
 ### 🏃‍♂️ Getting Started
-- **[🚀 Quick Start Guide](/agentcare/docs/setup/QUICK_START.html)** - Get up and running in minutes
-- **[🐳 Docker Setup](/agentcare/docs/setup/DOCKER_SETUP.html)** - Complete containerized development environment
-- **[⚙️ Environment Configuration](/agentcare/docs/setup/PLATFORM_SETUP_GUIDE.html)** - Configuration and environment variables
+- **[🚀 Quick Start Guide](https://github.com/vishalm/agentcare#quick-start)** - Get up and running in minutes
+- **[🐳 Docker Setup](https://github.com/vishalm/agentcare/blob/main/docs/setup/DOCKER_SETUP.md)** - Complete containerized development environment
+- **[⚙️ Environment Configuration](https://github.com/vishalm/agentcare/blob/main/docs/setup/PLATFORM_SETUP_GUIDE.md)** - Configuration and environment variables
 
 ### 🏗️ Architecture & Design
-- **[📊 System Architecture](/agentcare/docs/architecture/diagrams/SYSTEM_ARCHITECTURE.html)** - Visual system diagrams
-- **[🏛️ Architecture Guide](/agentcare/docs/architecture/ARCHITECTURE_GUIDE.html)** - Detailed system design
-- **[🏢 Multi-Tenancy](/agentcare/docs/architecture/MULTI_TENANCY_GUIDE.html)** - Tenant isolation and management
-- **[🔄 12-Factor App](/agentcare/docs/architecture/TWELVE_FACTOR_GUIDE.html)** - 12-Factor methodology compliance
+- **[📊 System Architecture](/agentcare/architecture/)** - Visual system diagrams and detailed design
+- **[🏛️ Architecture Guide](/agentcare/architecture/)** - Detailed system design
+- **[🏢 Multi-Tenancy](https://github.com/vishalm/agentcare/blob/main/docs/architecture/MULTI_TENANCY_GUIDE.md)** - Tenant isolation and management
+- **[🔄 12-Factor App](https://github.com/vishalm/agentcare/blob/main/docs/architecture/TWELVE_FACTOR_GUIDE.md)** - 12-Factor methodology compliance
 
 ### 📁 Project Organization
-- **[📂 Project Structure](/agentcare/docs/PROJECT_STRUCTURE.html)** - Complete codebase organization
-- **[📋 Documentation Organization](/agentcare/docs/DOCUMENTATION_ORGANIZATION.html)** - How docs are structured
+- **[📂 Project Structure](/agentcare/PROJECT_STRUCTURE/)** - Complete codebase organization
+- **[📋 Documentation Organization](https://github.com/vishalm/agentcare/blob/main/docs/DOCUMENTATION_ORGANIZATION.md)** - How docs are structured
 
 ### 🔧 API & Development
-- **[📖 API Reference](/agentcare/docs/api-reference.html)** - Complete REST API documentation
-- **[🧪 Testing Guide](/agentcare/docs/testing.html)** - Comprehensive testing strategies
-- **[🎯 Features Guide](/agentcare/docs/features.html)** - Platform features overview
+- **[📖 API Reference](/agentcare/api-reference/)** - Complete REST API documentation
+- **[🧪 Testing Guide](/agentcare/testing/)** - Comprehensive testing strategies
+- **[🎯 Features Guide](/agentcare/features/)** - Platform features overview
 
 ### 🚀 Enterprise Features
-- **[🏥 Enterprise Guide](/agentcare/docs/enterprise.html)** - Enterprise features and capabilities
-- **[🔒 Security & Compliance](/agentcare/docs/architecture/ARCHITECTURE_GUIDE.html#security)** - Security best practices
+- **[🏥 Enterprise Guide](/agentcare/enterprise/)** - Enterprise features and capabilities
+- **[🔒 Security & Compliance](/agentcare/architecture/#security)** - Security best practices
 
 ## 🎯 Quick Reference
 
@@ -129,8 +129,8 @@ graph TB
 - **[Documentation Issues](https://github.com/vishalm/agentcare/issues/new?labels=documentation)** - Documentation improvements
 
 ### Additional Resources
-- **[Contributing Guide](/agentcare/CONTRIBUTING.html)** - How to contribute to the project
-- **[License](/agentcare/LICENSE.html)** - MIT license details
+- **[Contributing Guide](https://github.com/vishalm/agentcare/blob/main/CONTRIBUTING.md)** - How to contribute to the project
+- **[License](https://github.com/vishalm/agentcare/blob/main/LICENSE)** - MIT license details
 
 ---
 
