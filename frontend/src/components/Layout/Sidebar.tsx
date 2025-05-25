@@ -8,7 +8,6 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
-  Divider,
   Chip,
   useTheme,
 } from '@mui/material';
@@ -20,7 +19,6 @@ import {
   LocalHospital,
   Schedule,
   Assessment,
-  Settings,
   Help,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';

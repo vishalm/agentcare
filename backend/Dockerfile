@@ -21,7 +21,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --include=dev --no-audit --no-fund
+RUN npm ci --no-audit --no-fund
 
 # Copy backend source code
 COPY . .
@@ -93,7 +93,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install all dependencies (including dev)
-RUN npm ci --include=dev
+RUN npm ci
 
 # Copy backend source code
 COPY . .

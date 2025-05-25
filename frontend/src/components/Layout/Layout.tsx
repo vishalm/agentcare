@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import {
   Box,
   Drawer,
@@ -12,7 +12,6 @@ import {
   MenuItem,
   Divider,
   useTheme,
-  useMediaQuery,
   Chip,
   Stack,
 } from '@mui/material';
@@ -23,9 +22,6 @@ import {
   Logout,
   Brightness4,
   Brightness7,
-  // Dashboard,
-  // Chat,
-  // AdminPanelSettings,
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -36,6 +32,7 @@ import ThemeSelector from '../UI/ThemeSelector';
 
 const Layout: React.FC = () => {
   const theme = useTheme();
+  const location = useLocation();
   // const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { user, logout, setTheme, getThemeForUser } = useAuthStore();
   

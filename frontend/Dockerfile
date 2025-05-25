@@ -24,7 +24,7 @@ FROM base AS development
 ENV NODE_ENV=development
 
 # Install all dependencies
-RUN npm ci --include=dev
+RUN npm ci
 
 # Copy source code
 COPY . .
@@ -50,7 +50,7 @@ FROM base AS builder
 ENV NODE_ENV=production
 
 # Install all dependencies for building
-RUN npm ci --include=dev
+RUN npm ci
 
 # Copy source code
 COPY . .

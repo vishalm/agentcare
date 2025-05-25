@@ -36,7 +36,6 @@ import {
   Person,
   LocalHospital,
   Business,
-  Visibility,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 
@@ -54,7 +53,7 @@ interface User {
 
 const AdminPage: React.FC = () => {
   const theme = useTheme();
-  const { user } = useAuthStore();
+  const { user: _user } = useAuthStore();
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
