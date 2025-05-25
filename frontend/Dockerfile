@@ -2,7 +2,7 @@
 # React + TypeScript + Vite
 
 # Base stage
-FROM node:18-alpine AS base
+FROM node:22-alpine AS base
 LABEL maintainer="AgentCare Team <dev@agentcare.com>"
 LABEL description="AgentCare Frontend - AI Healthcare Scheduling Interface"
 LABEL version="2.0.0"

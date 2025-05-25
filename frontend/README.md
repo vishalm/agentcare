@@ -36,7 +36,7 @@ This is the frontend application for AgentCare - a sophisticated healthcare appo
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ and npm 8+
+- Node.js 22+ and npm 10+
 - Backend API running (see `../backend/README.md`)
 
 ### Installation
@@ -322,7 +322,7 @@ const AppointmentsPage = lazy(() => import('./pages/AppointmentsPage'));
 
 ### Development
 ```dockerfile
-FROM node:18-alpine
+FROM node:22-alpine
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
