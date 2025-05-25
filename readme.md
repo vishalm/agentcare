@@ -50,7 +50,7 @@
 ## 🚀 Quick Start
 
 ### Prerequisites
-- **Node.js** 18+ and npm 8+
+- **Node.js** 22+ and npm 10+
 - **Docker** and Docker Compose
 - **PostgreSQL** 14+
 - **Redis** 7+

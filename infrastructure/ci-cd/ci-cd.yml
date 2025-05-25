@@ -10,7 +10,7 @@ on:
     - cron: '0 2 * * 1'  # Weekly security scan
 
 env:
-  NODE_VERSION: '18.x'
+  NODE_VERSION: '22.x'
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   KUBECTL_VERSION: '1.28.0'
@@ -107,7 +107,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [22.x]
     
     services:
       redis:

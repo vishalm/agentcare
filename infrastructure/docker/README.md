@@ -65,12 +65,12 @@ Multi-stage build supporting both frontend and backend:
 
 ```dockerfile
 # Build stages
-FROM node:18-alpine AS base              # Common base
+FROM node:22-alpine AS base              # Common base
 FROM base AS backend-build               # Backend build
 FROM base AS frontend-build              # Frontend build
 
 # Production stages  
-FROM node:18-alpine AS backend-production   # Backend runtime
+FROM node:22-alpine AS backend-production   # Backend runtime
 FROM nginx:alpine AS frontend-production   # Frontend with Nginx
 
 # Development stage
@@ -81,9 +81,9 @@ FROM base AS development                 # Development mode
 Dedicated backend container:
 
 ```dockerfile
-FROM node:18-alpine AS build            # Build stage
-FROM node:18-alpine AS production       # Production runtime
-FROM node:18-alpine AS development      # Development mode
+FROM node:22-alpine AS build            # Build stage
+FROM node:22-alpine AS production       # Production runtime
+FROM node:22-alpine AS development      # Development mode
 ```
 
 **Features:**
@@ -97,10 +97,10 @@ FROM node:18-alpine AS development      # Development mode
 Dedicated frontend container:
 
 ```dockerfile
-FROM node:18-alpine AS build            # Build React app
+FROM node:22-alpine AS build            # Build React app
 FROM nginx:alpine AS production         # Serve with Nginx
-FROM node:18-alpine AS development      # Vite dev server
-FROM node:18-alpine AS static-server    # Alternative to Nginx
+FROM node:22-alpine AS development      # Vite dev server
+FROM node:22-alpine AS static-server    # Alternative to Nginx
 ```
 
 **Features:**

@@ -5,7 +5,7 @@
 ## Quick Start
 
 ### Prerequisites
-- Node.js 18+ and npm
+- Node.js 22+ and npm
 - PostgreSQL 14+
 - Git
 

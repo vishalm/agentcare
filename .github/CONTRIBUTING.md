@@ -21,7 +21,7 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ and npm 8+
+- Node.js 22+ and npm 10+
 - Docker and Docker Compose
 - Git with GPG signing configured
 - Ollama (optional, for LLM features)

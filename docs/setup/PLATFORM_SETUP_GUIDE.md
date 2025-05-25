@@ -32,7 +32,7 @@ This comprehensive guide will walk you through setting up AgentCare from develop
 
 ```bash
 # Core Requirements
-- Node.js 18.x or higher
+- Node.js 22.x or higher
 - npm 9.x or higher
 - PostgreSQL 14.x or higher
 - Git 2.30+
@@ -53,7 +53,7 @@ This comprehensive guide will walk you through setting up AgentCare from develop
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Install required software
-brew install node@18 postgresql@14 git docker
+brew install node@22 postgresql@14 git docker
 brew install --cask docker
 ```
 
@@ -62,8 +62,8 @@ brew install --cask docker
 # Update package list
 sudo apt update
 
-# Install Node.js 18
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+# Install Node.js 22
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 # Install PostgreSQL 14
@@ -84,7 +84,7 @@ choco install nodejs postgresql git docker-desktop
 
 ```bash
 # Check versions
-node --version          # Should be v18.x.x or higher
+node --version          # Should be v22.x.x or higher
 npm --version           # Should be 9.x.x or higher
 psql --version          # Should be 14.x or higher
 git --version           # Should be 2.30+ 

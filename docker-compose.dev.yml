@@ -563,7 +563,7 @@ services:
 
   # File watcher service for additional build tasks
   watcher:
-    image: node:18-alpine
+    image: node:22-alpine
     container_name: agentcare-watcher
     volumes:
       - .:/app:ro

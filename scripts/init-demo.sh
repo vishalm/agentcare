@@ -67,7 +67,7 @@ check_system_requirements() {
         if [ "$major_version" -ge 18 ]; then
             print_success "Node.js $node_version detected"
         else
-            print_error "Node.js 18+ required, found $node_version"
+            print_error "Node.js 22+ required, found $node_version"
             missing_deps+=("nodejs")
         fi
     else

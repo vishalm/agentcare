@@ -160,7 +160,7 @@ AgentCare has been successfully enhanced from a basic multi-agent healthcare sch
 ```
 
 ### Technology Stack
-- **Runtime**: Node.js 18+ with TypeScript
+- **Runtime**: Node.js 22+ with TypeScript
 - **LLM**: Ollama with qwen2.5:latest model
 - **Authentication**: JWT with crypto.pbkdf2
 - **Memory**: In-memory vector store with embeddings

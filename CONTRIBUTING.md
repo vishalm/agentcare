@@ -5,7 +5,7 @@ Thank you for your interest in contributing to AgentCare! This document provides
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ and npm 8+
+- Node.js 22+ and npm 10+
 - Docker and Docker Compose
 - Git
 

@@ -18,6 +18,12 @@
     "test:unit": "mkdir -p coverage && echo 'Frontend unit tests not yet implemented' && exit 0",
     "test:watch": "echo 'Frontend test watch not yet implemented' && exit 0",
     "test:coverage": "mkdir -p coverage && echo 'Frontend test coverage not yet implemented' && exit 0",
+    "test:e2e": "echo 'E2E tests not yet implemented' && exit 0",
+    "test:ci": "npm run test -- --ci --coverage --watchAll=false",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json}\"",
+    "clean": "rm -rf dist coverage .nyc_output",
     "security:deps": "npm audit --audit-level moderate --omit=dev || echo 'Security scan completed with known exceptions: d3-color ReDoS vulnerability in recharts->victory-vendor->d3-interpolate chain (GHSA-36jr-mh4h-2g58) - not exploitable in our charting context' && exit 0"
   },
   "dependencies": {
@@ -51,6 +57,7 @@
     "eslint": "^8.49.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "prettier": "^3.1.0",
     "typescript": "^5.2.2",
     "vite": "^6.3.5"
   },

@@ -57,12 +57,12 @@ if command -v node &> /dev/null; then
     
     # Check if version is >= 18
     NODE_MAJOR=$(echo $NODE_VERSION | cut -d'.' -f1 | sed 's/v//')
-    if [ "$NODE_MAJOR" -lt 18 ]; then
-        echo -e "${RED}❌ Node.js version 18+ required. Found: $NODE_VERSION${NC}"
+    if [ "$NODE_MAJOR" -lt 22 ]; then
+    echo -e "${RED}❌ Node.js version 22+ required. Found: $NODE_VERSION${NC}"
         exit 1
     fi
 else
-    echo -e "${RED}❌ Node.js not found. Please install Node.js 18+${NC}"
+    echo -e "${RED}❌ Node.js not found. Please install Node.js 22+${NC}"
     exit 1
 fi
 

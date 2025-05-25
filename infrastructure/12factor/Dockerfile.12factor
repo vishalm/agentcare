@@ -7,7 +7,7 @@
 # ========================================
 # Stage 1: Base image with Node.js
 # ========================================
-FROM node:18-alpine AS base
+FROM node:22-alpine AS base
 
 # Factor 2: System dependencies explicitly declared
 RUN apk add --no-cache \

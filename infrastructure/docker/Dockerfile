@@ -4,7 +4,7 @@
 # ============================================================================
 # Base stage with Node.js and common dependencies
 # ============================================================================
-FROM node:18-alpine AS base
+FROM node:22-alpine AS base
 LABEL maintainer="AgentCare Team <dev@agentcare.com>"
 LABEL description="AgentCare Healthcare Platform - Monorepo Build"
 LABEL version="3.0.0"
@@ -70,7 +70,7 @@ RUN npm run build
 # ============================================================================
 # Backend production stage
 # ============================================================================
-FROM node:18-alpine AS backend-production
+FROM node:22-alpine AS backend-production
 ENV NODE_ENV=production
 ENV PORT=3000
 LABEL service="backend"

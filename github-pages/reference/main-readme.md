@@ -124,7 +124,7 @@ docker-compose ps                    # Container status
 - Ports: 3000, 3001, 5432, 6379, 11434
 
 **Development**
-- Node.js 18+
+- Node.js 22+
 - PostgreSQL 14+
 - Redis 7+
 

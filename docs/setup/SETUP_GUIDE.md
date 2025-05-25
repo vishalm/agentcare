@@ -10,7 +10,7 @@ This guide will help you set up the enhanced AgentCare system with Ollama LLM in
 ## 🚀 Quick Start
 
 ### Prerequisites
-- **Node.js** v18+ with npm
+- **Node.js** v22+ with npm
 - **Ollama** installed and running
 - **Git** for version control
 - **Modern web browser** (Chrome, Firefox, Safari, Edge)
@@ -491,7 +491,7 @@ ENABLE_USER_REGISTRATION=true
 #### Docker Deployment
 ```dockerfile
 # Dockerfile example
-FROM node:18-alpine
+FROM node:22-alpine
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production

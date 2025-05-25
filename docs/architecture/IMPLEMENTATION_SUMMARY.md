@@ -296,7 +296,7 @@ graph LR
 ## 🌟 Key Achievements
 
 ### ✅ **Technical Excellence**
-- **Modern Stack**: Node.js 18+, TypeScript, React
+- **Modern Stack**: Node.js 22+, TypeScript, React
 - **AI Integration**: Ollama LLM with RAG memory system
 - **Cloud Native**: Kubernetes-ready with Helm charts
 - **Observability**: Full metrics, logs, and traces

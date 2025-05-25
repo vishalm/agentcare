@@ -63,13 +63,9 @@ jobs:
           filters: |
             frontend:
               - 'frontend/**'
-              - 'package.json'
-              - 'package-lock.json'
             backend:
               - 'backend/**'
               - 'database/**'
-              - 'package.json'
-              - 'package-lock.json'
             docs:
               - 'docs/**'
               - '*.md'
@@ -91,10 +87,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
-
-      - name: "Install root dependencies"
-        run: npm ci
+          cache-dependency-path: 'frontend/package-lock.json'
 
       - name: "Install frontend dependencies"
         working-directory: ./frontend
@@ -134,10 +127,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
-
-      - name: "Install root dependencies"
-        run: npm ci
+          cache-dependency-path: 'backend/package-lock.json'
 
       - name: "Install backend dependencies"
         working-directory: ./backend
@@ -177,10 +167,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
-
-      - name: "Install root dependencies"
-        run: npm ci
+          cache-dependency-path: 'frontend/package-lock.json'
 
       - name: "Install frontend dependencies"
         working-directory: ./frontend
@@ -216,10 +203,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
-
-      - name: "Install root dependencies"
-        run: npm ci
+          cache-dependency-path: 'backend/package-lock.json'
 
       - name: "Install backend dependencies"
         working-directory: ./backend
@@ -277,10 +261,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
-
-      - name: "Install root dependencies"
-        run: npm ci
+          cache-dependency-path: 'backend/package-lock.json'
 
       - name: "Install backend dependencies"
         working-directory: ./backend
@@ -331,22 +312,25 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: 'backend/package-lock.json'
 
-      - name: "Install root dependencies"
+      - name: "Install backend dependencies"
+        working-directory: ./backend
         run: npm ci
 
       - name: "Run contract tests"
+        working-directory: ./backend
         run: npm run test:contract -- --ci --watchAll=false
 
       - name: "Create coverage directory if not exists"
-        run: mkdir -p coverage
+        run: mkdir -p backend/coverage
 
       - name: "Upload contract test results"
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: contract-test-results
-          path: coverage/
+          path: backend/coverage/
           retention-days: 7
 
   # End-to-End UI Tests
@@ -390,9 +374,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-
-      - name: "Install root dependencies"
-        run: npm ci
+          cache-dependency-path: |
+            frontend/package-lock.json
+            backend/package-lock.json
 
       - name: "Install frontend dependencies"
         working-directory: ./frontend
@@ -403,6 +387,7 @@ jobs:
         run: npm ci
 
       - name: "Install Playwright browsers"
+        working-directory: ./frontend
         run: npx playwright install --with-deps
 
       - name: "Wait for services"
@@ -448,6 +433,7 @@ jobs:
           timeout 60s bash -c 'until curl -f http://localhost:3001; do sleep 2; done'
 
       - name: "Run E2E tests"
+        working-directory: ./frontend
         run: npm run test:e2e
         env:
           FRONTEND_URL: http://localhost:3001
@@ -591,10 +577,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
-
-      - name: "Install root dependencies"
-        run: npm ci
+          cache-dependency-path: '${{ matrix.component }}/package-lock.json'
 
       - name: "Install ${{ matrix.component }} dependencies"
         working-directory: ./${{ matrix.component }}
@@ -656,11 +639,14 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: 'backend/package-lock.json'
 
-      - name: "Install dependencies"
+      - name: "Install backend dependencies"
+        working-directory: ./backend
         run: npm ci
 
       - name: "Run performance tests"
+        working-directory: ./backend
         run: npm run perf:benchmark
 
       - name: "Upload performance results"
