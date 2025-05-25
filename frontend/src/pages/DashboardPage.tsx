@@ -14,11 +14,9 @@ import {
   useTheme,
 } from '@mui/material';
 import {
-  Dashboard,
   TrendingUp,
   Schedule,
   Person,
-  Notifications,
   Chat,
   Assessment,
 } from '@mui/icons-material';

@@ -19,8 +19,6 @@ import {
   VisibilityOff,
   Email,
   Lock,
-  LocalHospital,
-  PersonAdd,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
@@ -68,8 +66,8 @@ const LoginPage: React.FC = () => {
       login(response.user, response.token);
       toast.success(`Welcome back, ${response.user.name}!`);
       navigate('/dashboard');
-    } catch (error: any) {
-      const message = error.response?.data?.error || 'Login failed. Please try again.';
+    } catch (error: unknown) {
+      const message = (error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Login failed. Please try again.';
       setError(message);
       toast.error(message);
     } finally {

@@ -1,5 +1,6 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { User } from '../store/authStore';
+import { logger } from '../utils/logger';
 
 class ApiService {
   private api: AxiosInstance;
@@ -24,7 +25,9 @@ class ApiService {
               config.headers.Authorization = `Bearer ${parsed.state.token}`;
             }
           } catch (error) {
-            console.warn('Failed to parse auth token:', error);
+            // Failed to parse auth token - remove invalid token
+            localStorage.removeItem('agentcare-auth-storage');
+            logger.warn('Failed to parse auth token, removing invalid token', error, 'Auth');
           }
         }
         return config;
@@ -144,7 +147,7 @@ class ApiService {
       const response = await this.api.post('/auth/register', data);
       return response.data;
     } catch (error) {
-      console.warn('API registration failed, using demo mode:', error);
+      logger.apiFallback('Registration failed, using demo mode', error, 'Auth');
       // For demo purposes, simulate registration
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -173,7 +176,7 @@ class ApiService {
       const response = await this.api.post('/auth/login', data);
       return response.data;
     } catch (error) {
-      console.warn('API login failed, using demo mode:', error);
+      logger.apiFallback('Login failed, using demo mode', error, 'Auth');
       // Fallback to demo mode
       await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -204,7 +207,7 @@ class ApiService {
       await this.api.post('/auth/logout');
     } catch (error) {
       // Ignore errors for demo
-      console.warn('Logout API call failed, continuing with local logout');
+      logger.apiFallback('Logout API call failed, continuing with local logout', error, 'Auth');
     }
   }
 
@@ -214,7 +217,7 @@ class ApiService {
       const response = await this.api.get('/user/profile');
       return response.data;
     } catch (error) {
-      console.warn('API getProfile failed, using demo mode:', error);
+      logger.apiFallback('getProfile failed, using demo mode', error, 'User');
       // Demo fallback
       const token = localStorage.getItem('agentcare-auth-storage');
       if (token) {
@@ -230,7 +233,7 @@ class ApiService {
       const response = await this.api.put('/user/profile', updates);
       return response.data;
     } catch (error) {
-      console.warn('API updateProfile failed, using demo mode:', error);
+      logger.apiFallback('updateProfile failed, using demo mode', error, 'User');
       // Demo mode - just return updated user
       const currentUser = await this.getProfile();
       return { ...currentUser, ...updates };
@@ -242,7 +245,7 @@ class ApiService {
       const response = await this.api.put('/user/preferences', preferences);
       return response.data;
     } catch (error) {
-      console.warn('API updatePreferences failed, using demo mode:', error);
+      logger.apiFallback('updatePreferences failed, using demo mode', error, 'User');
       // Demo mode - just return updated user
       const currentUser = await this.getProfile();
       return { ...currentUser, preferences };
@@ -261,7 +264,7 @@ class ApiService {
       const response = await this.api.post('/agents/process', { message });
       return response.data;
     } catch (error) {
-      console.warn('API processMessage failed, using demo mode:', error);
+      logger.apiFallback('processMessage failed, using demo mode', error, 'Agents');
       // Demo response
       await new Promise(resolve => setTimeout(resolve, 1000));
       return {
@@ -283,7 +286,7 @@ class ApiService {
       const response = await this.api.get('/agents/status');
       return response.data;
     } catch (error) {
-      console.warn('API getAgentStatus failed, using demo mode:', error);
+      logger.apiFallback('getAgentStatus failed, using demo mode', error, 'Agents');
       // Demo status
       return {
         supervisor: { active: true, status: 'demo_mode' },
@@ -306,9 +309,9 @@ class ApiService {
     try {
       await this.api.post('/conversation/reset');
     } catch (error) {
-      console.warn('API resetConversation failed, using demo mode:', error);
+      logger.apiFallback('resetConversation failed, using demo mode', error, 'Conversation');
       // Demo mode - just log
-      console.log('Demo: Conversation reset');
+      logger.info('Demo: Conversation reset', null, 'Conversation');
     }
   }
 
@@ -322,7 +325,7 @@ class ApiService {
       const response = await this.api.get('/system/health');
       return response.data;
     } catch (error) {
-      console.warn('API getSystemHealth failed, using demo mode:', error);
+      logger.apiFallback('getSystemHealth failed, using demo mode', error, 'System');
       return {
         status: 'demo_mode',
         services: {
@@ -349,7 +352,7 @@ class ApiService {
       const response = await this.api.get('/system/ollama/status');
       return response.data;
     } catch (error) {
-      console.warn('API getOllamaStatus failed, using demo mode:', error);
+      logger.apiFallback('getOllamaStatus failed, using demo mode', error, 'System');
       return {
         status: 'not_configured',
         model: 'qwen2.5:latest'
@@ -373,7 +376,7 @@ class ApiService {
       const response = await this.api.get('/admin/users', { params });
       return response.data;
     } catch (error) {
-      console.warn('API getUsers failed, using demo mode:', error);
+      logger.apiFallback('getUsers failed, using demo mode', error, 'Admin');
       // Demo response
       return {
         users: this.demoUsers as User[],
@@ -398,7 +401,7 @@ class ApiService {
       const response = await this.api.post('/admin/users', userData);
       return response.data;
     } catch (error) {
-      console.warn('API createUser failed, using demo mode:', error);
+      logger.apiFallback('createUser failed, using demo mode', error, 'Admin');
       // Demo response
       await new Promise(resolve => setTimeout(resolve, 1000));
       return {
@@ -418,7 +421,7 @@ class ApiService {
       const response = await this.api.put(`/admin/users/${userId}`, updates);
       return response.data;
     } catch (error) {
-      console.warn('API updateUser failed, using demo mode:', error);
+      logger.apiFallback('updateUser failed, using demo mode', error, 'Admin');
       // Demo response
       const existingUser = this.demoUsers.find(u => u.id === userId);
       return { ...existingUser, ...updates } as User;
@@ -429,9 +432,9 @@ class ApiService {
     try {
       await this.api.delete(`/admin/users/${userId}`);
     } catch (error) {
-      console.warn('API deleteUser failed, using demo mode:', error);
+      logger.apiFallback('deleteUser failed, using demo mode', error, 'Admin');
       // Demo mode - just log
-      console.log(`Demo: User ${userId} deleted`);
+      logger.info(`Demo: User ${userId} deleted`, null, 'Admin');
     }
   }
 
@@ -446,7 +449,7 @@ class ApiService {
       const response = await this.api.get('/admin/stats');
       return response.data;
     } catch (error) {
-      console.warn('API getSystemStats failed, using demo mode:', error);
+      logger.apiFallback('getSystemStats failed, using demo mode', error, 'Admin');
       return {
         totalUsers: this.demoUsers.length,
         activeUsers: this.demoUsers.length,
@@ -478,7 +481,7 @@ class ApiService {
       const response = await this.api.get('/system/logs', { params });
       return response.data;
     } catch (error) {
-      console.warn('API getSystemLogs failed, using demo mode:', error);
+      logger.apiFallback('getSystemLogs failed, using demo mode', error, 'System');
       // Demo logs
       const mockLogs = Array.from({ length: params?.limit || 20 }, (_, i) => ({
         id: i + 1,
@@ -506,7 +509,7 @@ class ApiService {
       const response = await this.api.post('/system/database/seed', options);
       return response.data;
     } catch (error) {
-      console.warn('API seedDatabase failed, using demo mode:', error);
+      logger.apiFallback('seedDatabase failed, using demo mode', error, 'System');
       await new Promise(resolve => setTimeout(resolve, 2000));
       return {
         success: true,
@@ -526,7 +529,7 @@ class ApiService {
       const response = await this.api.get('/system/database/stats');
       return response.data;
     } catch (error) {
-      console.warn('API getDatabaseStats failed, using demo mode:', error);
+      logger.apiFallback('getDatabaseStats failed, using demo mode', error, 'System');
       return {
         users: 10,
         providers: 4,
@@ -554,7 +557,7 @@ class ApiService {
       const response = await this.api.get('/appointments', { params });
       return response.data;
     } catch (error) {
-      console.warn('API getAppointments failed, using demo mode:', error);
+      logger.apiFallback('getAppointments failed, using demo mode', error, 'Appointments');
       // Generate demo appointments
       const appointments = Array.from({ length: params?.limit || 10 }, (_, i) => ({
         id: `apt-${i + 1}`,
@@ -587,7 +590,7 @@ class ApiService {
       const response = await this.api.post('/appointments', appointmentData);
       return response.data;
     } catch (error) {
-      console.warn('API createAppointment failed, using demo mode:', error);
+      logger.apiFallback('createAppointment failed, using demo mode', error, 'Appointments');
       await new Promise(resolve => setTimeout(resolve, 1000));
       return {
         id: `apt-${Date.now()}`,
@@ -603,7 +606,7 @@ class ApiService {
       const response = await this.api.put(`/appointments/${appointmentId}`, updates);
       return response.data;
     } catch (error) {
-      console.warn('API updateAppointment failed, using demo mode:', error);
+      logger.apiFallback('updateAppointment failed, using demo mode', error, 'Appointments');
       return { id: appointmentId, ...updates, updatedAt: new Date().toISOString() };
     }
   }
@@ -612,8 +615,8 @@ class ApiService {
     try {
       await this.api.post(`/appointments/${appointmentId}/cancel`, { reason });
     } catch (error) {
-      console.warn('API cancelAppointment failed, using demo mode:', error);
-      console.log(`Demo: Appointment ${appointmentId} cancelled. Reason: ${reason || 'No reason'}`);
+      logger.apiFallback('cancelAppointment failed, using demo mode', error, 'Appointments');
+      logger.info(`Demo: Appointment ${appointmentId} cancelled. Reason: ${reason || 'No reason'}`, null, 'Appointments');
     }
   }
 }
