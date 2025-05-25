@@ -1,3 +1,5 @@
+{% include doc-header.html %}
+
 # AgentCare v2.0 Setup Guide
 ## Enhanced Multi-Agent Healthcare Scheduling with Ollama LLM + RAG
 

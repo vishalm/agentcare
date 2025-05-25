@@ -11,7 +11,7 @@ Welcome to the comprehensive documentation for AgentCare - the AI-powered health
 ### 🏃‍♂️ Getting Started
 - **[🚀 Quick Start Guide](/agentcare/docs/setup/QUICK_START.html)** - Get up and running in minutes
 - **[🐳 Docker Setup](/agentcare/docs/setup/DOCKER_SETUP.html)** - Complete containerized development environment
-- **[⚙️ Environment Configuration](/agentcare/docs/setup/ENVIRONMENT_SETUP.html)** - Configuration and environment variables
+- **[⚙️ Environment Configuration](/agentcare/docs/setup/PLATFORM_SETUP_GUIDE.html)** - Configuration and environment variables
 
 ### 🏗️ Architecture & Design
 - **[📊 System Architecture](/agentcare/docs/architecture/diagrams/SYSTEM_ARCHITECTURE.html)** - Visual system diagrams
@@ -30,7 +30,7 @@ Welcome to the comprehensive documentation for AgentCare - the AI-powered health
 
 ### 🚀 Enterprise Features
 - **[🏥 Enterprise Guide](/agentcare/docs/enterprise.html)** - Enterprise features and capabilities
-- **[🔒 Security & Compliance](/agentcare/docs/operations/SECURITY.html)** - Security best practices
+- **[🔒 Security & Compliance](/agentcare/docs/architecture/ARCHITECTURE_GUIDE.html#security)** - Security best practices
 
 ## 🎯 Quick Reference
 
