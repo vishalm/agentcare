@@ -427,6 +427,38 @@ jobs:
           path: coverage/
         continue-on-error: true
 
+      - name: "Verify SonarCloud Token"
+        run: |
+          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
+            echo "❌ SONAR_TOKEN is not set. Please add it to GitHub Secrets."
+            exit 1
+          else
+            echo "✅ SONAR_TOKEN is configured"
+          fi
+
+      - name: "Prepare SonarCloud Analysis"
+        run: |
+          echo "📊 Preparing SonarCloud analysis..."
+          echo "Project: vishalm_agentcare"
+          echo "Organization: vishalm"
+          echo "Branch: ${{ github.ref_name }}"
+          
+          # Create coverage directory if it doesn't exist
+          mkdir -p coverage/frontend-coverage coverage/backend-coverage
+          
+          # Check for coverage files
+          if [ -f "coverage/frontend-coverage/lcov.info" ]; then
+            echo "✅ Frontend coverage found"
+          else
+            echo "⚠️ Frontend coverage not found"
+          fi
+          
+          if [ -f "coverage/backend-coverage/lcov.info" ]; then
+            echo "✅ Backend coverage found"
+          else
+            echo "⚠️ Backend coverage not found"
+          fi
+
       - name: "SonarCloud Scan"
         uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
@@ -436,14 +468,26 @@ jobs:
           args: >
             -Dsonar.projectKey=vishalm_agentcare
             -Dsonar.organization=vishalm
+            -Dsonar.projectName="AgentCare - Multi-Agent Healthcare Scheduling Platform"
+            -Dsonar.projectVersion=3.0.0-beta
             -Dsonar.sources=frontend/src,backend/src
-            -Dsonar.tests=frontend/tests,backend/tests,tests
+            -Dsonar.tests=frontend/src,backend/src,tests
+            -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx
             -Dsonar.typescript.lcov.reportPaths=coverage/frontend-coverage/lcov.info,coverage/backend-coverage/lcov.info
             -Dsonar.javascript.lcov.reportPaths=coverage/frontend-coverage/lcov.info,coverage/backend-coverage/lcov.info
             -Dsonar.testExecutionReportPaths=coverage/backend-coverage/test-results.xml
-            -Dsonar.coverage.exclusions=**/*.test.ts,**/*.spec.ts,**/node_modules/**,**/dist/**,**/coverage/**
-            -Dsonar.cpd.exclusions=**/*.test.ts,**/*.spec.ts
-            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**,**/*.d.ts
+            -Dsonar.coverage.exclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx,**/node_modules/**,**/dist/**,**/coverage/**,**/*.d.ts
+            -Dsonar.cpd.exclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx,**/*.d.ts
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**,**/*.d.ts,**/public/**,**/static/**
+            -Dsonar.qualitygate.wait=true
+            -Dsonar.sourceEncoding=UTF-8
+            -Dsonar.scm.provider=git
+
+      - name: "SonarCloud Results"
+        if: always()
+        run: |
+          echo "📈 SonarCloud analysis completed"
+          echo "🔗 View results at: https://sonarcloud.io/project/overview?id=vishalm_agentcare"
 
   # Security Scanning
   security-scan:
