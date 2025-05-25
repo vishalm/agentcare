@@ -1,6 +1,9 @@
 import { SupervisorAgent } from '../../../backend/src/agents/SupervisorAgent';
 import { Logger } from '../../../backend/src/utils/Logger';
 import { MetricsCollector } from '../../../backend/src/utils/MetricsCollector';
+import { OllamaService } from '../../../backend/src/services/OllamaService';
+import { UserManagementService } from '../../../backend/src/services/UserManagementService';
+import { RAGService } from '../../../backend/src/services/RAGService';
 import { AvailabilityAgent } from '../../../backend/src/agents/AvailabilityAgent';
 import { BookingAgent } from '../../../backend/src/agents/BookingAgent';
 import { FAQAgent } from '../../../backend/src/agents/FAQAgent';
@@ -14,6 +17,9 @@ describe('SupervisorAgent', () => {
   let supervisorAgent: SupervisorAgent;
   let mockLogger: jest.Mocked<Logger>;
   let mockMetrics: jest.Mocked<MetricsCollector>;
+  let mockOllamaService: jest.Mocked<OllamaService>;
+  let mockUserService: jest.Mocked<UserManagementService>;
+  let mockRAGService: jest.Mocked<RAGService>;
   let mockAvailabilityAgent: jest.Mocked<AvailabilityAgent>;
   let mockBookingAgent: jest.Mocked<BookingAgent>;
   let mockFAQAgent: jest.Mocked<FAQAgent>;
@@ -38,6 +44,27 @@ describe('SupervisorAgent', () => {
       exportMetrics: jest.fn(),
     } as any;
 
+    mockOllamaService = {
+      analyzeIntent: jest.fn(),
+      generateResponse: jest.fn(),
+      healthCheck: jest.fn()
+    } as any;
+
+    mockUserService = {
+      validateToken: jest.fn(),
+      addMessage: jest.fn(),
+      getConversationHistory: jest.fn(),
+      getConversationContext: jest.fn()
+    } as any;
+
+    mockRAGService = {
+      retrieveContext: jest.fn(),
+      storeConversationMessage: jest.fn(),
+      generateEnhancedPrompt: jest.fn(),
+      updateConversationSummary: jest.fn(),
+      cleanupUserData: jest.fn()
+    } as any;
+
     mockAvailabilityAgent = {
       process: jest.fn(),
       isAgentActive: jest.fn(),
@@ -56,6 +83,9 @@ describe('SupervisorAgent', () => {
     supervisorAgent = new SupervisorAgent(
       mockLogger,
       mockMetrics,
+      mockOllamaService,
+      mockUserService,
+      mockRAGService,
       mockAvailabilityAgent,
       mockBookingAgent,
       mockFAQAgent
@@ -64,6 +94,204 @@ describe('SupervisorAgent', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('constructor', () => {
+    it('should create a SupervisorAgent instance', () => {
+      expect(supervisorAgent).toBeInstanceOf(SupervisorAgent);
+      expect(supervisorAgent.isAgentActive()).toBe(false);
+    });
+  });
+
+  describe('isAgentActive', () => {
+    it('should return false initially', () => {
+      expect(supervisorAgent.isAgentActive()).toBe(false);
+    });
+  });
+
+  describe('healthCheck', () => {
+    it('should return health status for all services', async () => {
+      mockOllamaService.healthCheck.mockResolvedValue(true);
+
+      const result = await supervisorAgent.healthCheck();
+
+      expect(result).toHaveProperty('status');
+      expect(result).toHaveProperty('services');
+      expect(result.services).toHaveProperty('ollama');
+      expect(result.services).toHaveProperty('supervisor');
+      expect(result.services).toHaveProperty('availability');
+      expect(result.services).toHaveProperty('booking');
+      expect(result.services).toHaveProperty('faq');
+    });
+
+    it('should return healthy status when all services are available', async () => {
+      mockOllamaService.healthCheck.mockResolvedValue(true);
+
+      const result = await supervisorAgent.healthCheck();
+
+      expect(result.status).toBe('healthy');
+    });
+  });
+
+  describe('process', () => {
+    const mockMessage = 'Hello, I need to book an appointment';
+    const mockUser = {
+      id: 'user123',
+      email: 'test@example.com',
+      name: 'Test User',
+      passwordHash: 'hash',
+      createdAt: new Date(),
+      isActive: true,
+      preferences: {
+        language: 'en',
+        timezone: 'UTC',
+        notifications: { email: true, sms: false, reminders: true },
+        preferredDoctorSpecializations: []
+      },
+      profile: {}
+    };
+
+    const mockSession = {
+      sessionId: 'session123',
+      userId: 'user123',
+      createdAt: new Date(),
+      lastActivityAt: new Date(),
+      expiresAt: new Date(Date.now() + 3600000),
+      isActive: true
+    };
+
+    it('should process message and return response', async () => {
+      // Setup mocks
+      mockUserService.validateToken.mockResolvedValue({ user: mockUser, session: mockSession });
+      mockUserService.getConversationHistory.mockResolvedValue('Previous conversation...');
+      mockRAGService.retrieveContext.mockResolvedValue({
+        relevantHistory: 'Previous interactions...',
+        userPreferences: JSON.stringify(mockUser.preferences),
+        entities: new Map(),
+        conversationSummary: 'User needs healthcare assistance',
+        recentContext: 'context'
+      });
+      mockUserService.addMessage.mockResolvedValue({
+        id: 'msg123',
+        role: 'user',
+        content: mockMessage,
+        timestamp: new Date()
+      });
+      mockOllamaService.analyzeIntent.mockResolvedValue({
+        intent: 'booking',
+        confidence: 0.9,
+        entities: [],
+        summary: 'User wants to book an appointment'
+      });
+      mockRAGService.generateEnhancedPrompt.mockResolvedValue('Enhanced prompt...');
+      mockOllamaService.generateResponse.mockResolvedValue({
+        response: 'I can help you book an appointment',
+        tokens: 50
+      });
+      mockBookingAgent.process.mockResolvedValue('Booking process completed');
+
+      const result = await supervisorAgent.process(mockMessage, { token: 'valid-token' });
+
+      expect(result).toContain('I can help you book an appointment');
+      expect(mockLogger.info).toHaveBeenCalledWith('SupervisorAgent processing message', expect.any(Object));
+      expect(mockMetrics.startOperation).toHaveBeenCalled();
+      expect(mockMetrics.endOperation).toHaveBeenCalled();
+    });
+
+    it('should handle invalid token by creating guest session', async () => {
+      mockUserService.validateToken.mockRejectedValue(new Error('Invalid token'));
+      mockOllamaService.analyzeIntent.mockResolvedValue({
+        intent: 'general',
+        confidence: 0.8,
+        entities: [],
+        summary: 'General conversation'
+      });
+      mockUserService.addMessage.mockResolvedValue({
+        id: 'msg123',
+        role: 'user',
+        content: mockMessage,
+        timestamp: new Date()
+      });
+      mockOllamaService.generateResponse.mockResolvedValue({
+        response: 'Hello! How can I help you today?',
+        tokens: 30
+      });
+
+      const result = await supervisorAgent.process(mockMessage, { token: 'invalid-token' });
+
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        'Token validation failed, creating guest session',
+        expect.objectContaining({
+          errorType: 'Error',
+          sessionType: 'guest'
+        })
+      );
+      expect(result).toBeDefined();
+    });
+
+    it('should handle no token by creating guest session', async () => {
+      mockOllamaService.analyzeIntent.mockResolvedValue({
+        intent: 'general',
+        confidence: 0.8,
+        entities: [],
+        summary: 'General conversation'
+      });
+      mockUserService.addMessage.mockResolvedValue({
+        id: 'msg123',
+        role: 'user',
+        content: mockMessage,
+        timestamp: new Date()
+      });
+      mockOllamaService.generateResponse.mockResolvedValue({
+        response: 'Hello! How can I help you today?',
+        tokens: 30
+      });
+
+      const result = await supervisorAgent.process(mockMessage);
+
+      expect(result).toBeDefined();
+      expect(mockUserService.validateToken).not.toHaveBeenCalled();
+    });
+
+    it('should handle errors gracefully', async () => {
+      mockUserService.validateToken.mockRejectedValue(new Error('Database error'));
+      mockUserService.addMessage.mockRejectedValue(new Error('Failed to add message'));
+
+      const result = await supervisorAgent.process(mockMessage, { token: 'valid-token' });
+
+      expect(result).toContain('experiencing some technical difficulties');
+      expect(mockLogger.error).toHaveBeenCalled();
+      expect(mockMetrics.recordError).toHaveBeenCalledWith('supervisor_process');
+    });
+  });
+
+  describe('resetConversation', () => {
+    it('should reset conversation successfully', async () => {
+      mockUserService.getConversationContext.mockResolvedValue({
+        userId: 'user123',
+        sessionId: 'session123',
+        messages: [],
+        summary: '',
+        entities: new Map(),
+        lastUpdated: new Date()
+      });
+      mockRAGService.cleanupUserData.mockResolvedValue(undefined);
+
+      await supervisorAgent.resetConversation('user123', 'session123');
+
+      expect(mockLogger.info).toHaveBeenCalledWith('Conversation reset completed', {
+        userId: 'user123',
+        sessionId: 'session123'
+      });
+    });
+
+    it('should handle reset errors gracefully', async () => {
+      mockUserService.getConversationContext.mockRejectedValue(new Error('Reset failed'));
+
+      await supervisorAgent.resetConversation('user123', 'session123');
+
+      expect(mockLogger.error).toHaveBeenCalledWith('Error resetting conversation', expect.any(Object));
+    });
   });
 
   describe('Intent Analysis', () => {
@@ -220,19 +448,6 @@ describe('SupervisorAgent', () => {
         'Error in SupervisorAgent process',
         expect.objectContaining({ error: expect.any(Error) })
       );
-    });
-  });
-
-  describe('Intent Processing with Pre-analyzed Intent', () => {
-    test('should use provided intent instead of analyzing', async () => {
-      const message = 'Some message';
-      const providedIntent = { type: 'booking', confidence: 0.95 };
-      mockBookingAgent.process.mockResolvedValue('Booking response');
-
-      const response = await supervisorAgent.process(message, providedIntent);
-
-      expect(mockBookingAgent.process).toHaveBeenCalledWith(message, providedIntent);
-      expect(response).toBe('Booking response');
     });
   });
 

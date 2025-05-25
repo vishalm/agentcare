@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="22" failures="0" errors="0" time="0.618">
+  <testsuite name="API Contract Tests" errors="0" failures="0" skipped="0" timestamp="2025-05-25T03:03:53" time="0.267" tests="13">
+    <testcase classname="API Contract Tests Health Endpoint Contract should follow health response contract" name="API Contract Tests Health Endpoint Contract should follow health response contract" time="0.043">
+    </testcase>
+    <testcase classname="API Contract Tests Agent Processing Endpoint Contract should follow successful processing response contract" name="API Contract Tests Agent Processing Endpoint Contract should follow successful processing response contract" time="0.009">
+    </testcase>
+    <testcase classname="API Contract Tests Agent Processing Endpoint Contract should follow error response contract for missing message" name="API Contract Tests Agent Processing Endpoint Contract should follow error response contract for missing message" time="0.006">
+    </testcase>
+    <testcase classname="API Contract Tests Agent Processing Endpoint Contract should reject requests without proper content-type" name="API Contract Tests Agent Processing Endpoint Contract should reject requests without proper content-type" time="0.004">
+    </testcase>
+    <testcase classname="API Contract Tests Agent Status Endpoint Contract should follow status response contract" name="API Contract Tests Agent Status Endpoint Contract should follow status response contract" time="0.006">
+    </testcase>
+    <testcase classname="API Contract Tests Metrics Endpoint Contract should follow metrics response contract" name="API Contract Tests Metrics Endpoint Contract should follow metrics response contract" time="0.004">
+    </testcase>
+    <testcase classname="API Contract Tests Reset Endpoint Contract should follow reset response contract" name="API Contract Tests Reset Endpoint Contract should follow reset response contract" time="0.004">
+    </testcase>
+    <testcase classname="API Contract Tests Error Handling Contract should follow 404 error contract" name="API Contract Tests Error Handling Contract should follow 404 error contract" time="0.005">
+    </testcase>
+    <testcase classname="API Contract Tests Response Header Contracts all JSON endpoints should return proper content-type" name="API Contract Tests Response Header Contracts all JSON endpoints should return proper content-type" time="0.014">
+    </testcase>
+    <testcase classname="API Contract Tests Response Header Contracts all endpoints should include security headers" name="API Contract Tests Response Header Contracts all endpoints should include security headers" time="0.004">
+    </testcase>
+    <testcase classname="API Contract Tests Timestamp Consistency Contract all endpoints should return ISO 8601 timestamps" name="API Contract Tests Timestamp Consistency Contract all endpoints should return ISO 8601 timestamps" time="0.016">
+    </testcase>
+    <testcase classname="API Contract Tests Request Validation Contracts POST endpoints should validate required fields" name="API Contract Tests Request Validation Contracts POST endpoints should validate required fields" time="0.005">
+    </testcase>
+    <testcase classname="API Contract Tests Request Validation Contracts endpoints should handle large payloads appropriately" name="API Contract Tests Request Validation Contracts endpoints should handle large payloads appropriately" time="0.004">
+    </testcase>
+  </testsuite>
+  <testsuite name="Agent Contract Tests" errors="0" failures="0" skipped="0" timestamp="2025-05-25T03:03:53" time="0.177" tests="9">
+    <testcase classname="Agent Contract Tests Agent Implementation Contract should ensure all agents implement required process method" name="Agent Contract Tests Agent Implementation Contract should ensure all agents implement required process method" time="0.001">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Implementation Contract should ensure all agents implement isAgentActive method" name="Agent Contract Tests Agent Implementation Contract should ensure all agents implement isAgentActive method" time="0">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Implementation Contract should ensure process method returns a Promise" name="Agent Contract Tests Agent Implementation Contract should ensure process method returns a Promise" time="0.001">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Implementation Contract should ensure isAgentActive method returns boolean" name="Agent Contract Tests Agent Implementation Contract should ensure isAgentActive method returns boolean" time="0.001">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Method Signatures should have consistent process method signature" name="Agent Contract Tests Agent Method Signatures should have consistent process method signature" time="0.001">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Method Signatures should have consistent isAgentActive method signature" name="Agent Contract Tests Agent Method Signatures should have consistent isAgentActive method signature" time="0">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Constructor Requirements should have constructors that accept required dependencies" name="Agent Contract Tests Agent Constructor Requirements should have constructors that accept required dependencies" time="0">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Interface Compliance should ensure all agents can be instantiated with proper dependencies" name="Agent Contract Tests Agent Interface Compliance should ensure all agents can be instantiated with proper dependencies" time="0.001">
+    </testcase>
+    <testcase classname="Agent Contract Tests Agent Interface Compliance should ensure all agents are classes" name="Agent Contract Tests Agent Interface Compliance should ensure all agents are classes" time="0">
+    </testcase>
+  </testsuite>
+</testsuites>
