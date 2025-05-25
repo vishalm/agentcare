@@ -5,8 +5,8 @@ description: >-
   Multi-tenant healthcare SaaS platform with AI-powered coordination.
   HIPAA-compliant enterprise solution for hospitals, clinics, and healthcare organizations.
 
-baseurl: ""
-url: "https://yourusername.github.io/agentcare"
+baseurl: "/agentcare"
+url: "https://vishalm.github.io"
 
 # Company Information
 company:
@@ -41,6 +41,11 @@ plugins:
   - jekyll-github-metadata
   - jekyll-relative-links
 
+# Mermaid configuration
+mermaid:
+  version: "10.6.1"
+  theme: "default"
+
 # SEO and Social
 logo: /assets/images/agentcare-logo-square.png
 twitter:
@@ -50,7 +55,7 @@ twitter:
 social:
   name: AgentCare
   links:
-    - https://github.com/yourusername/agentcare
+    - https://github.com/vishalm/agentcare
     - https://linkedin.com/company/agentcare
     - https://twitter.com/agentcare
 

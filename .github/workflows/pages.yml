@@ -19,12 +19,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Build job
+  # Build job - Build both frontend app and documentation
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
     
     steps:
       - name: Checkout
@@ -37,13 +34,22 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'frontend/package-lock.json'
 
+      - name: Setup Ruby for Jekyll
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: './docs'
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
-      - name: Install dependencies
+      - name: Install frontend dependencies
+        working-directory: ./frontend
         run: npm ci
 
-      - name: Build application for GitHub Pages
+      - name: Build frontend application for GitHub Pages
+        working-directory: ./frontend
         run: npm run build:pages
         env:
           # Vite environment variables for GitHub Pages
@@ -51,10 +57,48 @@ jobs:
           VITE_APP_API_BASE_URL: https://api.agentcare.dev
           VITE_APP_GITHUB_PAGES: true
 
+      - name: Create Gemfile for Jekyll docs
+        working-directory: ./docs
+        run: |
+          cat > Gemfile << EOF
+          source "https://rubygems.org"
+          gem "github-pages", group: :jekyll_plugins
+          gem "jekyll-include-cache", group: :jekyll_plugins
+          EOF
+
+      - name: Install Jekyll dependencies
+        working-directory: ./docs
+        run: bundle install
+
+      - name: Build documentation with Jekyll
+        working-directory: ./docs
+        run: bundle exec jekyll build --destination ../_site/docs
+        env:
+          JEKYLL_ENV: production
+
+      - name: Combine frontend and docs
+        run: |
+          # Create the final site directory
+          mkdir -p _site_final
+          
+          # Copy the frontend build (main site)
+          cp -r frontend/dist/* _site_final/
+          
+          # Copy the documentation to /docs subdirectory
+          mkdir -p _site_final/docs
+          cp -r _site/docs/* _site_final/docs/
+          
+          # Create a redirect from root README to main site
+          cp README.md _site_final/
+          
+          # Ensure all Mermaid diagrams are properly configured
+          echo "Site structure:"
+          find _site_final -name "*.html" | head -10
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./frontend/dist
+          path: ./_site_final
 
   # Deployment job
   deploy:
