@@ -17,7 +17,7 @@ This guide demonstrates how AgentCare implements all 12 factors of the [12-Facto
 
 AgentCare has been architected from the ground up to follow 12-Factor principles:
 
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "12-Factor Implementation"
         F1[Factor 1: Codebase<br/>Single Git repository]
@@ -37,7 +37,7 @@ graph TB
     F1 --> F2 --> F3 --> F4
     F5 --> F6 --> F7 --> F8
     F9 --> F10 --> F11 --> F12
-```
+</div>
 
 ## 🔢 The 12 Factors
 

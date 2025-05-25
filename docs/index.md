@@ -1,4 +1,8 @@
-# 📚 AgentCare Documentation
+<div align="center">
+  <img src="assets/images/agentcare-logo-square.svg" alt="AgentCare Logo" width="80" height="80">
+  
+  # 📚 AgentCare Documentation
+</div>
 
 Welcome to the comprehensive documentation for AgentCare - the AI-powered healthcare scheduling platform. This documentation provides everything you need to understand, deploy, and develop with AgentCare.
 

@@ -164,7 +164,7 @@ services:
 
 ### Service Dependencies
 
-```mermaid
+<div class="mermaid">
 graph TD
     Frontend[🖥️ Frontend<br/>React UI]
     Backend[🔧 Backend<br/>API Server]
@@ -188,7 +188,7 @@ graph TD
     class Postgres database
     class Redis cache
     class Ollama ai
-```
+</div>
 
 ## 🌐 Network & Ports
 

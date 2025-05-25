@@ -1,3 +1,5 @@
+{% include doc-header.html %}
+
 # AgentCare System Architecture Diagrams
 
 ## 🏗️ High-Level System Architecture
@@ -66,7 +68,7 @@ graph TB
 
 ## 🤖 Multi-Agent Architecture
 
-```mermaid
+<div class="mermaid">
 graph TD
     subgraph "Agent Coordination Layer"
         SM[Supervisor Agent]
@@ -117,11 +119,11 @@ graph TD
     
     SM --> Events
     Events --> Response[Coordinated Response]
-```
+</div>
 
 ## 🔄 Request Flow Architecture
 
-```mermaid
+<div class="mermaid">
 sequenceDiagram
     participant User
     participant Frontend
@@ -151,11 +153,11 @@ sequenceDiagram
     Supervisor->>API_Gateway: Coordinated Response
     API_Gateway->>Frontend: JSON Response
     Frontend->>User: Updated UI
-```
+</div>
 
 ## 📊 Data Architecture
 
-```mermaid
+<div class="mermaid">
 erDiagram
     USERS {
         int id PK
@@ -214,11 +216,11 @@ erDiagram
     USERS ||--o{ APPOINTMENTS : makes
     PROVIDERS ||--o{ APPOINTMENTS : provides
     USERS ||--o{ AGENT_SESSIONS : has
-```
+</div>
 
 ## 🛡️ Security Architecture
 
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "Frontend Security"
         CSP[Content Security Policy]
@@ -258,11 +260,11 @@ graph TB
     VPN --> SecretMgmt
     SecretMgmt --> ContainerSec
     Audit --> HIPAA
-```
+</div>
 
 ## 🚀 Deployment Architecture
 
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "Development"
         Dev_Local[Local Development]
@@ -321,11 +323,11 @@ graph TB
     Prometheus --> Grafana
     Prometheus --> Alerts
     Prod_Pods --> Logs
-```
+</div>
 
 ## 🔄 AI/LLM Integration Architecture
 
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "LLM Processing Layer"
         Input[User Input]
@@ -374,11 +376,11 @@ graph TB
     Generation --> Postprocessing
     Postprocessing --> Validation
     Validation --> Output
-```
+</div>
 
 ## 📱 Frontend Component Architecture
 
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "App Shell"
         App[App Component]
@@ -437,7 +439,7 @@ graph TB
     AppointmentForm --> Modal
     Calendar --> Card
     UserManagement --> Table
-```
+</div>
 
 These diagrams provide a comprehensive visual representation of the AgentCare system architecture, covering all major components and their interactions. They can be used for:
 

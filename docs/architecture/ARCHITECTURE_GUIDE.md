@@ -1,3 +1,5 @@
+{% include doc-header.html %}
+
 # AgentCare Architecture Guide 🏗️
 
 **Enterprise-Grade Multi-Agent Healthcare Scheduling System**
@@ -21,7 +23,7 @@ This document provides a comprehensive overview of AgentCare's architectural pat
 
 AgentCare implements a modern, cloud-native architecture using multiple design patterns:
 
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "Process Management Layer"
         PM2[PM2 Cluster Manager]
@@ -69,7 +71,7 @@ graph TB
     API --> METRICS
     API --> LOGS
     API --> TRACES
-```
+</div>
 
 ### Core Architectural Principles
 

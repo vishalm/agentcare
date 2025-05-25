@@ -22,7 +22,7 @@ AgentCare's testing strategy covers all aspects of a multi-tenant healthcare pla
 
 ## 🏗️ Test Architecture
 
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "🧪 Multi-Tenant Testing Framework"
         subgraph "🔧 Unit Tests"
@@ -53,7 +53,7 @@ graph TB
             E2E4[Provider Management]
         end
     end
-```
+</div>
 
 ## 📋 Test Categories
 

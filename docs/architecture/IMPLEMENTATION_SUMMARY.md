@@ -29,7 +29,7 @@ AgentCare has been transformed from a basic multi-agent healthcare scheduling sy
 ## 🏗️ Architecture Enhancement
 
 ### Phase 1: Core System Enhancement ✅
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "Enhanced AgentCare v2.0"
         SA[Supervisor Agent + LLM]
@@ -50,7 +50,7 @@ graph TB
     SA --> UMS
     SA --> RAG
     SA --> OLS
-```
+</div>
 
 **Core Services Implemented**:
 1. **OllamaService.ts** - LLM integration with qwen2.5:latest
@@ -60,7 +60,7 @@ graph TB
 5. **Comprehensive API layer** - RESTful endpoints with security
 
 ### Phase 2: DevOps & Observability Stack ✅
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "Observability Layer"
         P[Prometheus Metrics]
@@ -94,7 +94,7 @@ graph TB
     S --> C
     C --> R
     R --> N
-```
+</div>
 
 ---
 
@@ -225,7 +225,7 @@ helm/agentcare/
 ## 🚀 Deployment Architecture
 
 ### Multi-Environment Strategy
-```mermaid
+<div class="mermaid">
 graph LR
     D[Development] --> S[Staging]
     S --> P[Production]
@@ -233,7 +233,7 @@ graph LR
     D --> |Local Docker| DC[Docker Compose]
     S --> |K8s Cluster| SC[Staging Cluster]
     P --> |K8s Cluster| PC[Production Cluster]
-```
+</div>
 
 ### Kubernetes Deployment
 - **Namespaces**: Isolated environments for different components

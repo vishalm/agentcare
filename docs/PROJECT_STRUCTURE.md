@@ -1,3 +1,5 @@
+{% include doc-header.html %}
+
 # AgentCare Project Structure Guide
 
 ## Overview
@@ -155,7 +157,7 @@ tests/
 
 ## 🔄 Build and Deployment Flow
 
-```mermaid
+<div class="mermaid">
 graph TD
     A[Source Code] --> B[Build Process]
     B --> C[Testing Pipeline]
@@ -173,11 +175,11 @@ graph TD
     F --> F1[Development]
     F --> F2[Staging]
     F --> F3[Production]
-```
+</div>
 
 ## 📱 Frontend Architecture
 
-```mermaid
+<div class="mermaid">
 graph TB
     A[React App] --> B[Router]
     B --> C[Pages]
@@ -186,11 +188,11 @@ graph TB
     E --> F[Store]
     F --> G[API Layer]
     G --> H[Backend API]
-```
+</div>
 
 ## 🔧 Backend Architecture
 
-```mermaid
+<div class="mermaid">
 graph TB
     A[Express Server] --> B[Routes]
     B --> C[Controllers]
@@ -199,7 +201,7 @@ graph TB
     E --> F[Tools]
     F --> G[Database]
     D --> H[External APIs]
-```
+</div>
 
 ## 🚀 Key Features by Directory
 

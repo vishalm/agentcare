@@ -4,6 +4,8 @@ title: API Reference
 permalink: /api-reference/
 ---
 
+{% include doc-header.html %}
+
 # AgentCare API Reference
 
 **Complete REST API documentation for multi-tenant healthcare operations**

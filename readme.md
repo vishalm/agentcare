@@ -1,4 +1,10 @@
-# 🏥 AgentCare - AI-Powered Healthcare Scheduling Platform
+<div align="center">
+  <img src="docs/assets/images/agentcare-logo-square.svg" alt="AgentCare Logo" width="120" height="120">
+  
+  # 🏥 AgentCare - AI-Powered Healthcare Scheduling Platform
+</div>
+
+
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-blue?logo=github)](https://vishalm.github.io/agentcare/)
 [![CI/CD Status](https://github.com/vishalm/agentcare/workflows/AgentCare%20Testing%20CI%2FCD/badge.svg)](https://github.com/vishalm/agentcare/actions)
@@ -110,7 +116,7 @@ agentcare/
 
 ## 🏗️ Architecture Overview
 
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "Frontend Layer"
         React[React App]
@@ -150,7 +156,7 @@ graph TB
     Supervisor --> Ollama
     Express --> Postgres
     Express --> Redis
-```
+</div>
 
 👉 **[Detailed Architecture Diagrams](docs/architecture/diagrams/SYSTEM_ARCHITECTURE.md)**
 

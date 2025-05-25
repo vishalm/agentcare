@@ -28,7 +28,7 @@ AgentCare v2.0 implements enterprise-grade DevOps practices with:
 
 ### Architecture Layers
 
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "Observability Layer"
         M[Metrics - Prometheus]
@@ -74,7 +74,7 @@ graph TB
     K --> NP
     K --> PSP
     K --> TLS
-```
+</div>
 
 ---
 
@@ -114,7 +114,7 @@ production:
 
 ### Complete Monitoring Architecture
 
-```mermaid
+<div class="mermaid">
 graph LR
     subgraph "Applications"
         AC[AgentCare API]
@@ -158,7 +158,7 @@ graph LR
     
     PM --> AM
     AM --> PD
-```
+</div>
 
 ### 1. **Metrics Collection (Prometheus)**
 
@@ -357,7 +357,7 @@ features:
 
 **File**: `.github/workflows/ci-cd.yml`
 
-```mermaid
+<div class="mermaid">
 graph TD
     A[Code Push] --> B[Validate & Security Scan]
     B --> C[Run Tests]
@@ -373,7 +373,7 @@ graph TD
     K --> M[Health Checks]
     L --> N[Cleanup]
     M --> N
-```
+</div>
 
 ### Pipeline Stages
 
@@ -404,7 +404,7 @@ graph TD
 
 ### Environment Promotion
 
-```mermaid
+<div class="mermaid">
 graph LR
     A[Developer] --> B[Feature Branch]
     B --> C[Pull Request]
@@ -416,7 +416,7 @@ graph LR
     H --> I[Merge to Main]
     I --> J[Tag Release]
     J --> K[Deploy to Production]
-```
+</div>
 
 ---
 

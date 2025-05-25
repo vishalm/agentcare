@@ -12,7 +12,7 @@ AgentCare implements a sophisticated multi-tenant architecture specifically desi
 
 ## 🏗️ System Architecture Overview
 
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "🏥 Multi-Tenant Healthcare Platform"
         subgraph "🌐 Organization Management Layer"
@@ -102,7 +102,7 @@ graph TB
             🛡️ SQL Injection Protection`"]
         end
     end
-```
+</div>
 
 ## 🌐 Multi-Tenant Organization Layer
 
@@ -137,7 +137,7 @@ type OrganizationType =
 
 ### User Management Hierarchy
 
-```mermaid
+<div class="mermaid">
 graph TD
     A[Organization] --> B[Organization Users]
     B --> C[Healthcare Providers]
@@ -154,7 +154,7 @@ graph TD
     D --> L[Front Desk Staff]
     D --> M[Schedulers]
     D --> N[Billing Staff]
-```
+</div>
 
 ### Tenant Context Management
 
@@ -221,7 +221,7 @@ class SupervisorAgent {
 
 ### Agent Coordination Flow
 
-```mermaid
+<div class="mermaid">
 sequenceDiagram
     participant U as User/Patient
     participant S as Supervisor Agent
@@ -240,13 +240,13 @@ sequenceDiagram
     D-->>B: Confirm booking
     B-->>S: Booking confirmation
     S-->>U: Appointment confirmed
-```
+</div>
 
 ## 🗄️ Multi-Tenant Data Layer
 
 ### Database Schema Design
 
-```mermaid
+<div class="mermaid">
 erDiagram
     organizations {
         uuid id PK
@@ -320,7 +320,7 @@ erDiagram
     users ||--o{ organization_users : "belongs_to"
     users ||--o{ patient_caregivers : "patient"
     users ||--o{ patient_caregivers : "caregiver"
-```
+</div>
 
 ### Row-Level Security (RLS) Implementation
 
@@ -367,7 +367,7 @@ CREATE INDEX CONCURRENTLY idx_organization_users_active
 
 ### HIPAA Compliance Architecture
 
-```mermaid
+<div class="mermaid">
 graph LR
     subgraph "🔒 HIPAA Compliance Framework"
         A[Data Encryption] --> B[Access Control]
@@ -395,7 +395,7 @@ graph LR
         F1[Automated Alerts] --> F
         F2[Response Procedures] --> F
     end
-```
+</div>
 
 ### Authentication & Authorization
 
@@ -448,7 +448,7 @@ class SecurityService {
 
 ### Request Processing Flow
 
-```mermaid
+<div class="mermaid">
 graph TD
     A[Client Request] --> B[Load Balancer]
     B --> C[API Gateway]
@@ -473,7 +473,7 @@ graph TD
     O --> P[Response Processing]
     P --> Q[Audit Logging]
     Q --> R[Client Response]
-```
+</div>
 
 ### Event-Driven Architecture
 
@@ -512,7 +512,7 @@ class EventBus {
 
 ### Horizontal Scaling Strategy
 
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "🌍 Multi-Region Deployment"
         subgraph "Region 1"
@@ -535,7 +535,7 @@ graph TB
         SCALING --> API1
         SCALING --> API2
     end
-```
+</div>
 
 ### Caching Strategy
 

@@ -104,7 +104,7 @@ npm start
 
 ## 🏗️ System Architecture
 
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "Frontend Layer"
         UI[Enhanced Web UI]
@@ -145,7 +145,7 @@ graph TB
     Supervisor --> RAG
     RAG --> Vectors
     UMS --> Sessions
-```
+</div>
 
 ---
 
