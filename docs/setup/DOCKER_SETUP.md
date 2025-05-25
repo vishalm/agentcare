@@ -1,3 +1,5 @@
+{% include doc-header.html %}
+
 # AgentCare Docker Development Setup
 
 This comprehensive Docker setup provides a complete development environment for AgentCare with all necessary infrastructure components including observability, monitoring, and storage services.

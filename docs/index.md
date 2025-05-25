@@ -139,6 +139,6 @@ graph TB
 
 **📚 Comprehensive documentation for a comprehensive platform**
 
-[🏠 Home](/agentcare/README.html) • [🚀 Quick Start](/agentcare/docs/setup/QUICK_START.html) • [🏗️ Architecture](/agentcare/docs/architecture/ARCHITECTURE_GUIDE.html) • [🔧 API](/agentcare/docs/api-reference.html)
+[🏠 Home](/agentcare/) • [🚀 Quick Start](/agentcare/docs/setup/QUICK_START.html) • [🏗️ Architecture](/agentcare/docs/architecture/ARCHITECTURE_GUIDE.html) • [🔧 API](/agentcare/docs/api-reference.html)
 
 </div> 

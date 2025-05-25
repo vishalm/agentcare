@@ -4,6 +4,8 @@ title: Architecture
 permalink: /architecture/
 ---
 
+{% include doc-header.html %}
+
 # AgentCare Architecture Guide
 
 **Multi-Tenant Healthcare SaaS Platform Design**

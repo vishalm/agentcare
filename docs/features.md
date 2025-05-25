@@ -4,6 +4,8 @@ title: "Platform Features"
 description: "Comprehensive healthcare platform features including multi-tenant architecture, AI coordination, HIPAA compliance, and enterprise integrations."
 ---
 
+{% include doc-header.html %}
+
 # Platform Features
 
 <div class="features-hero">

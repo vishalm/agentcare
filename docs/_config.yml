@@ -17,6 +17,10 @@ kramdown:
 # Theme
 remote_theme: pages-themes/cayman@v0.2.0
 
+# Site logo and favicon
+logo: "/agentcare/docs/assets/images/agentcare-logo-square.svg"
+favicon: "/agentcare/docs/assets/images/favicon-32x32.png"
+
 # Plugins
 plugins:
   - jekyll-feed

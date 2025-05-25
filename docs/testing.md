@@ -4,6 +4,8 @@ title: Testing Guide
 permalink: /testing/
 ---
 
+{% include doc-header.html %}
+
 # AgentCare Testing Guide
 
 **Comprehensive testing strategy for multi-tenant healthcare SaaS platform**

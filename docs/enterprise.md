@@ -4,6 +4,8 @@ title: "Enterprise Solutions"
 description: "Enterprise healthcare solutions with dedicated support, advanced security, and custom integrations for large healthcare organizations."
 ---
 
+{% include doc-header.html %}
+
 # Enterprise Solutions
 
 <div class="enterprise-hero">
