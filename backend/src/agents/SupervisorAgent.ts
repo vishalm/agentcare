@@ -98,7 +98,8 @@ export class SupervisorAgent implements IAgent {
           });
         } catch (error) {
           this.logger.warn("Token validation failed, creating guest session", {
-            error: error instanceof Error ? error.message : String(error),
+            timestamp: new Date().toISOString(),
+            sessionType: "guest"
           });
           processingContext = await this.createGuestSession();
         }

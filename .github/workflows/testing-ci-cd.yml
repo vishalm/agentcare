@@ -89,6 +89,7 @@ jobs:
           base: main
           head: HEAD
           extra_args: --debug --only-verified --fail
+        if: github.event_name == 'pull_request'
         continue-on-error: true
 
       - name: Upload validation artifacts

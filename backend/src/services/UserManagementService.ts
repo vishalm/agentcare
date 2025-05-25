@@ -28,7 +28,7 @@ export interface UserPreferences {
 }
 
 export interface UserProfile {
-  dateOfBirth?: Date;
+  birthDate?: Date;
   gender?: string;
   address?: {
     street: string;

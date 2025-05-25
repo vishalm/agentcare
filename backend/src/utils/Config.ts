@@ -39,7 +39,10 @@ export class Config {
     const value = this.config.get(key) || process.env[key] || defaultValue;
 
     if (!value && this.logger) {
-      this.logger.warn(`Configuration key '${key}' not found`);
+      this.logger.warn(`Configuration key not found`, {
+        keyType: key.includes('PASSWORD') || key.includes('SECRET') || key.includes('TOKEN') ? 'sensitive' : 'standard',
+        environment: this.getEnvironment()
+      });
     }
 
     return value || "";
