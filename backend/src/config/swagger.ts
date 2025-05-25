@@ -846,10 +846,11 @@ All endpoints maintain strict data isolation between organizations and implement
 const options = {
   definition: swaggerDefinition,
   apis: [
-    './backend/src/routes/*.ts',
-    './backend/src/routes/**/*.ts',
-    './backend/src/models/*.ts',
-    './backend/src/middleware/*.ts'
+    './src/index.ts',
+    './src/routes/*.ts',
+    './src/routes/**/*.ts',
+    './src/models/*.ts',
+    './src/middleware/*.ts'
   ]
 };
 

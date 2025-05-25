@@ -1,0 +1,675 @@
+version: '3.8'
+
+services:
+  # Ollama LLM Service - Core AI Engine
+  ollama:
+    image: ollama/ollama:latest
+    container_name: agentcare-ollama-dev
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_NUM_PARALLEL=${OLLAMA_NUM_PARALLEL:-2}
+      - OLLAMA_MAX_LOADED_MODELS=${OLLAMA_MAX_LOADED_MODELS:-1}
+    restart: unless-stopped
+    networks:
+      - agentcare-dev-network
+    command: >
+      sh -c "ollama serve &
+             sleep 10 &&
+             echo 'Pulling models...' &&
+             ollama pull qwen2.5:latest &&
+             ollama pull deepseek-r1:1.5b &&
+             echo 'Models ready!' &&
+             wait"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    labels:
+      - "traefik.enable=false"
+
+  # PostgreSQL Database with pgvector extension
+  postgres:
+    image: pgvector/pgvector:pg15
+    container_name: agentcare-postgres-dev
+    environment:
+      POSTGRES_DB: agentcare_dev
+      POSTGRES_USER: agentcare
+      POSTGRES_PASSWORD: agentcare_dev
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/enhanced-multi-tenant-schema.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./database/migrations:/docker-entrypoint-initdb.d/migrations:ro
+      - ./database/seeds:/docker-entrypoint-initdb.d/seeds:ro
+      - ./infrastructure/postgres/init-extensions.sql:/docker-entrypoint-initdb.d/00-extensions.sql:ro
+      - ./infrastructure/postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    networks:
+      - agentcare-dev-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentcare -d agentcare_dev"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    command: >
+      postgres
+      -c config_file=/etc/postgresql/postgresql.conf
+      -c log_statement=all
+      -c log_destination=stderr
+      -c max_connections=200
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c work_mem=4MB
+      -c maintenance_work_mem=64MB
+    labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=5432"
+
+  # Redis Cache with enhanced configuration
+  redis:
+    image: redis:7-alpine
+    container_name: agentcare-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./infrastructure/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - agentcare-dev-network
+    restart: unless-stopped
+    command: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=6379"
+
+  # Elasticsearch for logging and search
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: agentcare-elasticsearch-dev
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - cluster.name=agentcare-dev
+      - node.name=agentcare-node-1
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+      - ./infrastructure/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+    networks:
+      - agentcare-dev-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=9200"
+
+  # Logstash for log processing
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: agentcare-logstash-dev
+    ports:
+      - "5044:5044"
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "9600:9600"
+    volumes:
+      - ./infrastructure/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./infrastructure/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - logs_data:/var/log/agentcare:ro
+    networks:
+      - agentcare-dev-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      - "LS_JAVA_OPTS=-Xmx512m -Xms512m"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9600 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Kibana for log visualization
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: agentcare-kibana-dev
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=agentcare-kibana
+      - SERVER_HOST=0.0.0.0
+    volumes:
+      - ./infrastructure/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - kibana_data:/usr/share/kibana/data
+    networks:
+      - agentcare-dev-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: agentcare-prometheus-dev
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infrastructure/prometheus/rules:/etc/prometheus/rules:ro
+      - prometheus_data:/prometheus
+    networks:
+      - agentcare-dev-network
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:9090/-/healthy || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Grafana for metrics visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: agentcare-grafana-dev
+    ports:
+      - "3002:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource,redis-datasource,postgres-datasource
+      - GF_FEATURE_TOGGLES_ENABLE=publicDashboards
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infrastructure/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infrastructure/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - agentcare-dev-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Jaeger for distributed tracing
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: agentcare-jaeger-dev
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "14268:14268"  # Jaeger collector HTTP
+      - "14250:14250"  # Jaeger collector gRPC
+      - "6831:6831/udp"  # Jaeger agent UDP
+      - "6832:6832/udp"  # Jaeger agent UDP
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - QUERY_BASE_PATH=/jaeger
+    networks:
+      - agentcare-dev-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:16686/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Node Exporter for system metrics
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: agentcare-node-exporter-dev
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - agentcare-dev-network
+    restart: unless-stopped
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    profiles:
+      - monitoring
+
+  # Redis Exporter for Redis metrics
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: agentcare-redis-exporter-dev
+    ports:
+      - "9121:9121"
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+      - REDIS_PASSWORD=agentcare_redis_dev
+    networks:
+      - agentcare-dev-network
+    depends_on:
+      - redis
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Postgres Exporter for PostgreSQL metrics
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: agentcare-postgres-exporter-dev
+    ports:
+      - "9187:9187"
+    environment:
+      - DATA_SOURCE_NAME=postgresql://agentcare:agentcare_dev@postgres:5432/agentcare_dev?sslmode=disable
+    networks:
+      - agentcare-dev-network
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # AgentCare Backend API - Development with Live Reload
+  backend:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
+      target: development
+      args:
+        - NODE_ENV=development
+    container_name: agentcare-backend-dev
+    ports:
+      - "3000:3000"      # Main API port
+      - "9091:9091"      # Metrics port
+      - "9229:9229"      # Node.js debug port
+      - "35729:35729"    # Live reload port
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_URL=postgresql://agentcare:agentcare_dev@postgres:5432/agentcare_dev
+      - REDIS_URL=redis://:agentcare_redis_dev@redis:6379/0
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_MODEL=qwen2.5:latest
+      - OLLAMA_STARTUP_MAX_RETRIES=10
+      - OLLAMA_STARTUP_BASE_DELAY=3000
+      - OLLAMA_AUTO_PULL_MODEL=true
+      - ENABLE_OLLAMA_LLM=true
+      - ENABLE_RAG_SYSTEM=true
+      - ENABLE_USER_REGISTRATION=true
+      - JWT_SECRET=development-secret-key-change-in-production
+      - SESSION_SECRET=development-session-secret
+      - LOG_LEVEL=debug
+      - ENABLE_SWAGGER_UI=true
+      - ENABLE_METRICS=true
+      - METRICS_PORT=9091
+      - HIPAA_LOGGING=true
+      - AUDIT_LOG_RETENTION_DAYS=30
+      - ENABLE_RATE_LIMITING=false
+      - CORS_ORIGIN=http://localhost:3001
+      - ENABLE_CORS=true
+      # Observability
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - JAEGER_ENDPOINT=http://jaeger:14268/api/traces
+      - PROMETHEUS_PUSHGATEWAY=http://prometheus:9090
+      - ENABLE_TRACING=true
+      - ENABLE_APM=true
+      # Vector Database
+      - PGVECTOR_ENABLED=true
+      - VECTOR_DIMENSION=1536
+    volumes:
+      # Mount source code for live development
+      - ./backend/src:/app/backend/src:rw
+      - ./backend/package.json:/app/backend/package.json:ro
+      - ./backend/tsconfig.json:/app/backend/tsconfig.json:ro
+      - ./backend/jest.config.js:/app/backend/jest.config.js:ro
+      # Mount shared config files
+      - ./package.json:/app/package.json:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
+      # Persistent volumes for node_modules and logs
+      - backend_node_modules:/app/backend/node_modules
+      - logs_data:/app/logs
+      # Mount build output directory
+      - backend_dist:/app/backend/dist
+    networks:
+      - agentcare-dev-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    working_dir: /app/backend
+    labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=9091"
+      - "prometheus.io/path=/metrics"
+    # Use nodemon for automatic restart on changes
+    command: >
+      sh -c "
+        echo 'Installing dependencies...' &&
+        npm install &&
+        echo 'Starting backend with live reload...' &&
+        npm run dev
+      "
+
+  # AgentCare Frontend - Development with Hot Reload
+  frontend:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.frontend
+      target: development
+      args:
+        - NODE_ENV=development
+    container_name: agentcare-frontend-dev
+    ports:
+      - "3001:3001"      # Vite dev server
+      - "24678:24678"    # Vite HMR port
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://localhost:3000
+      - VITE_WS_URL=ws://localhost:3000
+      - VITE_ENABLE_MOCK_API=false
+      - VITE_APP_TITLE=AgentCare - AI Healthcare Scheduling (Dev)
+      - VITE_APP_VERSION=2.0.0-dev
+      - VITE_LOG_LEVEL=debug
+      - HMR_PORT=24678
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      # Analytics and monitoring
+      - VITE_JAEGER_URL=http://localhost:16686
+      - VITE_GRAFANA_URL=http://localhost:3002
+      - VITE_KIBANA_URL=http://localhost:5601
+    volumes:
+      # Mount source code for live development
+      - ./frontend/src:/app/frontend/src:rw
+      - ./frontend/public:/app/frontend/public:rw
+      - ./frontend/index.html:/app/frontend/index.html:rw
+      - ./frontend/package.json:/app/frontend/package.json:ro
+      - ./frontend/tsconfig.json:/app/frontend/tsconfig.json:ro
+      - ./frontend/tsconfig.node.json:/app/frontend/tsconfig.node.json:ro
+      - ./frontend/vite.config.ts:/app/frontend/vite.config.ts:ro
+      - ./frontend/nginx.conf:/app/frontend/nginx.conf:ro
+      # Persistent volumes for node_modules and build output
+      - frontend_node_modules:/app/frontend/node_modules
+      - frontend_dist:/app/frontend/dist
+    networks:
+      - agentcare-dev-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    working_dir: /app/frontend
+    # Use Vite dev server with HMR
+    command: >
+      sh -c "
+        echo 'Installing frontend dependencies...' &&
+        npm install &&
+        echo 'Starting Vite dev server with HMR...' &&
+        npm run dev -- --host 0.0.0.0 --port 3001
+      "
+
+  # Production Frontend Build Service (for testing production builds)
+  frontend-build:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.frontend
+      target: builder
+    container_name: agentcare-frontend-build
+    environment:
+      - NODE_ENV=production
+      - VITE_API_BASE_URL=http://localhost:3000
+    volumes:
+      # Mount source for building
+      - ./frontend:/app/frontend:ro
+      # Mount build output
+      - frontend_prod_dist:/app/frontend/dist
+    networks:
+      - agentcare-dev-network
+    working_dir: /app/frontend
+    command: >
+      sh -c "
+        echo 'Building frontend for production...' &&
+        npm install &&
+        npm run build &&
+        echo 'Production build complete!' &&
+        tail -f /dev/null
+      "
+    profiles:
+      - build
+
+  # Nginx for serving production build and reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: agentcare-nginx-dev
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/nginx/conf.d:/etc/nginx/conf.d:ro
+      - frontend_prod_dist:/usr/share/nginx/html:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    networks:
+      - agentcare-dev-network
+    depends_on:
+      - backend
+      - frontend-build
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles:
+      - nginx
+
+  # pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: agentcare-pgadmin-dev
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@agentcare.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_DISABLE_POSTFIX: 'true'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./infrastructure/pgadmin/servers.json:/pgadmin4/servers.json:ro
+    networks:
+      - agentcare-dev-network
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    profiles:
+      - tools
+
+  # Redis Commander for Redis management
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: agentcare-redis-commander-dev
+    environment:
+      - REDIS_HOSTS=redis:redis:6379:0:agentcare_redis_dev
+      - HTTP_USER=admin
+      - HTTP_PASSWORD=admin
+    ports:
+      - "8081:8081"
+    networks:
+      - agentcare-dev-network
+    depends_on:
+      - redis
+    restart: unless-stopped
+    profiles:
+      - tools
+
+  # File watcher service for additional build tasks
+  watcher:
+    image: node:18-alpine
+    container_name: agentcare-watcher
+    volumes:
+      - .:/app:ro
+      - ./logs:/app/logs:rw
+    working_dir: /app
+    command: >
+      sh -c "
+        echo 'Starting file watcher...' &&
+        npm install -g chokidar-cli &&
+        chokidar 'backend/src/**/*.ts' 'frontend/src/**/*.{ts,tsx,js,jsx}' --initial --command 'echo Changed: {path} at {time}' --verbose
+      "
+    networks:
+      - agentcare-dev-network
+    profiles:
+      - watcher
+
+  # Mailhog for email testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: agentcare-mailhog-dev
+    ports:
+      - "8025:8025"  # Web UI
+      - "1025:1025"  # SMTP
+    networks:
+      - agentcare-dev-network
+    restart: unless-stopped
+    profiles:
+      - tools
+
+  # MinIO for S3-compatible object storage
+  minio:
+    image: minio/minio:latest
+    container_name: agentcare-minio-dev
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=agentcare
+      - MINIO_ROOT_PASSWORD=agentcare123
+    volumes:
+      - minio_data:/data
+    networks:
+      - agentcare-dev-network
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    profiles:
+      - storage
+
+networks:
+  agentcare-dev-network:
+    driver: bridge
+    name: agentcare-dev-network
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  # Database volumes
+  postgres_data:
+    name: agentcare-postgres-dev-data
+  redis_data:
+    name: agentcare-redis-dev-data
+  
+  # AI/ML volumes
+  ollama_data:
+    name: agentcare-ollama-dev-data
+  
+  # Application volumes
+  logs_data:
+    name: agentcare-logs-dev-data
+  
+  # Node.js dependency volumes (for faster rebuilds)
+  backend_node_modules:
+    name: agentcare-backend-dev-node-modules
+  frontend_node_modules:
+    name: agentcare-frontend-dev-node-modules
+  
+  # Build output volumes
+  backend_dist:
+    name: agentcare-backend-dev-dist
+  frontend_dist:
+    name: agentcare-frontend-dev-dist
+  frontend_prod_dist:
+    name: agentcare-frontend-prod-dist
+  
+  # Observability volumes
+  elasticsearch_data:
+    name: agentcare-elasticsearch-dev-data
+  kibana_data:
+    name: agentcare-kibana-dev-data
+  prometheus_data:
+    name: agentcare-prometheus-dev-data
+  grafana_data:
+    name: agentcare-grafana-dev-data
+  
+  # Storage volumes
+  minio_data:
+    name: agentcare-minio-dev-data
+  
+  # Tool volumes
+  pgadmin_data:
+    name: agentcare-pgadmin-dev-data
+  nginx_logs:
+    name: agentcare-nginx-logs-dev

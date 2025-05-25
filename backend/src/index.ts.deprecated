@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger";
 import { Logger } from "./utils/Logger";
 import { MetricsCollector } from "./utils/MetricsCollector";
 import { ErrorHandler } from "./utils/ErrorHandler";
@@ -214,6 +216,42 @@ class AgentCareApplication {
   }
 
   private setupRoutes(): void {
+    // Swagger API Documentation
+    const swaggerOptions = {
+      customCss: `
+        .swagger-ui .topbar { display: none }
+        .swagger-ui .info hgroup.main h2 { color: #1f77b4 }
+        .swagger-ui .scheme-container { background: #fafafa; padding: 20px; border-radius: 5px; }
+        .swagger-ui .info { margin: 30px 0; }
+        .swagger-ui .info .title { font-size: 36px; }
+        .swagger-ui .info .description { font-size: 16px; line-height: 1.6; }
+      `,
+      customSiteTitle: 'AgentCare API Documentation',
+      customfavIcon: '/assets/favicon.ico',
+      swaggerOptions: {
+        persistAuthorization: true,
+        docExpansion: 'none',
+        operationsSorter: 'alpha',
+        tagsSorter: 'alpha',
+        filter: true,
+        tryItOutEnabled: true
+      }
+    };
+
+    // Swagger UI endpoint
+    this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerOptions));
+
+    // Swagger JSON endpoint
+    this.app.get('/api/docs.json', (req, res) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.send(swaggerSpec);
+    });
+
+    // Default route - redirect to API docs
+    this.app.get('/', (req, res) => {
+      res.redirect('/api/docs');
+    });
+
     // Health check endpoint
     this.app.get("/health", async (req, res) => {
       try {
@@ -241,6 +279,39 @@ class AgentCareApplication {
     });
 
     // Authentication endpoints
+    /**
+     * @swagger
+     * /api/v1/auth/register:
+     *   post:
+     *     summary: Register a new user
+     *     tags: [Authentication]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - email
+     *               - password
+     *               - name
+     *             properties:
+     *               email:
+     *                 type: string
+     *                 format: email
+     *               password:
+     *                 type: string
+     *                 minLength: 6
+     *               name:
+     *                 type: string
+     *               phone:
+     *                 type: string
+     *     responses:
+     *       201:
+     *         description: User registered successfully
+     *       400:
+     *         description: Invalid input data
+     */
     this.app.post("/api/v1/auth/register", async (req, res) => {
       try {
         const { email, password, name, phone } = req.body;
@@ -275,6 +346,33 @@ class AgentCareApplication {
       }
     });
 
+    /**
+     * @swagger
+     * /api/v1/auth/login:
+     *   post:
+     *     summary: Authenticate user
+     *     tags: [Authentication]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - email
+     *               - password
+     *             properties:
+     *               email:
+     *                 type: string
+     *                 format: email
+     *               password:
+     *                 type: string
+     *     responses:
+     *       200:
+     *         description: Login successful
+     *       401:
+     *         description: Invalid credentials
+     */
     this.app.post("/api/v1/auth/login", async (req, res) => {
       try {
         const { email, password } = req.body;
@@ -326,6 +424,35 @@ class AgentCareApplication {
     });
 
     // Enhanced agent processing endpoint
+    /**
+     * @swagger
+     * /api/v1/agents/process:
+     *   post:
+     *     summary: Process message through AI agent system
+     *     tags: [AI Agents]
+     *     security:
+     *       - bearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - message
+     *             properties:
+     *               message:
+     *                 type: string
+     *                 minLength: 1
+     *                 description: Message to process
+     *     responses:
+     *       200:
+     *         description: Message processed successfully
+     *       400:
+     *         description: Invalid message format
+     *       500:
+     *         description: Processing failed
+     */
     this.app.post("/api/v1/agents/process", async (req, res) => {
       try {
         const { message } = req.body;
@@ -579,15 +706,21 @@ class AgentCareApplication {
     try {
       const port = this.config.get("API_PORT") || 3000;
 
-      // Check Ollama connection
+      // Initialize Ollama service with retry mechanism
       if (this.config.get("ENABLE_OLLAMA_LLM") === "true") {
-        const ollamaHealthy = await this.ollamaService.healthCheck();
-        if (!ollamaHealthy) {
-          this.logger.warn(
-            "Ollama service is not available. Some features may be limited.",
-          );
+        this.logger.info("Initializing Ollama service...");
+        
+        const ollamaResult = await this.ollamaService.initialize();
+        
+        if (ollamaResult.isHealthy) {
+          this.logger.info("Ollama service initialized successfully", {
+            modelAvailable: ollamaResult.modelAvailable,
+            message: ollamaResult.message,
+          });
         } else {
-          this.logger.info("Ollama service connected successfully");
+          this.logger.warn("Ollama service initialization failed", {
+            message: ollamaResult.message,
+          });
         }
       }
 

@@ -1,0 +1,96 @@
+title: AgentCare Documentation
+description: Enterprise-grade multi-agent healthcare scheduling platform with AI coordination and HIPAA compliance
+url: https://yourusername.github.io
+baseurl: /agentcare
+
+# Jekyll configuration
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# GitHub Pages configuration
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-mermaid
+
+# Navigation
+header_pages:
+  - setup/index.md
+  - operations/index.md
+  - architecture/index.md
+  - testing/index.md
+  - guides/index.md
+
+# Site settings
+author: AgentCare Team
+email: support@agentcare.dev
+twitter_username: agentcare
+github_username: yourusername
+
+# Mermaid configuration
+mermaid:
+  # Version 9.4.3 for compatibility
+  src: 'https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js'
+
+# Build settings
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+
+# Collections for documentation
+collections:
+  setup:
+    output: true
+    permalink: /:collection/:name/
+  operations:
+    output: true
+    permalink: /:collection/:name/
+  architecture:
+    output: true
+    permalink: /:collection/:name/
+  testing:
+    output: true
+    permalink: /:collection/:name/
+  guides:
+    output: true
+    permalink: /:collection/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "setup"
+    values:
+      layout: "page"
+  - scope:
+      path: ""
+      type: "operations"
+    values:
+      layout: "page"
+  - scope:
+      path: ""
+      type: "architecture"
+    values:
+      layout: "page"
+  - scope:
+      path: ""
+      type: "testing"
+    values:
+      layout: "page"
+  - scope:
+      path: ""
+      type: "guides"
+    values:
+      layout: "page" 

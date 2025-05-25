@@ -566,8 +566,64 @@ export function createOrganizationRoutes(
    *                         licenseNumber:
    *                           type: string
    *                         specialties:
-   * POST /api/v1/organizations/:id/providers
-   * Register a healthcare provider
+   *                           type: array
+   *                           items:
+   *                             type: string
+ */
+
+  /**
+   * @swagger
+   * /organizations/{organizationId}/providers:
+   *   post:
+   *     tags: [Organizations]
+   *     summary: Register a healthcare provider
+   *     description: Register a new healthcare provider for the organization
+   *     parameters:
+   *       - $ref: '#/components/parameters/OrganizationId'
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - email
+   *               - name
+   *               - role
+   *             properties:
+   *               email:
+   *                 type: string
+   *                 format: email
+   *               name:
+   *                 type: string
+   *               role:
+   *                 type: string
+   *                 enum: [attending_physician, specialist, surgeon, resident_physician, nurse_practitioner, physician_assistant, nurse_manager, registered_nurse, charge_nurse, licensed_practical_nurse, physical_therapist, occupational_therapist, social_worker, pharmacist]
+   *               specialties:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *               licenseNumber:
+   *                 type: string
+   *               licenseState:
+   *                 type: string
+   *               deaNumber:
+   *                 type: string
+   *               npiNumber:
+   *                 type: string
+   *               department:
+   *                 type: string
+   *               employmentType:
+   *                 type: string
+   *     responses:
+   *       201:
+   *         description: Provider registered successfully
+   *       400:
+   *         description: Invalid input
+   *       401:
+   *         $ref: '#/components/responses/Unauthorized'
+   *       403:
+   *         $ref: '#/components/responses/Forbidden'
    */
   router.post('/:id/providers', 
     multiTenantService.resolveTenantMiddleware(),
@@ -658,8 +714,52 @@ export function createOrganizationRoutes(
   );
 
   /**
-   * POST /api/v1/organizations/:id/patients
-   * Register a patient
+   * @swagger
+   * /organizations/{organizationId}/patients:
+   *   post:
+   *     tags: [Organizations]
+   *     summary: Register a patient
+   *     description: Register a new patient for the organization
+   *     parameters:
+   *       - $ref: '#/components/parameters/OrganizationId'
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - email
+   *               - name
+   *               - dateOfBirth
+   *             properties:
+   *               email:
+   *                 type: string
+   *                 format: email
+   *               name:
+   *                 type: string
+   *               dateOfBirth:
+   *                 type: string
+   *                 format: date
+   *               gender:
+   *                 type: string
+   *               phone:
+   *                 type: string
+   *               address:
+   *                 type: object
+   *               emergencyContact:
+   *                 type: object
+   *               insuranceInfo:
+   *                 type: object
+   *               preferredLanguage:
+   *                 type: string
+   *               medicalRecordNumber:
+   *                 type: string
+   *     responses:
+   *       201:
+   *         description: Patient registered successfully
+   *       400:
+   *         description: Invalid input
    */
   router.post('/:id/patients',
     multiTenantService.resolveTenantMiddleware(),
@@ -732,8 +832,55 @@ export function createOrganizationRoutes(
   );
 
   /**
-   * POST /api/v1/organizations/:id/patients/:patientId/caregivers
-   * Add caregiver for patient
+   * @swagger
+   * /organizations/{organizationId}/patients/{patientId}/caregivers:
+   *   post:
+   *     tags: [Organizations]
+   *     summary: Add caregiver for patient
+   *     description: Add a caregiver for a specific patient
+   *     parameters:
+   *       - $ref: '#/components/parameters/OrganizationId'
+   *       - name: patientId
+   *         in: path
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - caregiverEmail
+   *               - caregiverName
+   *               - relationshipType
+   *               - authorizationLevel
+   *               - authorizedBy
+   *             properties:
+   *               caregiverEmail:
+   *                 type: string
+   *                 format: email
+   *               caregiverName:
+   *                 type: string
+   *               relationshipType:
+   *                 type: string
+   *               authorizationLevel:
+   *                 type: string
+   *               canScheduleAppointments:
+   *                 type: boolean
+   *               canReceiveMedicalInfo:
+   *                 type: boolean
+   *               canMakeMedicalDecisions:
+   *                 type: boolean
+   *               authorizedBy:
+   *                 type: string
+   *     responses:
+   *       201:
+   *         description: Caregiver added successfully
+   *       400:
+   *         description: Invalid input
    */
   router.post('/:id/patients/:patientId/caregivers',
     multiTenantService.resolveTenantMiddleware(),
@@ -812,8 +959,44 @@ export function createOrganizationRoutes(
   );
 
   /**
-   * POST /api/v1/organizations/:id/staff
-   * Register support staff
+   * @swagger
+   * /organizations/{organizationId}/staff:
+   *   post:
+   *     tags: [Organizations]
+   *     summary: Register support staff
+   *     description: Register a new support staff member for the organization
+   *     parameters:
+   *       - $ref: '#/components/parameters/OrganizationId'
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - email
+   *               - name
+   *               - role
+   *             properties:
+   *               email:
+   *                 type: string
+   *                 format: email
+   *               name:
+   *                 type: string
+   *               role:
+   *                 type: string
+   *                 enum: [medical_assistant, front_desk, scheduler, insurance_verifier, medical_records, practice_manager, billing_manager, system_administrator]
+   *               department:
+   *                 type: string
+   *               employmentType:
+   *                 type: string
+   *               employeeId:
+   *                 type: string
+   *     responses:
+   *       201:
+   *         description: Staff member registered successfully
+   *       400:
+   *         description: Invalid input
    */
   router.post('/:id/staff',
     multiTenantService.resolveTenantMiddleware(),
@@ -896,8 +1079,52 @@ export function createOrganizationRoutes(
   // Bulk Operations
 
   /**
-   * POST /api/v1/organizations/:id/bulk/providers
-   * Bulk register providers from CSV/Excel
+   * @swagger
+   * /organizations/{organizationId}/bulk/providers:
+   *   post:
+   *     tags: [Organizations]
+   *     summary: Bulk register providers from CSV/Excel
+   *     description: Register multiple healthcare providers in bulk for the organization
+   *     parameters:
+   *       - $ref: '#/components/parameters/OrganizationId'
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - providers
+   *             properties:
+   *               providers:
+   *                 type: array
+   *                 items:
+   *                   type: object
+   *                   required:
+   *                     - email
+   *                     - name
+   *                     - role
+   *                   properties:
+   *                     email:
+   *                       type: string
+   *                       format: email
+   *                     name:
+   *                       type: string
+   *                     role:
+   *                       type: string
+   *                     specialties:
+   *                       type: array
+   *                       items:
+   *                         type: string
+   *                     licenseNumber:
+   *                       type: string
+   *                     department:
+   *                       type: string
+   *     responses:
+   *       200:
+   *         description: Bulk registration completed
+   *       400:
+   *         description: Invalid input
    */
   router.post('/:id/bulk/providers',
     multiTenantService.resolveTenantMiddleware(),

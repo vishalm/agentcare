@@ -492,36 +492,50 @@ export class RAGService {
       },
     ];
 
+    let successCount = 0;
+    
     for (const knowledge of healthcareKnowledge) {
       try {
         const embedding = await this.ollamaService.generateEmbeddings(
           knowledge.content,
         );
 
-        const document: VectorDocument = {
-          id: `kb_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          content: knowledge.content,
-          embedding,
-          metadata: {
-            userId: "system",
-            sessionId: "system",
-            timestamp: new Date(),
-            type: knowledge.type,
-            source: "knowledge_base",
-            importance: 0.8,
-          },
-        };
+        // Only create document if embeddings were generated successfully
+        if (embedding && embedding.length > 0) {
+          const document: VectorDocument = {
+            id: `kb_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            content: knowledge.content,
+            embedding,
+            metadata: {
+              userId: "system",
+              sessionId: "system",
+              timestamp: new Date(),
+              type: knowledge.type,
+              source: "knowledge_base",
+              importance: 0.8,
+            },
+          };
 
-        this.vectorStore.set(document.id, document);
+          this.vectorStore.set(document.id, document);
+          successCount++;
+        } else {
+          this.logger.warn("Empty embedding returned for knowledge base item", {
+            content: knowledge.content.substring(0, 50) + "...",
+          });
+        }
       } catch (error) {
         this.logger.error("Error initializing knowledge base item", {
           error: error instanceof Error ? error.message : String(error),
+          content: knowledge.content.substring(0, 50) + "...",
         });
+        // Continue with other items even if one fails
       }
     }
 
     this.logger.info("Healthcare knowledge base initialized", {
-      itemCount: healthcareKnowledge.length,
+      itemCount: successCount,
+      totalItems: healthcareKnowledge.length,
+      success: successCount > 0,
     });
   }
 }

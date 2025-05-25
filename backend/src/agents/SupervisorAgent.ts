@@ -529,12 +529,17 @@ export class SupervisorAgent implements IAgent {
       faq: this.faqAgent ? true : false,
     };
 
-    const allHealthy = Object.values(services).every(
-      (status) => status === true,
-    );
+    // Count critical services (those needed for core functionality)
+    const criticalServices = ['supervisor', 'availability', 'booking', 'faq'];
+    const criticalHealthy = criticalServices.every(service => services[service] === true);
+    
+    // Ollama is optional - system can work without it
+    const status = criticalHealthy ? 
+      (services.ollama ? "healthy" : "degraded") : 
+      "unhealthy";
 
     return {
-      status: allHealthy ? "healthy" : "degraded",
+      status,
       services,
     };
   }

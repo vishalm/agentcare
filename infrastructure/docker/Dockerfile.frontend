@@ -1,0 +1,155 @@
+# AgentCare Frontend Service Dockerfile
+# React Healthcare Scheduling UI
+
+# Build stage
+FROM node:18-alpine AS build
+LABEL maintainer="AgentCare Team <dev@agentcare.com>"
+LABEL description="AgentCare Frontend React Application"
+LABEL version="3.0.0"
+
+# Install system dependencies
+RUN apk add --no-cache \
+    curl \
+    git \
+    && rm -rf /var/cache/apk/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy root package.json and frontend package.json
+COPY package*.json ./
+COPY frontend/package*.json ./frontend/
+
+# Install dependencies
+RUN npm ci --only=production --no-audit --no-fund
+RUN cd frontend && npm ci --include=dev --no-audit --no-fund
+
+# Copy frontend source code
+COPY frontend/ ./frontend/
+
+# Build the frontend application
+WORKDIR /app/frontend
+RUN npm run build
+
+# Production stage with Nginx
+FROM nginx:alpine AS production
+ENV NODE_ENV=production
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    curl \
+    tini \
+    && rm -rf /var/cache/apk/*
+
+# Create non-root user
+RUN addgroup -g 1001 -S agentcare && \
+    adduser -S agentcare -u 1001 -G agentcare
+
+# Copy built application from build stage
+COPY --from=build /app/frontend/dist /usr/share/nginx/html
+
+# Copy custom nginx configuration
+COPY infrastructure/docker/nginx.conf /etc/nginx/nginx.conf
+
+# Create required directories and set permissions
+RUN mkdir -p /var/cache/nginx /var/log/nginx /var/run && \
+    chown -R agentcare:agentcare /var/cache/nginx /var/log/nginx /var/run /usr/share/nginx/html && \
+    chmod -R 755 /var/cache/nginx /var/log/nginx /var/run
+
+# Create nginx.pid file with proper permissions
+RUN touch /var/run/nginx.pid && \
+    chown agentcare:agentcare /var/run/nginx.pid
+
+# Switch to non-root user
+USER agentcare
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:80/ || exit 1
+
+# Expose port
+EXPOSE 80
+
+# Use tini as init system
+ENTRYPOINT ["tini", "--"]
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
+
+# Development stage (for development builds)
+FROM node:18-alpine AS development
+ENV NODE_ENV=development
+
+RUN apk add --no-cache \
+    curl \
+    git \
+    && rm -rf /var/cache/apk/*
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY frontend/package*.json ./frontend/
+
+# Install all dependencies (including dev)
+RUN npm ci --include=dev
+RUN cd frontend && npm ci --include=dev
+
+# Copy source code
+COPY frontend/ ./frontend/
+
+# Create user for development
+RUN addgroup -g 1001 -S agentcare && \
+    adduser -S agentcare -u 1001 -G agentcare
+
+# Set ownership
+RUN chown -R agentcare:agentcare /app
+
+# Switch to non-root user
+USER agentcare
+
+# Expose development port
+EXPOSE 3001
+
+# Start development server
+CMD ["npm", "run", "dev:frontend"]
+
+# Static file server stage (alternative to nginx)
+FROM node:18-alpine AS static-server
+ENV NODE_ENV=production
+
+RUN apk add --no-cache \
+    curl \
+    tini \
+    && rm -rf /var/cache/apk/*
+
+# Install serve globally
+RUN npm install -g serve
+
+# Create non-root user
+RUN addgroup -g 1001 -S agentcare && \
+    adduser -S agentcare -u 1001 -G agentcare
+
+WORKDIR /app
+
+# Copy built application from build stage
+COPY --from=build /app/frontend/dist ./dist
+
+# Set ownership
+RUN chown -R agentcare:agentcare /app
+
+# Switch to non-root user
+USER agentcare
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:3001/ || exit 1
+
+# Expose port
+EXPOSE 3001
+
+# Use tini as init system
+ENTRYPOINT ["tini", "--"]
+
+# Serve static files
+CMD ["serve", "-s", "dist", "-l", "3001"] 

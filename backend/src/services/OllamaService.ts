@@ -56,10 +56,14 @@ export class OllamaService {
         content: prompt,
       });
 
-      const response = await fetch(`${this.baseUrl}/api/chat`, {
+      // Use 127.0.0.1 instead of localhost to avoid IPv6 issues
+      const url = this.baseUrl.replace('localhost', '127.0.0.1');
+      
+      const response = await fetch(`${url}/api/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "User-Agent": "AgentCare-Backend/2.0.0"
         },
         body: JSON.stringify({
           model: this.model,
@@ -230,26 +234,44 @@ export class OllamaService {
    */
   async generateEmbeddings(text: string): Promise<number[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/embeddings`, {
+      const timeout = parseInt(this.config.get("OLLAMA_TIMEOUT") || "30000");
+      
+      // Use 127.0.0.1 instead of localhost to avoid IPv6 issues
+      const url = this.baseUrl.replace('localhost', '127.0.0.1');
+      
+      const response = await fetch(`${url}/api/embeddings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "User-Agent": "AgentCare-Backend/2.0.0"
         },
         body: JSON.stringify({
           model: this.model,
           prompt: text,
         }),
+        signal: AbortSignal.timeout(timeout),
       });
 
       if (!response.ok) {
-        throw new Error(`Embedding API error: ${response.status}`);
+        throw new Error(`Embedding API error: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
-      return (data as any)?.embedding || [];
+      const embedding = (data as any)?.embedding || [];
+      
+      if (embedding.length === 0) {
+        this.logger.warn("Empty embedding returned", {
+          textLength: text.length,
+          model: this.model,
+        });
+      }
+      
+      return embedding;
     } catch (error) {
       this.logger.error("Error generating embeddings", {
         error: error instanceof Error ? error.message : String(error),
+        textLength: text.length,
+        model: this.model,
       });
       return [];
     }
@@ -260,14 +282,233 @@ export class OllamaService {
    */
   async healthCheck(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/tags`);
+      // Use 127.0.0.1 instead of localhost to avoid IPv6 issues
+      const url = this.baseUrl.replace('localhost', '127.0.0.1');
+      
+      const response = await fetch(`${url}/api/tags`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'AgentCare-Backend/2.0.0'
+        },
+        signal: AbortSignal.timeout(5000), // 5 second timeout
+      });
+      
+      this.logger.debug("Ollama health check response", {
+        status: response.status,
+        statusText: response.statusText,
+        url: `${url}/api/tags`
+      });
+      
       return response.ok;
     } catch (error) {
       this.logger.error("Ollama health check failed", {
         error: error instanceof Error ? error.message : String(error),
+        baseUrl: this.baseUrl,
+        resolvedUrl: this.baseUrl.replace('localhost', '127.0.0.1')
       });
       return false;
     }
+  }
+
+  /**
+   * Health check with retry mechanism for service startup
+   */
+  async healthCheckWithRetry(
+    maxRetries: number = parseInt(this.config.get("OLLAMA_STARTUP_MAX_RETRIES") || "5"),
+    baseDelay: number = parseInt(this.config.get("OLLAMA_STARTUP_BASE_DELAY") || "2000"),
+    maxDelay: number = parseInt(this.config.get("OLLAMA_STARTUP_MAX_DELAY") || "30000")
+  ): Promise<boolean> {
+    this.logger.info("Starting Ollama health check with retry", {
+      maxRetries,
+      baseDelay,
+      maxDelay,
+    });
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        this.logger.debug(`Ollama health check attempt ${attempt}/${maxRetries}`);
+        
+        const isHealthy = await this.healthCheck();
+        
+        if (isHealthy) {
+          this.logger.info("Ollama service is healthy", {
+            attempt,
+            totalRetries: maxRetries,
+          });
+          return true;
+        }
+
+        if (attempt < maxRetries) {
+          // Calculate exponential backoff delay with jitter
+          const delay = Math.min(
+            baseDelay * Math.pow(2, attempt - 1) + Math.random() * 1000,
+            maxDelay
+          );
+          
+          this.logger.warn(`Ollama not ready, retrying in ${Math.round(delay)}ms`, {
+            attempt,
+            nextRetryIn: Math.round(delay),
+            remainingRetries: maxRetries - attempt,
+          });
+
+          await this.sleep(delay);
+        }
+      } catch (error) {
+        this.logger.error(`Ollama health check attempt ${attempt} failed`, {
+          error: error instanceof Error ? error.message : String(error),
+          attempt,
+          remainingRetries: maxRetries - attempt,
+        });
+
+        if (attempt < maxRetries) {
+          const delay = Math.min(baseDelay * Math.pow(2, attempt - 1), maxDelay);
+          await this.sleep(delay);
+        }
+      }
+    }
+
+    this.logger.warn("Ollama service is not available after all retries", {
+      maxRetries,
+      totalWaitTime: Math.round(baseDelay * (Math.pow(2, maxRetries) - 1)),
+    });
+    
+    return false;
+  }
+
+  /**
+   * Check if a specific model is available
+   */
+  async checkModelAvailability(model?: string): Promise<boolean> {
+    const modelToCheck = model || this.model;
+    
+    try {
+      // Use 127.0.0.1 instead of localhost to avoid IPv6 issues
+      const url = this.baseUrl.replace('localhost', '127.0.0.1');
+      
+      const response = await fetch(`${url}/api/tags`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'AgentCare-Backend/2.0.0'
+        },
+        signal: AbortSignal.timeout(10000),
+      });
+      
+      if (!response.ok) {
+        return false;
+      }
+
+      const data = await response.json();
+      const availableModels = (data as any)?.models || [];
+      
+      const isAvailable = availableModels.some((m: any) => 
+        m.name === modelToCheck || m.name.startsWith(modelToCheck.split(':')[0])
+      );
+
+      if (!isAvailable) {
+        this.logger.warn("Required model not available", {
+          requestedModel: modelToCheck,
+          availableModels: availableModels.map((m: any) => m.name),
+        });
+      }
+
+      return isAvailable;
+    } catch (error) {
+      this.logger.error("Error checking model availability", {
+        error: error instanceof Error ? error.message : String(error),
+        model: modelToCheck,
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Initialize Ollama service with comprehensive checks
+   */
+  async initialize(): Promise<{
+    isHealthy: boolean;
+    modelAvailable: boolean;
+    message: string;
+  }> {
+    this.logger.info("Initializing Ollama service", {
+      baseUrl: this.baseUrl,
+      model: this.model,
+    });
+
+    // Check if Ollama service is healthy with retries
+    const isHealthy = await this.healthCheckWithRetry();
+    
+    if (!isHealthy) {
+      return {
+        isHealthy: false,
+        modelAvailable: false,
+        message: "Ollama service is not available. Some AI features will be limited.",
+      };
+    }
+
+    // Check if the required model is available
+    const modelAvailable = await this.checkModelAvailability();
+    
+    if (!modelAvailable) {
+      const autoPull = this.config.get("OLLAMA_AUTO_PULL_MODEL") === "true";
+      
+      if (autoPull) {
+        this.logger.info("Attempting to pull required model", { model: this.model });
+        
+        try {
+          const pullSuccess = await this.pullModel();
+          if (pullSuccess) {
+            return {
+              isHealthy: true,
+              modelAvailable: true,
+              message: `Ollama service initialized successfully with model ${this.model}`,
+            };
+          } else {
+            return {
+              isHealthy: true,
+              modelAvailable: false,
+              message: `Ollama service is healthy but model ${this.model} could not be pulled`,
+            };
+          }
+        } catch (error) {
+          this.logger.error("Failed to pull model", {
+            error: error instanceof Error ? error.message : String(error),
+            model: this.model,
+          });
+          
+          return {
+            isHealthy: true,
+            modelAvailable: false,
+            message: `Ollama service is healthy but model ${this.model} is not available`,
+          };
+        }
+      } else {
+        this.logger.warn("Model not available and auto-pull is disabled", {
+          model: this.model,
+          autoPull,
+        });
+        
+        return {
+          isHealthy: true,
+          modelAvailable: false,
+          message: `Ollama service is healthy but model ${this.model} is not available (auto-pull disabled)`,
+        };
+      }
+    }
+
+    return {
+      isHealthy: true,
+      modelAvailable: true,
+      message: `Ollama service initialized successfully with model ${this.model}`,
+    };
+  }
+
+  /**
+   * Helper method to sleep for specified milliseconds
+   */
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /**
@@ -279,10 +520,14 @@ export class OllamaService {
     try {
       this.logger.info("Pulling Ollama model", { model: modelToPull });
 
-      const response = await fetch(`${this.baseUrl}/api/pull`, {
+      // Use 127.0.0.1 instead of localhost to avoid IPv6 issues
+      const url = this.baseUrl.replace('localhost', '127.0.0.1');
+      
+      const response = await fetch(`${url}/api/pull`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "User-Agent": "AgentCare-Backend/2.0.0"
         },
         body: JSON.stringify({
           name: modelToPull,
