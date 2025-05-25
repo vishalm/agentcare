@@ -8,6 +8,7 @@
 [![Multi-Tenant](https://img.shields.io/badge/Multi--Tenant-Healthcare-blue.svg)]()
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)]()
 [![Observability](https://img.shields.io/badge/Observability-Complete-green.svg)]()
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-blue.svg)](https://vishalm.github.io/agentcare/)
 
 ## 🚀 One-Command Setup
 
@@ -194,6 +195,53 @@ curl http://localhost:11434/api/tags    # Ollama status
 - **[🩺 System Inspector](docs/operations/INSPECTOR_GUIDE.md)** - Health monitoring
 - **[⚡ Quick Reference](docs/setup/QUICK_REFERENCE.md)** - Command shortcuts
 - **[🎯 Demo Guide](docs/setup/DEMO_GUIDE.md)** - Complete walkthrough
+
+### 🌐 GitHub Pages & Live Demo
+
+**🔗 [Live Demo](https://vishalm.github.io/agentcare/)** - Production deployment on GitHub Pages
+
+AgentCare is deployed automatically via GitHub Pages for demonstration and testing purposes.
+
+#### Features Available on GitHub Pages:
+- **📱 Responsive Frontend** - Full React/TypeScript application
+- **🤖 Demo AI Agents** - Simulated multi-agent coordination
+- **📋 Interactive Documentation** - Complete API reference
+- **🎯 Healthcare Scenarios** - Pre-loaded demo data
+- **📊 Live Dashboards** - Real-time metrics visualization
+
+#### Deployment Pipeline:
+```bash
+# Automatic deployment on main branch push
+✅ Build Process     → React production build
+✅ Asset Optimization → Minified CSS/JS bundles  
+✅ GitHub Actions    → CI/CD pipeline execution
+✅ Pages Deployment  → Automatic site update
+✅ CDN Distribution  → Global edge caching
+```
+
+#### Repository Settings for GitHub Pages:
+1. **Source**: Deploy from `gh-pages` branch
+2. **Custom Domain**: `agentcare.dev` (optional)
+3. **HTTPS**: Enforced for security
+4. **Build Process**: GitHub Actions workflow
+
+#### Local GitHub Pages Testing:
+```bash
+# Build production version locally
+npm run build
+
+# Serve production build
+npx serve -s build -l 4000
+
+# Test GitHub Pages deployment
+npm run deploy:pages
+```
+
+#### GitHub Pages Configuration Files:
+- **`.github/workflows/pages.yml`** - Deployment automation
+- **`package.json`** - Build and deployment scripts  
+- **`public/CNAME`** - Custom domain configuration
+- **`public/404.html`** - SPA routing fallback
 
 ### Architecture Documentation
 - **[🏗️ System Architecture](docs/architecture/ARCHITECTURE_GUIDE.md)** - Design patterns

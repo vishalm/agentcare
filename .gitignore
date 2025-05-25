@@ -196,7 +196,9 @@ dist
 
 # Gatsby files
 .cache/
-public
+# public (commented out to allow frontend/public for GitHub Pages)
+# Only ignore Gatsby's public directory specifically
+gatsby/public/
 
 # Storybook build outputs
 .out
