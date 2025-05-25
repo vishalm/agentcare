@@ -2,6 +2,7 @@ module.exports = {
   root: true,
   env: {
     node: true,
+    browser: true,
     es2022: true,
     jest: true
   },
@@ -63,6 +64,25 @@ module.exports = {
         '@typescript-eslint/no-unused-vars': 'warn',
         'no-unused-vars': 'warn',
         'no-unreachable': 'warn'
+      }
+    },
+    {
+      files: ['frontend/**/*.ts', 'frontend/**/*.tsx'],
+      env: {
+        browser: true,
+        es2022: true
+      },
+      rules: {
+        'no-console': 'warn', // Allow console in development
+        '@typescript-eslint/no-unused-vars': ['warn', { 
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_'
+        }],
+        'no-unused-vars': ['warn', { 
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_'
+        }]
       }
     }
   ],

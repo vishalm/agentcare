@@ -348,7 +348,7 @@ export class OrganizationService {
       await client.query('SELECT set_tenant_context($1)', [organizationId]);
 
       // Check if caregiver user exists, create if not
-      let caregiverResult = await client.query(`
+      const caregiverResult = await client.query(`
         SELECT id FROM users 
         WHERE email = $1 AND organization_id = $2
       `, [data.caregiverEmail, organizationId]);
