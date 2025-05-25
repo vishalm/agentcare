@@ -101,13 +101,16 @@ jobs:
         run: npm ci
 
       - name: "Lint frontend code"
-        run: npm run lint:frontend
+        working-directory: ./frontend
+        run: npm run lint
 
       - name: "Type check frontend"
-        run: npm run type-check:frontend
+        working-directory: ./frontend
+        run: npm run type-check
 
       - name: "Build frontend"
-        run: npm run build:frontend
+        working-directory: ./frontend
+        run: npm run build
 
       - name: "Upload frontend build artifacts"
         uses: actions/upload-artifact@v4
@@ -141,13 +144,16 @@ jobs:
         run: npm ci
 
       - name: "Lint backend code"
-        run: npm run lint:backend
+        working-directory: ./backend
+        run: npm run lint
 
       - name: "Type check backend"
-        run: npm run type-check:backend
+        working-directory: ./backend
+        run: npm run type-check
 
       - name: "Build backend"
-        run: npm run build:backend
+        working-directory: ./backend
+        run: npm run build
 
       - name: "Upload backend build artifacts"
         uses: actions/upload-artifact@v4
@@ -181,7 +187,8 @@ jobs:
         run: npm ci
 
       - name: "Run frontend unit tests with coverage"
-        run: npm run test:frontend
+        working-directory: ./frontend
+        run: npm run test
 
       - name: "Create coverage directory if not exists"
         run: mkdir -p frontend/coverage
@@ -219,7 +226,8 @@ jobs:
         run: npm ci
 
       - name: "Run backend unit tests with coverage"
-        run: npm run test:backend
+        working-directory: ./backend
+        run: npm run test
 
       - name: "Upload backend unit test coverage"
         uses: actions/upload-artifact@v4
