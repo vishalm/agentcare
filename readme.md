@@ -12,6 +12,58 @@ A comprehensive healthcare SaaS platform built with multi-tenant architecture, f
 [![Testing](https://img.shields.io/badge/Test%20Coverage-80%25+-brightgreen.svg)]()
 [![12-Factor](https://img.shields.io/badge/12--Factor-Compliant-brightgreen.svg)](https://12factor.net/)
 
+## 🚀 Quick Start
+
+### One-Command Demo Setup
+```bash
+# Complete setup with demo data and all personas
+./scripts/init-demo.sh
+
+# Then start the system
+npm run dev
+
+# Access at http://localhost:3001
+```
+
+### Demo Credentials
+All demo accounts use password: **`AgentCare2024!`**
+- **Admin**: `admin@agentcare.dev`
+- **Doctor**: `doctor@agentcare.dev` 
+- **Nurse**: `nurse@agentcare.dev`
+- **Patient**: `patient@agentcare.dev`
+- **Receptionist**: `receptionist@agentcare.dev`
+
+## 📚 Documentation Navigation
+
+### 🎯 **Demo & Getting Started**
+- **[⚡ Quick Reference](QUICK_REFERENCE.md)** - Developer cheat sheet with all commands
+- **[🚀 Demo Guide](DEMO_GUIDE.md)** - Complete demo walkthrough with all personas
+- **[📖 Main Documentation](docs/README.md)** - Central documentation hub
+- **[⚙️ Quick Setup Scripts](scripts/)** - Automated setup and database tools
+
+### 🏗️ **Architecture & Implementation**
+- **[🏥 Architecture Guide](ARCHITECTURE_GUIDE.md)** - System design and components
+- **[📋 Implementation Summary](IMPLEMENTATION_SUMMARY.md)** - Technical details
+- **[🏢 Multi-Tenancy Guide](MULTI_TENANCY_GUIDE.md)** - Multi-organization support
+- **[👥 Healthcare Users](HEALTHCARE_SAAS_USERS.md)** - 24+ user roles and permissions
+
+### 🛠️ **Development & Operations**
+- **[🚀 DevOps Guide](DEVOPS_GUIDE.md)** - Deployment and operations
+- **[📊 Twelve Factor](TWELVE_FACTOR_GUIDE.md)** - 12-Factor methodology
+- **[🧪 Testing Guide](TEST_SUMMARY.md)** - Testing strategies (3,115+ tests)
+- **[⚙️ Platform Setup](PLATFORM_SETUP_GUIDE.md)** - Environment configuration
+
+### 🎨 **Frontend & UI**
+- **[🎨 Frontend Demo](frontend/demo.md)** - UI themes and persona showcase
+- **[🖼️ Components](frontend/src/components/)** - React component library
+- **[🎨 Theming System](frontend/src/theme/)** - Persona-based themes
+- **[💾 State Management](frontend/src/store/)** - Application state
+
+### 🗄️ **Database & Data**
+- **[📊 Database Schema](database/schema/)** - Complete database structure
+- **[🔄 Migrations](database/migrations/)** - Schema evolution
+- **[🌱 Demo Seeds](database/seeds/)** - Demo data for all personas
+
 ## 🏆 **Enterprise Healthcare SaaS Achievements**
 
 ### 🚀 **Production-Ready Multi-Tenant Platform**

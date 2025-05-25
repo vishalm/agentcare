@@ -555,10 +555,13 @@ export class OrganizationService {
       licenseNumber: row.license_number,
       accreditation: row.accreditation,
       settings: row.settings,
+      featuresEnabled: row.features_enabled || [],
       subscriptionPlan: row.subscription_plan,
       subscriptionStatus: row.subscription_status,
       subscriptionExpiresAt: row.subscription_expires_at,
       isActive: row.is_active,
+      isVerified: row.is_verified || false,
+      onboardingStatus: row.onboarding_status || 'pending',
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       onboardedAt: row.onboarded_at,
@@ -577,6 +580,9 @@ export class OrganizationService {
       employeeId: row.employee_id,
       hireDate: row.hire_date,
       isActive: row.is_active,
+      isVerified: row.is_verified || false,
+      accessLevel: row.access_level || 1,
+      requires2FA: row.requires_2fa || false,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };
@@ -593,6 +599,7 @@ export class OrganizationService {
       isEmergencyContact: row.is_emergency_contact,
       authorizationLevel: row.authorization_level,
       authorizedActions: row.authorized_actions,
+      authorizedBy: row.authorized_by,
       canScheduleAppointments: row.can_schedule_appointments,
       canReceiveMedicalInfo: row.can_receive_medical_info,
       canMakeMedicalDecisions: row.can_make_medical_decisions,
@@ -600,5 +607,26 @@ export class OrganizationService {
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };
+  }
+
+  /**
+   * Find organization by ID
+   */
+  async findById(id: string): Promise<Organization | null> {
+    const client = await this.db.connect();
+    
+    try {
+      const result = await client.query(`
+        SELECT * FROM organizations WHERE id = $1
+      `, [id]);
+
+      if (result.rows.length === 0) {
+        return null;
+      }
+
+      return this.formatOrganization(result.rows[0]);
+    } finally {
+      client.release();
+    }
   }
 } 

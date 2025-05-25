@@ -4,6 +4,15 @@ import helmet from 'helmet';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger';
 
+// Route imports
+import authRoutes from './routes/authRoutes';
+import userRoutes from './routes/userRoutes';
+import agentRoutes from './routes/agentRoutes';
+import adminRoutes from './routes/adminRoutes';
+// import organizationRoutes from './routes/organizationRoutes'; // TODO: Set up dependency injection
+import systemRoutes from './routes/systemRoutes';
+import appointmentRoutes from './routes/appointmentRoutes';
+
 const app = express();
 
 // Security middleware
@@ -19,7 +28,11 @@ app.use(helmet({
   },
 }));
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+  credentials: true,
+}));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -65,10 +78,13 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
-// TODO: Add your API routes here
-// app.use('/api/v1/organizations', organizationRoutes);
-// app.use('/api/v1/auth', authRoutes);
-// app.use('/api/v1/appointments', appointmentRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/agents', agentRoutes);
+app.use('/api/v1/admin', adminRoutes);
+// app.use('/api/v1/organizations', organizationRoutes); // TODO: Set up dependency injection
+app.use('/api/v1/system', systemRoutes);
+app.use('/api/v1/appointments', appointmentRoutes);
 
 // Default route - redirect to API docs
 app.get('/', (req, res) => {

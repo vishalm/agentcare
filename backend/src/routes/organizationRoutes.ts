@@ -256,9 +256,10 @@ export function createOrganizationRoutes(
         }
       });
     } catch (error) {
-      logger.error('Failed to create organization via API', { error });
+      logger.error('Failed to create organization', { error });
       res.status(400).json({
-        error: error.message || 'Failed to create organization'
+        success: false,
+        error: (error as Error).message || 'Failed to create organization'
       });
     }
   });
@@ -650,7 +651,7 @@ export function createOrganizationRoutes(
       } catch (error) {
         logger.error('Failed to register provider via API', { error });
         res.status(400).json({
-          error: error.message || 'Failed to register provider'
+          error: (error as Error).message || 'Failed to register provider'
         });
       }
     }
@@ -724,7 +725,7 @@ export function createOrganizationRoutes(
       } catch (error) {
         logger.error('Failed to register patient via API', { error });
         res.status(400).json({
-          error: error.message || 'Failed to register patient'
+          error: (error as Error).message || 'Failed to register patient'
         });
       }
     }
@@ -804,7 +805,7 @@ export function createOrganizationRoutes(
       } catch (error) {
         logger.error('Failed to add caregiver via API', { error });
         res.status(400).json({
-          error: error.message || 'Failed to add caregiver'
+          error: (error as Error).message || 'Failed to add caregiver'
         });
       }
     }
@@ -886,7 +887,7 @@ export function createOrganizationRoutes(
       } catch (error) {
         logger.error('Failed to register staff via API', { error });
         res.status(400).json({
-          error: error.message || 'Failed to register staff'
+          error: (error as Error).message || 'Failed to register staff'
         });
       }
     }
@@ -911,7 +912,10 @@ export function createOrganizationRoutes(
           });
         }
 
-        const results = {
+        const results: {
+          successful: Array<{ email: string; userId: string; role: string }>;
+          failed: Array<{ email: string; error: string }>;
+        } = {
           successful: [],
           failed: []
         };
@@ -927,7 +931,7 @@ export function createOrganizationRoutes(
           } catch (error) {
             results.failed.push({
               email: provider.email,
-              error: error.message
+              error: (error as Error).message || 'Unknown error'
             });
           }
         }
@@ -1018,4 +1022,7 @@ export function createOrganizationRoutes(
   );
 
   return router;
-} 
+}
+
+// Default export for compatibility with app.ts
+export default createOrganizationRoutes; 

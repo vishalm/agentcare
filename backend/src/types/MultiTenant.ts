@@ -361,9 +361,13 @@ export type OnboardingStep =
 
 export interface TenantContext {
   organizationId: string;
+  organization?: Organization;
   userId?: string;
+  user?: any;
   userRole?: string;
-  permissions?: string[];
+  permissions?: any[];
+  subscription?: any;
+  settings?: OrganizationSettings;
   sessionId?: string;
   ipAddress?: string;
   userAgent?: string;
@@ -790,5 +794,42 @@ export function isOrganizationUser(obj: any): obj is OrganizationUser {
 }
 
 export function isPatientCaregiver(obj: any): obj is PatientCaregiver {
-  return obj && typeof obj.patientId === 'string' && typeof obj.caregiverId === 'string';
+  return obj && typeof obj.organizationId === 'string' && typeof obj.patientId === 'string';
+}
+
+// Missing interfaces for MultiTenantService
+export interface ITenantResolver {
+  resolveTenant(context: any): Promise<string | null>;
+}
+
+export interface IOrganizationService {
+  findById(id: string): Promise<Organization | null>;
+  getOrganizationStats(id: string): Promise<OrganizationStats>;
+  createOrganization(data: Partial<Organization>): Promise<Organization>;
+  registerProvider(organizationId: string, providerData: any): Promise<any>;
+  registerPatient(organizationId: string, patientData: any): Promise<any>;
+  addCaregiver(organizationId: string, caregiverData: any): Promise<any>;
+  getOnboardingStatus(organizationId: string): Promise<OnboardingStatus>;
+}
+
+// Error classes
+export class TenantNotFoundError extends Error {
+  constructor(tenantId: string) {
+    super(`Tenant not found: ${tenantId}`);
+    this.name = 'TenantNotFoundError';
+  }
+}
+
+export class TenantAccessDeniedError extends Error {
+  constructor(tenantId: string, reason?: string) {
+    super(`Access denied to tenant: ${tenantId}${reason ? ` - ${reason}` : ''}`);
+    this.name = 'TenantAccessDeniedError';
+  }
+}
+
+export class TenantSubscriptionExpiredError extends Error {
+  constructor(tenantId: string) {
+    super(`Subscription expired for tenant: ${tenantId}`);
+    this.name = 'TenantSubscriptionExpiredError';
+  }
 } 

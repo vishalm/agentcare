@@ -6,6 +6,7 @@ import {
   IOrganizationService,
   OrganizationUser,
   OrganizationStats,
+  OnboardingStatus,
   TenantNotFoundError,
   TenantAccessDeniedError,
   TenantSubscriptionExpiredError
@@ -23,7 +24,7 @@ export class MultiTenantService implements ITenantResolver, IOrganizationService
 
   constructor(logger: Logger) {
     this.logger = logger;
-    this.tenantStorage = new AsyncLocalStorage<TenantContext>();
+    this.tenantStorage = new AsyncLocalStorage();
   }
 
   /**
@@ -393,7 +394,8 @@ export class MultiTenantService implements ITenantResolver, IOrganizationService
           user: req.user, // Assuming user is set by auth middleware
           permissions: [], // Would be loaded based on user role
           subscription: {} as any, // Would be loaded from database
-          settings: organization.settings
+          settings: organization.settings,
+          timestamp: new Date()
         };
 
         this.setTenantContext(context);
@@ -526,5 +528,40 @@ export class MultiTenantService implements ITenantResolver, IOrganizationService
       storageUsed: 0,
       storageLimit: 1000
     };
+  }
+
+  // ITenantResolver implementation
+  async resolveTenant(context: any): Promise<string | null> {
+    const organization = await this.resolveFromContext(context);
+    return organization ? organization.id : null;
+  }
+
+  // IOrganizationService implementation
+  async getOrganizationStats(id: string): Promise<OrganizationStats> {
+    return await this.getStats(id);
+  }
+
+  async createOrganization(data: Partial<Organization>): Promise<Organization> {
+    return await this.create(data);
+  }
+
+  async registerProvider(organizationId: string, providerData: any): Promise<any> {
+    // This would delegate to the actual OrganizationService
+    throw new Error('Not implemented - should delegate to OrganizationService');
+  }
+
+  async registerPatient(organizationId: string, patientData: any): Promise<any> {
+    // This would delegate to the actual OrganizationService
+    throw new Error('Not implemented - should delegate to OrganizationService');
+  }
+
+  async addCaregiver(organizationId: string, caregiverData: any): Promise<any> {
+    // This would delegate to the actual OrganizationService
+    throw new Error('Not implemented - should delegate to OrganizationService');
+  }
+
+  async getOnboardingStatus(organizationId: string): Promise<OnboardingStatus> {
+    // This would delegate to the actual OrganizationService
+    throw new Error('Not implemented - should delegate to OrganizationService');
   }
 } 
