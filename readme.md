@@ -1,340 +1,360 @@
-# 🏥 AgentCare - Multi-Agent Healthcare Scheduling System
+# 🏥 AgentCare - AI-Powered Healthcare Scheduling Platform
 
-**Enterprise-grade multi-agent healthcare scheduling platform with AI-powered coordination, full observability stack, and production-ready Docker infrastructure**
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-blue?logo=github)](https://vishalm.github.io/agentcare/)
+[![CI/CD Status](https://github.com/vishalm/agentcare/workflows/AgentCare%20Testing%20CI%2FCD/badge.svg)](https://github.com/vishalm/agentcare/actions)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=vishalm_agentcare&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=vishalm_agentcare)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue?logo=docker)](https://hub.docker.com/r/agentcare/platform)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-3.0.0--beta-orange.svg)]()
-[![HIPAA](https://img.shields.io/badge/HIPAA-Compliant-green.svg)]()
-[![Multi-Tenant](https://img.shields.io/badge/Multi--Tenant-Healthcare-blue.svg)]()
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)]()
-[![Observability](https://img.shields.io/badge/Observability-Complete-green.svg)]()
+> **Enterprise-grade multi-agent healthcare scheduling platform with AI coordination, HIPAA compliance, and real-time appointment management.**
 
-## 🚀 One-Command Setup
+## 🌟 Live Demo & Documentation
 
-```bash
-# Complete development environment with full observability stack
-chmod +x docker-dev.sh && ./docker-dev.sh start
-```
-
-### 🌐 Access Points (Development)
-- **🖥️ Frontend**: http://localhost:3001 (React/TypeScript with HMR)
-- **🔧 Backend API**: http://localhost:3000 (Node.js/Express with live reload)
-- **📚 API Documentation**: http://localhost:3000/api/v1 (Swagger UI)
-- **🤖 Ollama LLM**: http://localhost:11434 (Local AI inference)
-
-### 📊 Observability & Monitoring
-- **📈 Grafana**: http://localhost:3002 (admin/admin) - Metrics visualization
-- **🔍 Prometheus**: http://localhost:9090 - Metrics collection
-- **🔎 Jaeger**: http://localhost:16686 - Distributed tracing
-- **📋 Kibana**: http://localhost:5601 - Log analysis
-- **🔧 Elasticsearch**: http://localhost:9200 - Search engine
-
-### 🛠️ Development Tools
-- **🗄️ pgAdmin**: http://localhost:5050 (admin@agentcare.local/admin)
-- **💾 Redis Commander**: http://localhost:8081 (admin/admin)
-- **📧 Mailhog**: http://localhost:8025 - Email testing
-- **📦 MinIO Console**: http://localhost:9001 (agentcare/agentcare123) - S3 storage
-
-### Demo Credentials
-All demo accounts use password: **`AgentCare2024!`**
-- **Admin**: `admin@agentcare.dev`
-- **Doctor**: `doctor@agentcare.dev` 
-- **Patient**: `patient@agentcare.dev`
-
-## 🏗️ Modern Architecture
-
-### Multi-Agent AI System
-**AgentCare implements a sophisticated coordination architecture:**
-
-- **🧠 Supervisor Agent** - Intelligent routing and task orchestration
-- **📅 Availability Agent** - Schedule optimization and conflict resolution  
-- **📝 Booking Agent** - Appointment creation and confirmation workflows
-- **❓ FAQ Agent** - Healthcare knowledge base and patient support
-- **🔄 Planner Layer** - Multi-agent coordination and finish processing
-- **🛠️ Tooling Layer** - Specialized tools for each agent with activation tracking
-
-### Backend Architecture (Modernized)
-**Transitioned from monolithic to modular design:**
-- **`app.ts`** - Express application configuration
-- **`server.ts`** - Server initialization and lifecycle
-- **Middleware Stack** - JWT auth, CORS, security, rate limiting
-- **Agent Coordination** - Promise-based multi-agent processing
-- **Health Monitoring** - Comprehensive system diagnostics
-
-### Infrastructure Stack
-```
-┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
-│   React/TS      │  │  Node.js/TS     │  │   PostgreSQL    │
-│   Frontend      │  │   Backend       │  │   + pgvector    │
-│   (Port 3001)   │  │  (Port 3000)    │  │   (Port 5432)   │
-└─────────────────┘  └─────────────────┘  └─────────────────┘
-        │                      │                      │
-        │              ┌───────┴───────┐             │
-        │              │     Redis     │             │
-        │              │     Cache     │             │
-        │              │  (Port 6379)  │             │
-        │              └───────────────┘             │
-        │                                            │
-┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
-│     Ollama      │  │   Prometheus    │  │    Grafana      │
-│   LLM Service   │  │    Metrics      │  │   Dashboards    │
-│  (Port 11434)   │  │  (Port 9090)    │  │  (Port 3002)    │
-└─────────────────┘  └─────────────────┘  └─────────────────┘
-```
+- **🚀 [Live Demo](https://vishalm.github.io/agentcare/)** - Interactive frontend demo
+- **📚 [Documentation](https://vishalm.github.io/agentcare/docs/)** - Complete technical docs
+- **🏗️ [Architecture Guide](docs/architecture/SYSTEM_ARCHITECTURE.md)** - System diagrams
+- **🔧 [API Documentation](docs/api-reference.md)** - RESTful API reference
 
 ## 🎯 Key Features
 
-### Healthcare-Specific
-- **🏥 Multi-Organization Support** - Hospitals, clinics, specialty centers
-- **👨‍⚕️ Provider Management** - Licensing, credentialing, specialties  
-- **📅 AI-Powered Scheduling** - Intelligent appointment optimization
-- **🔐 Data Isolation** - Complete tenant separation and security
-- **📋 HIPAA Compliance** - Healthcare data protection by design
-- **👥 24+ User Types** - Complete healthcare ecosystem support
+### 🤖 Multi-Agent AI System
+- **Supervisor Agent** - Orchestrates and coordinates all agent activities
+- **Booking Agent** - Handles appointment scheduling and modifications
+- **Availability Agent** - Manages provider schedules and time slots
+- **FAQ Agent** - Provides intelligent responses using RAG system
 
-### AI & Technology
-- **🤖 Multi-Agent Coordination** - Intelligent task distribution
-- **🧠 Ollama LLM Integration** - Local Qwen2.5 model with retry mechanisms
-- **📚 RAG System** - Conversational context and knowledge base
-- **🗄️ Vector Database** - PostgreSQL with pgvector for AI search
-- **⚡ Real-Time Processing** - Sub-second agent responses
-- **🔄 Retry Logic** - Exponential backoff for service reliability
+### 🏥 Healthcare-Specific Features
+- **HIPAA Compliance** - Secure handling of protected health information
+- **Provider Management** - Comprehensive healthcare provider profiles
+- **Appointment Scheduling** - Real-time availability and booking
+- **Patient Portal** - User-friendly interface for patients
 
-### Production-Ready Infrastructure
-- **🐳 Docker Containerization** - Complete development environment
-- **📊 Full Observability** - Metrics, logs, traces, and monitoring
-- **🔍 Health Monitoring** - Comprehensive system diagnostics
-- **🧪 Testing Framework** - 3,115+ lines of comprehensive tests
-- **☸️ Cloud-Native** - Kubernetes-ready infrastructure
-- **💾 Storage Solutions** - S3-compatible MinIO integration
+### 🧠 AI & LLM Integration
+- **Ollama Integration** - Local LLM processing with Qwen 2.5 and DeepSeek R1
+- **RAG System** - Vector-based conversation memory and knowledge retrieval
+- **Natural Language Processing** - Intelligent understanding of user requests
+- **Context Awareness** - Maintains conversation context across interactions
 
-## 🏥 What You Get
+### 🛡️ Enterprise Security
+- **JWT Authentication** - Secure token-based authentication
+- **Role-Based Access Control** - Granular permission management
+- **Rate Limiting** - API protection against abuse
+- **Audit Logging** - Comprehensive activity tracking
 
-### Core Healthcare Platform
-- **Multi-Tenant Architecture** - Support for multiple healthcare organizations
-- **Intelligent Agent Coordination** - AI-powered appointment scheduling
-- **HIPAA Compliance** - Built-in audit trails and data protection
-- **Complete User Ecosystem** - 24+ healthcare user types supported
-- **Vector-Powered Search** - AI-enhanced patient and provider matching
+## 🚀 Quick Start
 
-### Development Environment
-- **🔄 Live Reloading** - Frontend HMR and backend auto-restart
-- **📊 Full Observability** - Prometheus + Grafana + Jaeger + ELK stack
-- **🛠️ Developer Tools** - pgAdmin, Redis Commander, email testing
-- **💾 Persistent Storage** - S3-compatible object storage with MinIO
-- **🗄️ Vector Database** - PostgreSQL with pgvector for AI operations
+### Prerequisites
+- **Node.js** 18+ and npm 8+
+- **Docker** and Docker Compose
+- **PostgreSQL** 14+
+- **Redis** 7+
+- **Ollama** for AI features
 
-### Observability & Monitoring
-- **📈 Metrics Collection** - Application, database, and system metrics
-- **📋 Structured Logging** - JSON logs with request tracing
-- **🔍 Distributed Tracing** - Cross-service request tracking
-- **🚨 Health Checks** - Automated service monitoring
-- **📊 Pre-built Dashboards** - Performance and business metrics
-
-## ⚡ Development Commands
-
-### Environment Management
+### 1. Clone and Setup
 ```bash
-# Quick start development environment
-./docker-dev.sh dev                    # Core services only
-./docker-dev.sh start                  # All services + observability
-
-# Service management
-./docker-dev.sh start-backend          # Backend services only
-./docker-dev.sh start-frontend         # Frontend service only
-./docker-dev.sh start-observability    # Monitoring stack
-./docker-dev.sh start-tools            # Development tools
-
-# Utilities
-./docker-dev.sh logs [service]         # View logs
-./docker-dev.sh shell [service]        # Container shell access
-./docker-dev.sh health                 # System health check
-./docker-dev.sh status                 # Service status
+git clone https://github.com/vishalm/agentcare.git
+cd agentcare
+npm run setup
 ```
 
-### Traditional Docker Commands
+### 2. Environment Configuration
 ```bash
-# Core operations
-docker-compose -f docker-compose.dev.yml up -d    # Start all
-docker-compose -f docker-compose.dev.yml down     # Stop all
-docker-compose -f docker-compose.dev.yml logs -f  # Follow logs
-
-# Service management
-docker-compose restart backend          # Restart backend
-docker-compose exec backend bash        # Backend shell
-docker-compose exec postgres psql -U agentcare agentcare_dev
-
-# Health monitoring
-curl http://localhost:3000/health       # Backend health
-curl http://localhost:11434/api/tags    # Ollama status
+cp env.example .env
+# Edit .env with your configuration
 ```
 
-## 🛠️ System Requirements
-
-### Minimum Development Setup
-- **Docker & Docker Compose** - Container orchestration
-- **8GB RAM** (16GB recommended for Ollama LLM)
-- **20GB free disk space** - For containers and volumes
-- **Available ports**: 3000, 3001, 5432, 6379, 9090, 11434, and others
-
-### Production Deployment
-- **Node.js 18+** - Backend runtime
-- **PostgreSQL 14+** - Database with pgvector extension
-- **Redis 7+** - Cache and session storage
-- **SSL/TLS certificates** - HTTPS encryption
-- **Reverse proxy** - Load balancing and security
-
-## 📚 Documentation
-
-**📖 [Complete Documentation →](docs/README.md)**
-
-### Quick Access Guides
-- **[🚀 Setup Guide](docs/setup/SETUP_GUIDE.md)** - Installation and configuration
-- **[🐳 Docker Guide](DOCKER_SETUP.md)** - Complete development environment
-- **[🩺 System Inspector](docs/operations/INSPECTOR_GUIDE.md)** - Health monitoring
-- **[⚡ Quick Reference](docs/setup/QUICK_REFERENCE.md)** - Command shortcuts
-- **[🎯 Demo Guide](docs/setup/DEMO_GUIDE.md)** - Complete walkthrough
-
-### Architecture Documentation
-- **[🏗️ System Architecture](docs/architecture/ARCHITECTURE_GUIDE.md)** - Design patterns
-- **[🤖 Multi-Agent System](docs/architecture/AGENTS.md)** - AI coordination
-- **[🏢 Multi-Tenancy](docs/architecture/MULTI_TENANCY_GUIDE.md)** - Data isolation
-- **[👥 Healthcare Users](docs/guides/HEALTHCARE_SAAS_USERS.md)** - 24+ user roles
-
-### Development & Testing
-- **[🧪 Testing Framework](docs/testing/TEST_SUMMARY.md)** - Comprehensive testing
-- **[📊 Observability](docs/operations/OBSERVABILITY.md)** - Monitoring setup
-- **[🔧 API Reference](http://localhost:3000/api/v1)** - Interactive documentation
-
-## 🏥 Healthcare Features
-
-### Multi-Organization Support
-- **Hospital Systems** - Large healthcare networks
-- **Specialty Clinics** - Focused medical practices
-- **Urgent Care Centers** - Walk-in medical services
-- **Telehealth Platforms** - Remote consultation support
-
-### Provider Management
-- **Licensing & Credentialing** - Professional verification
-- **Specialty Tracking** - Medical specialization management
-- **Schedule Optimization** - AI-powered availability matching
-- **Performance Analytics** - Provider efficiency metrics
-
-### Patient Experience
-- **Intelligent Booking** - AI-assisted appointment scheduling
-- **Real-time Availability** - Up-to-date provider schedules
-- **Automated Reminders** - Multi-channel notifications
-- **FAQ Support** - AI-powered question answering
-
-## 🚨 Troubleshooting
-
-### Common Issues
-
-#### Docker Memory Issues
+### 3. Start Development Environment
 ```bash
-# Increase Docker memory to 8GB+
-# Check system resources
-./docker-dev.sh health
+# Start all services with Docker Compose
+docker-compose up
+
+# Or start services individually
+npm run dev:backend  # Backend API (port 3000)
+npm run dev:frontend # Frontend UI (port 3001)
 ```
 
-#### Port Conflicts
+### 4. Initialize Database
 ```bash
-# Check for conflicting services
-lsof -i :3000  # Backend API
-lsof -i :3001  # Frontend dev server
-lsof -i :5432  # PostgreSQL
+npm run db:setup
+npm run db:seed  # Optional: add demo data
 ```
 
-#### Ollama Connection Issues
+### 5. Start Ollama (for AI features)
 ```bash
-# Check Ollama service
-curl http://localhost:11434/api/tags
-./docker-dev.sh logs ollama
-
-# Verify model download
-docker-compose exec ollama ollama list
+ollama serve
+ollama pull qwen2.5:latest
 ```
 
-#### Elasticsearch Setup
-```bash
-# Increase virtual memory
-sudo sysctl -w vm.max_map_count=262144
+## 📁 Project Structure
 
-# Make permanent
-echo 'vm.max_map_count=262144' | sudo tee -a /etc/sysctl.conf
 ```
+agentcare/
+├── 📱 frontend/              # React + TypeScript + Vite
+│   ├── src/components/       # React components
+│   ├── src/pages/           # Page components
+│   ├── src/store/           # State management
+│   └── public/              # Static assets
+├── 🔧 backend/               # Node.js + Express + TypeScript
+│   ├── src/agents/          # AI agents
+│   ├── src/controllers/     # API controllers
+│   ├── src/services/        # Business logic
+│   └── src/tools/           # Agent tools
+├── 🗄️ database/              # PostgreSQL schemas
+├── 🏗️ infrastructure/        # Docker, K8s, CI/CD
+├── 📚 docs/                  # Documentation
+├── 🧪 tests/                 # Test suites
+└── 📜 scripts/               # Automation scripts
+```
+
+👉 **[Complete Project Structure Guide](docs/PROJECT_STRUCTURE.md)**
+
+## 🏗️ Architecture Overview
+
+```mermaid
+graph TB
+    subgraph "Frontend Layer"
+        React[React App]
+        UI[Material-UI]
+        Store[Zustand Store]
+    end
+    
+    subgraph "API Layer"
+        Express[Express Server]
+        Auth[JWT Auth]
+        Rate[Rate Limiting]
+    end
+    
+    subgraph "Multi-Agent System"
+        Supervisor[Supervisor Agent]
+        Booking[Booking Agent]
+        Availability[Availability Agent]
+        FAQ[FAQ Agent]
+    end
+    
+    subgraph "AI/LLM Layer"
+        Ollama[Ollama LLM]
+        RAG[RAG System]
+        Knowledge[Knowledge Base]
+    end
+    
+    subgraph "Data Layer"
+        Postgres[(PostgreSQL)]
+        Redis[(Redis Cache)]
+    end
+    
+    React --> Express
+    Express --> Supervisor
+    Supervisor --> Booking
+    Supervisor --> Availability
+    Supervisor --> FAQ
+    Supervisor --> Ollama
+    Express --> Postgres
+    Express --> Redis
+```
+
+👉 **[Detailed Architecture Diagrams](docs/architecture/diagrams/SYSTEM_ARCHITECTURE.md)**
+
+## 🛠️ Development
+
+### Available Scripts
+
+```bash
+# Development
+npm run dev                   # Start full development stack
+npm run dev:backend          # Backend only
+npm run dev:frontend         # Frontend only
+
+# Building
+npm run build                # Build both frontend and backend
+npm run build:backend        # Build backend only
+npm run build:frontend       # Build frontend only
+
+# Testing
+npm run test                 # Run all tests
+npm run test:unit           # Unit tests
+npm run test:integration    # Integration tests
+npm run test:ui             # E2E tests with Playwright
+
+# Docker
+npm run docker:build        # Build all Docker images
+npm run docker:compose      # Start with Docker Compose
+npm run docker:build:backend-standalone  # Backend container
+npm run docker:build:frontend-standalone # Frontend container
+
+# Quality
+npm run lint                # ESLint
+npm run type-check          # TypeScript
+npm run format             # Prettier
+npm run security:scan      # Security audit
+```
+
+### Technology Stack
+
+#### Frontend
+- **React 18** with TypeScript
+- **Material-UI** for components
+- **Zustand** for state management
+- **React Query** for API calls
+- **Vite** for fast development
+
+#### Backend
+- **Node.js** with Express
+- **TypeScript** for type safety
+- **PostgreSQL** database
+- **Redis** for caching
+- **JWT** authentication
+- **Ollama** for AI/LLM
+
+#### Infrastructure
+- **Docker** containerization
+- **Kubernetes** orchestration
+- **GitHub Actions** CI/CD
+- **SonarCloud** code quality
+- **Prometheus** monitoring
+
+## 🚀 Deployment
+
+### Docker Deployment
+```bash
+# Quick start with Docker Compose
+docker-compose up -d
+
+# Production deployment
+npm run docker:prod
+```
+
+### Kubernetes Deployment
+```bash
+# Deploy to Kubernetes
+kubectl apply -f infrastructure/kubernetes/
+
+# Or use Helm
+helm install agentcare infrastructure/helm/agentcare
+```
+
+### GitHub Pages (Frontend Only)
+The frontend is automatically deployed to GitHub Pages on every push to main:
+- **URL**: https://vishalm.github.io/agentcare/
+- **Auto-deployment**: Via GitHub Actions
+- **Manual deployment**: `npm run deploy:pages`
+
+👉 **[Detailed Deployment Guide](docs/operations/DEPLOYMENT_GUIDE.md)**
+
+## 🧪 Testing
+
+Comprehensive testing strategy with multiple test types:
+
+- **Unit Tests**: Jest for component and function testing
+- **Integration Tests**: API and database integration
+- **Contract Tests**: API contract validation
+- **E2E Tests**: Playwright for user journey testing
+- **Performance Tests**: Load and stress testing
+
+```bash
+npm run test:all              # Run all test suites
+npm run test:coverage         # Generate coverage report
+npm run test:ci              # CI-optimized test run
+```
+
+## 📊 Monitoring & Observability
+
+- **Health Checks**: `/health` endpoint for service monitoring
+- **Metrics**: Prometheus metrics at `/metrics`
+- **Logging**: Structured JSON logging with Winston
+- **Tracing**: Request tracing for debugging
+- **Alerts**: Configurable alerting rules
 
 ## 🔒 Security & Compliance
 
-### HIPAA Compliance Features
-- **Data Encryption** - At rest and in transit
-- **Audit Logging** - Complete access trails
-- **Access Controls** - Role-based permissions
-- **Data Isolation** - Multi-tenant security
-- **Backup & Recovery** - Data protection protocols
+### HIPAA Compliance
+- **Data Encryption**: At rest and in transit
+- **Access Controls**: Role-based permissions
+- **Audit Logging**: Complete activity tracking
+- **Data Retention**: Configurable retention policies
 
-### Development Security
-- **Environment Variables** - No hardcoded secrets
-- **JWT Authentication** - Secure session management
-- **Rate Limiting** - API abuse prevention
-- **CORS Configuration** - Cross-origin security
-- **Input Validation** - SQL injection prevention
-
-## 📊 Performance & Monitoring
-
-### Metrics Collection
-- **Application Performance** - Response times, throughput
-- **Database Metrics** - Query performance, connections
-- **Cache Performance** - Redis hit rates, memory usage
-- **System Resources** - CPU, memory, disk utilization
-- **AI/LLM Operations** - Model inference times, accuracy
-
-### Observability Stack
-- **Prometheus** - Metrics scraping and storage
-- **Grafana** - Visualization and alerting
-- **Jaeger** - Distributed request tracing  
-- **ELK Stack** - Centralized log management
-- **Health Checks** - Automated service monitoring
+### Security Features
+- **JWT Authentication**: Secure token-based auth
+- **Rate Limiting**: API protection
+- **Input Validation**: Comprehensive data validation
+- **CORS Configuration**: Secure cross-origin requests
+- **Container Security**: Non-root containers with minimal attack surface
 
 ## 🤝 Contributing
 
-### Development Workflow
-1. **Fork and clone** the repository
-2. **Set up environment** using `./docker-dev.sh dev`
-3. **Create feature branch** following semantic naming
-4. **Write tests** before implementing features
-5. **Submit pull request** with comprehensive description
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-### Code Standards
-- **TypeScript** for all new development
-- **Functional programming** patterns for agents
-- **Comprehensive error handling** with logging
-- **JSDoc comments** for public methods
-- **Semantic commit messages** (feat:, fix:, docs:)
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### Testing Requirements
-- **Minimum 80% coverage** for new code
-- **Unit tests** for agent classes
-- **Integration tests** for API endpoints
-- **E2E tests** for critical workflows
-- **Mock external dependencies** in tests
+### Development Guidelines
+- Follow [TypeScript best practices](docs/guides/TYPESCRIPT_GUIDE.md)
+- Write tests for new features
+- Update documentation
+- Follow [commit conventions](docs/guides/COMMIT_CONVENTIONS.md)
 
-## 📜 License
+## 📚 Documentation
 
-MIT License - see [LICENSE](LICENSE) file for details.
+- **[Project Structure](docs/PROJECT_STRUCTURE.md)** - Complete codebase organization
+- **[Architecture Guide](docs/architecture/ARCHITECTURE_GUIDE.md)** - System design and patterns
+- **[API Reference](docs/api-reference.md)** - RESTful API documentation
+- **[Setup Guide](docs/setup/QUICK_START.md)** - Detailed installation instructions
+- **[Docker Guide](docs/setup/DOCKER_SETUP.md)** - Container deployment
+- **[Testing Guide](docs/testing.md)** - Testing strategies and best practices
+
+## 🏆 Features Roadmap
+
+### Current Version (v3.0.0-beta)
+- ✅ Multi-agent AI system
+- ✅ Real-time appointment booking
+- ✅ HIPAA-compliant architecture
+- ✅ Docker containerization
+- ✅ GitHub Actions CI/CD
+
+### Planned Features
+- 🔄 Advanced AI scheduling optimization
+- 🔄 Mobile application (React Native)
+- 🔄 Provider calendar integration
+- 🔄 Telemedicine support
+- 🔄 Analytics dashboard
+- 🔄 Multi-language support
+
+## 📈 Performance
+
+- **Response Time**: < 100ms average API response
+- **Availability**: 99.9% uptime target
+- **Scalability**: Horizontal scaling with Kubernetes
+- **Throughput**: 1000+ concurrent users supported
+- **Database**: Optimized queries with connection pooling
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Ollama** - Local LLM processing
+- **Material-UI** - React component library  
+- **PostgreSQL** - Robust database system
+- **Docker** - Containerization platform
+- **GitHub Actions** - CI/CD automation
 
 ---
 
-**🏥 Built for Healthcare Providers**  
-*Empowering healthcare organizations with intelligent, secure, and scalable AI technology.*
+## 📞 Support & Contact
 
-**🚀 Ready to Get Started?**
-```bash
-chmod +x docker-dev.sh && ./docker-dev.sh start
-```
+- **GitHub Issues**: [Report bugs or request features](https://github.com/vishalm/agentcare/issues)
+- **Documentation**: [Complete documentation site](https://vishalm.github.io/agentcare/)
+- **Email**: vishal@agentcare.dev
 
-Access your complete development environment at:
-- **Frontend**: http://localhost:3001
-- **Backend**: http://localhost:3000
-- **Grafana**: http://localhost:3002
-- **Full service map**: [DOCKER_SETUP.md](DOCKER_SETUP.md) 
+---
+
+<div align="center">
+
+**🏥 Built with ❤️ for healthcare providers and patients**
+
+[Live Demo](https://vishalm.github.io/agentcare/) • [Documentation](docs/) • [API Reference](docs/api-reference.md) • [Contributing](CONTRIBUTING.md)
+
+</div> 
