@@ -5,6 +5,14 @@
 # 📚 AgentCare Documentation
 Welcome to the comprehensive documentation for AgentCare - the AI-powered healthcare scheduling platform. This documentation provides everything you need to understand, deploy, and develop with AgentCare.
 
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 12px; text-align: center; margin: 2rem 0;">
+  <h3 style="margin: 0 0 1rem 0; color: white;">🌐 Visit the Official AgentCare Website</h3>
+  <p style="margin: 0 0 1.5rem 0; opacity: 0.9;">Experience the live AgentCare platform with interactive demos and full feature showcase</p>
+  <a href="https://vishalm.github.io/agentcare/" style="background: rgba(255,255,255,0.2); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; border: 2px solid rgba(255,255,255,0.3); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+    🚀 Launch AgentCare Website
+  </a>
+</div>
+
 ## 🚀 Quick Navigation
 
 ### 🏃‍♂️ Getting Started
@@ -34,6 +42,7 @@ Welcome to the comprehensive documentation for AgentCare - the AI-powered health
 ## 🎯 Quick Reference
 
 ### 🔗 Essential Links
+- **[🌐 AgentCare Website](https://vishalm.github.io/agentcare/)** - Official AgentCare platform website
 - **[GitHub Repository](https://github.com/vishalm/agentcare)** - Source code and issues
 - **[Live Demo](https://vishalm.github.io/agentcare/)** - Interactive frontend demo
 - **[CI/CD Pipeline](https://github.com/vishalm/agentcare/actions)** - Build and deployment status
