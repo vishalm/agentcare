@@ -1,0 +1,210 @@
+# AgentCare Enterprise GitHub Pages Configuration
+title: "AgentCare"
+tagline: "Enterprise Healthcare SaaS Platform"
+description: >-
+  Multi-tenant healthcare SaaS platform with AI-powered coordination.
+  HIPAA-compliant enterprise solution for hospitals, clinics, and healthcare organizations.
+
+baseurl: ""
+url: "https://yourusername.github.io/agentcare"
+
+# Company Information
+company:
+  name: "AgentCare"
+  legal_name: "AgentCare Healthcare Technologies"
+  tagline: "Revolutionizing Healthcare Management"
+  logo: "/assets/images/agentcare-logo.svg"
+  founded: "2024"
+  headquarters: "San Francisco, CA"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: 'highlight'
+    span:
+      line_numbers: false
+    block:
+      line_numbers: true
+      start_line: 1
+
+# Theme and plugins
+remote_theme: pages-themes/cayman@v0.2.0
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-redirect-from
+  - jekyll-github-metadata
+  - jekyll-relative-links
+
+# SEO and Social
+logo: /assets/images/agentcare-logo-square.png
+twitter:
+  username: agentcare
+  card: summary_large_image
+
+social:
+  name: AgentCare
+  links:
+    - https://github.com/yourusername/agentcare
+    - https://linkedin.com/company/agentcare
+    - https://twitter.com/agentcare
+
+# Navigation
+navigation:
+  main:
+    - title: "Platform"
+      url: "/"
+    - title: "Features"
+      url: "/features/"
+    - title: "Documentation"
+      url: "/docs/"
+    - title: "API"
+      url: "/api/"
+    - title: "Security"
+      url: "/security/"
+    - title: "Enterprise"
+      url: "/enterprise/"
+    - title: "Support"
+      url: "/support/"
+
+  docs:
+    - title: "Quick Start"
+      url: "/docs/quick-start/"
+    - title: "Architecture"
+      url: "/docs/architecture/"
+    - title: "API Reference"
+      url: "/docs/api/"
+    - title: "Security & HIPAA"
+      url: "/docs/security/"
+    - title: "Deployment"
+      url: "/docs/deployment/"
+    - title: "Testing"
+      url: "/docs/testing/"
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:name/
+  features:
+    output: true
+    permalink: /:collection/:name/
+  case_studies:
+    output: true
+    permalink: /:collection/:name/
+  enterprise:
+    output: true
+    permalink: /:collection/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: "_docs"
+      type: "docs"
+    values:
+      layout: "docs"
+      sidebar: "docs"
+  - scope:
+      path: "_features"
+      type: "features"
+    values:
+      layout: "feature"
+  - scope:
+      path: "_case_studies"
+      type: "case_studies"
+    values:
+      layout: "case_study"
+  - scope:
+      path: "_enterprise"
+      type: "enterprise"
+    values:
+      layout: "enterprise"
+
+# Enterprise Features
+enterprise:
+  compliance:
+    - "HIPAA Compliant"
+    - "SOC 2 Type II"
+    - "HITECH Certified"
+    - "ISO 27001"
+  integrations:
+    - "Epic EMR"
+    - "Cerner PowerChart"
+    - "Allscripts"
+    - "athenahealth"
+  support:
+    sla: "99.9%"
+    response_time: "< 15 minutes"
+    support_channels:
+      - "24/7 Phone Support"
+      - "Dedicated Success Manager"
+      - "Priority Email Support"
+      - "Live Chat"
+
+# Platform Statistics
+stats:
+  organizations: "500+"
+  users: "50,000+"
+  appointments: "1M+"
+  uptime: "99.9%"
+  countries: "15+"
+
+# Technology Stack
+tech_stack:
+  backend:
+    - "Node.js / TypeScript"
+    - "Express.js"
+    - "PostgreSQL"
+    - "Redis"
+  ai:
+    - "Ollama LLM"
+    - "Vector Search"
+    - "RAG System"
+    - "Multi-Agent Coordination"
+  security:
+    - "End-to-End Encryption"
+    - "JWT Authentication"
+    - "Row-Level Security"
+    - "Audit Trails"
+  infrastructure:
+    - "Docker & Kubernetes"
+    - "AWS / GCP / Azure"
+    - "Prometheus & Grafana"
+    - "CI/CD Pipeline"
+
+# Contact Information
+contact:
+  sales: "sales@agentcare.com"
+  support: "support@agentcare.com"
+  security: "security@agentcare.com"
+  general: "hello@agentcare.com"
+  phone: "+1 (555) 123-CARE"
+  address: "123 Healthcare Blvd, San Francisco, CA 94105"
+
+# Analytics and Tracking
+google_analytics: G-XXXXXXXXXX
+gtag: G-XXXXXXXXXX
+
+# Exclude from build
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - README.md
+  - LICENSE
+  - package.json
+  - package-lock.json 

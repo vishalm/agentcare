@@ -1,75 +1,127 @@
-# AgentCare Dockerfile
-# Multi-stage build for optimized production image
+# AgentCare Multi-Stage Dockerfile
+# Multi-tenant Healthcare SaaS Platform
 
-# Stage 1: Build stage
-FROM node:18-alpine AS builder
+# Base stage with Node.js
+FROM node:18-alpine AS base
+LABEL maintainer="AgentCare Team <dev@agentcare.com>"
+LABEL description="Multi-tenant Healthcare SaaS Platform"
+LABEL version="3.0.0"
 
-# Set working directory
+# Install system dependencies
+RUN apk add --no-cache \
+    curl \
+    dumb-init \
+    postgresql-client \
+    && rm -rf /var/cache/apk/*
+
+# Create app directory
 WORKDIR /app
-
-# Install build dependencies
-RUN apk add --no-cache python3 make g++ curl
 
 # Copy package files
 COPY package*.json ./
-COPY backend/tsconfig.json ./backend/
+COPY backend/package*.json ./backend/
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Development stage
+FROM base AS development
+ENV NODE_ENV=development
+
+# Install all dependencies (including devDependencies)
+RUN npm ci --include=dev
+RUN cd backend && npm ci --include=dev
 
 # Copy source code
-COPY backend/src ./backend/src
-COPY frontend/public ./frontend/public
-
-# Build the application
-RUN npm run build:backend
-
-# Stage 2: Production stage
-FROM node:18-alpine AS runtime
-
-# Set working directory
-WORKDIR /app
-
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S agentcare -u 1001
-
-# Install curl for health checks
-RUN apk add --no-cache curl
-
-# Copy built application from builder stage
-COPY --from=builder --chown=agentcare:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=agentcare:nodejs /app/backend/dist ./backend/dist
-COPY --from=builder --chown=agentcare:nodejs /app/frontend/public ./frontend/public
-COPY --from=builder --chown=agentcare:nodejs /app/package*.json ./
+COPY . .
 
 # Create logs directory
-RUN mkdir -p logs && chown agentcare:nodejs logs
+RUN mkdir -p /app/logs && chmod 755 /app/logs
+
+# Expose development ports
+EXPOSE 3000 9090
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Development command
+CMD ["npm", "run", "dev"]
+
+# Production dependencies stage
+FROM base AS production-deps
+ENV NODE_ENV=production
+
+# Install only production dependencies
+RUN npm ci --only=production && npm cache clean --force
+RUN cd backend && npm ci --only=production && npm cache clean --force
+
+# Build stage
+FROM base AS build
+ENV NODE_ENV=production
+
+# Install all dependencies for building
+RUN npm ci --include=dev
+RUN cd backend && npm ci --include=dev
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Production stage
+FROM node:18-alpine AS production
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    curl \
+    dumb-init \
+    postgresql-client \
+    && rm -rf /var/cache/apk/*
+
+# Create non-root user
+RUN addgroup -g 1001 -S agentcare && \
+    adduser -S agentcare -u 1001 -G agentcare
+
+# Create app directory
+WORKDIR /app
+
+# Copy production dependencies
+COPY --from=production-deps /app/node_modules ./node_modules
+COPY --from=production-deps /app/backend/node_modules ./backend/node_modules
+
+# Copy built application
+COPY --from=build /app/backend/dist ./backend/dist
+COPY --from=build /app/package*.json ./
+COPY --from=build /app/backend/package*.json ./backend/
+
+# Copy necessary runtime files
+COPY database ./database
+COPY scripts ./scripts
+
+# Create logs directory and set permissions
+RUN mkdir -p /app/logs && \
+    chown -R agentcare:agentcare /app && \
+    chmod -R 755 /app
 
 # Switch to non-root user
 USER agentcare
 
-# Expose port
-EXPOSE 3000
-
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
 
-# Environment variables
-ENV NODE_ENV=production
-ENV API_PORT=3000
-ENV LOG_LEVEL=info
+# Expose application port
+EXPOSE ${PORT}
 
-# Labels for better Docker management
-LABEL org.opencontainers.image.title="AgentCare" \
-      org.opencontainers.image.description="Enhanced Multi-Agent Healthcare Scheduling System with Ollama LLM + RAG" \
-      org.opencontainers.image.version="2.0.0-alpha" \
-      org.opencontainers.image.authors="Vishal Mishra <vishal@agentcare.dev>" \
-      org.opencontainers.image.url="https://github.com/vishalm/agentcare" \
-      org.opencontainers.image.source="https://github.com/vishalm/agentcare" \
-      org.opencontainers.image.vendor="AgentCare" \
-      org.opencontainers.image.licenses="MIT"
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
 
-# Start the application
-CMD ["npm", "start"] 
+# Production command
+CMD ["npm", "start"]
+
+# Multi-architecture build support
+FROM production AS production-arm64
+# ARM64 specific optimizations can go here
+
+FROM production AS production-amd64
+# AMD64 specific optimizations can go here 

@@ -1,51 +1,510 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="22" failures="0" errors="0" time="0.618">
-  <testsuite name="API Contract Tests" errors="0" failures="0" skipped="0" timestamp="2025-05-25T03:03:53" time="0.267" tests="13">
-    <testcase classname="API Contract Tests Health Endpoint Contract should follow health response contract" name="API Contract Tests Health Endpoint Contract should follow health response contract" time="0.043">
+<testsuites name="jest tests" tests="107" failures="34" errors="0" time="0.899">
+  <testsuite name="Data Isolation Security Tests" errors="0" failures="19" skipped="0" timestamp="2025-05-25T04:30:03" time="0.159" tests="19">
+    <testcase classname="Data Isolation Security Tests Cross-Tenant Data Access Prevention should prevent accessing other organization users without tenant context" name="Data Isolation Security Tests Cross-Tenant Data Access Prevention should prevent accessing other organization users without tenant context" time="0.001">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:92:30)</failure>
     </testcase>
-    <testcase classname="API Contract Tests Agent Processing Endpoint Contract should follow successful processing response contract" name="API Contract Tests Agent Processing Endpoint Contract should follow successful processing response contract" time="0.009">
+    <testcase classname="Data Isolation Security Tests Cross-Tenant Data Access Prevention should strictly isolate patient data between organizations" name="Data Isolation Security Tests Cross-Tenant Data Access Prevention should strictly isolate patient data between organizations" time="0.001">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:106:32)</failure>
     </testcase>
-    <testcase classname="API Contract Tests Agent Processing Endpoint Contract should follow error response contract for missing message" name="API Contract Tests Agent Processing Endpoint Contract should follow error response contract for missing message" time="0.006">
+    <testcase classname="Data Isolation Security Tests Cross-Tenant Data Access Prevention should prevent cross-tenant patient medical record access" name="Data Isolation Security Tests Cross-Tenant Data Access Prevention should prevent cross-tenant patient medical record access" time="0.001">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:129:121)</failure>
     </testcase>
-    <testcase classname="API Contract Tests Agent Processing Endpoint Contract should reject requests without proper content-type" name="API Contract Tests Agent Processing Endpoint Contract should reject requests without proper content-type" time="0.004">
+    <testcase classname="Data Isolation Security Tests Cross-Tenant Data Access Prevention should prevent cross-tenant appointment access" name="Data Isolation Security Tests Cross-Tenant Data Access Prevention should prevent cross-tenant appointment access" time="0">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:167:121)</failure>
     </testcase>
-    <testcase classname="API Contract Tests Agent Status Endpoint Contract should follow status response contract" name="API Contract Tests Agent Status Endpoint Contract should follow status response contract" time="0.006">
+    <testcase classname="Data Isolation Security Tests Email and Identity Isolation should allow same email addresses in different organizations" name="Data Isolation Security Tests Email and Identity Isolation should allow same email addresses in different organizations" time="0.001">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:216:23)</failure>
     </testcase>
-    <testcase classname="API Contract Tests Metrics Endpoint Contract should follow metrics response contract" name="API Contract Tests Metrics Endpoint Contract should follow metrics response contract" time="0.004">
+    <testcase classname="Data Isolation Security Tests Email and Identity Isolation should prevent duplicate emails within same organization" name="Data Isolation Security Tests Email and Identity Isolation should prevent duplicate emails within same organization" time="0.001">
+      <failure>Error: expect(received).rejects.toThrow()
+
+Matcher error: received value must be a promise or a function returning a promise
+
+Received has value: undefined
+    at Object.toThrow (/Users/vishalmishra/workspace/self/agentcare/node_modules/expect/build/index.js:204:13)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:242:48)</failure>
     </testcase>
-    <testcase classname="API Contract Tests Reset Endpoint Contract should follow reset response contract" name="API Contract Tests Reset Endpoint Contract should follow reset response contract" time="0.004">
+    <testcase classname="Data Isolation Security Tests Email and Identity Isolation should maintain medical record number uniqueness per organization" name="Data Isolation Security Tests Email and Identity Isolation should maintain medical record number uniqueness per organization" time="0.003">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:257:26)</failure>
     </testcase>
-    <testcase classname="API Contract Tests Error Handling Contract should follow 404 error contract" name="API Contract Tests Error Handling Contract should follow 404 error contract" time="0.005">
+    <testcase classname="Data Isolation Security Tests Caregiver Relationship Isolation should isolate caregiver relationships by organization" name="Data Isolation Security Tests Caregiver Relationship Isolation should isolate caregiver relationships by organization" time="0.001">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:308:37)</failure>
     </testcase>
-    <testcase classname="API Contract Tests Response Header Contracts all JSON endpoints should return proper content-type" name="API Contract Tests Response Header Contracts all JSON endpoints should return proper content-type" time="0.014">
+    <testcase classname="Data Isolation Security Tests Caregiver Relationship Isolation should prevent cross-organization caregiver access to patient data" name="Data Isolation Security Tests Caregiver Relationship Isolation should prevent cross-organization caregiver access to patient data" time="0.001">
+      <failure>Error: expect(received).rejects.toThrow()
+
+Matcher error: received value must be a promise or a function returning a promise
+
+Received has value: undefined
+    at Object.toThrow (/Users/vishalmishra/workspace/self/agentcare/node_modules/expect/build/index.js:204:13)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:332:58)
+    at Promise.then.completed (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:316:40)
+    at _runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="API Contract Tests Response Header Contracts all endpoints should include security headers" name="API Contract Tests Response Header Contracts all endpoints should include security headers" time="0.004">
+    <testcase classname="Data Isolation Security Tests Organization User Role Isolation should isolate user roles and permissions by organization" name="Data Isolation Security Tests Organization User Role Isolation should isolate user roles and permissions by organization" time="0.001">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:341:117)</failure>
     </testcase>
-    <testcase classname="API Contract Tests Timestamp Consistency Contract all endpoints should return ISO 8601 timestamps" name="API Contract Tests Timestamp Consistency Contract all endpoints should return ISO 8601 timestamps" time="0.016">
+    <testcase classname="Data Isolation Security Tests Tenant Context Security should prevent SQL injection in tenant context setting" name="Data Isolation Security Tests Tenant Context Security should prevent SQL injection in tenant context setting" time="0.001">
+      <failure>Error: expect(received).rejects.toThrow()
+
+Matcher error: received value must be a promise or a function returning a promise
+
+Received has value: undefined
+    at Object.toThrow (/Users/vishalmishra/workspace/self/agentcare/node_modules/expect/build/index.js:204:13)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:391:18)
+    at Promise.then.completed (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:316:40)
+    at _runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="API Contract Tests Request Validation Contracts POST endpoints should validate required fields" name="API Contract Tests Request Validation Contracts POST endpoints should validate required fields" time="0.005">
+    <testcase classname="Data Isolation Security Tests Tenant Context Security should validate tenant context UUID format" name="Data Isolation Security Tests Tenant Context Security should validate tenant context UUID format" time="0">
+      <failure>Error: expect(received).rejects.toThrow()
+
+Matcher error: received value must be a promise or a function returning a promise
+
+Received has value: undefined
+    at Object.toThrow (/Users/vishalmishra/workspace/self/agentcare/node_modules/expect/build/index.js:204:13)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:409:20)
+    at Promise.then.completed (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:316:40)
+    at _runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:444:34)</failure>
     </testcase>
-    <testcase classname="API Contract Tests Request Validation Contracts endpoints should handle large payloads appropriately" name="API Contract Tests Request Validation Contracts endpoints should handle large payloads appropriately" time="0.004">
+    <testcase classname="Data Isolation Security Tests Tenant Context Security should handle null tenant context gracefully" name="Data Isolation Security Tests Tenant Context Security should handle null tenant context gracefully" time="0.001">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:419:21)</failure>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Tenant Context Security should maintain tenant context isolation between connections" name="Data Isolation Security Tests Tenant Context Security should maintain tenant context isolation between connections" time="0">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:429:22)</failure>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Data Leakage Prevention should never leak sensitive data across organizations" name="Data Isolation Security Tests Data Leakage Prevention should never leak sensitive data across organizations" time="0">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:478:31)</failure>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Data Leakage Prevention should prevent accidental cross-tenant queries" name="Data Isolation Security Tests Data Leakage Prevention should prevent accidental cross-tenant queries" time="0.001">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:507:42)</failure>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests Data Leakage Prevention should audit potential data access violations" name="Data Isolation Security Tests Data Leakage Prevention should audit potential data access violations" time="0">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:522:29)</failure>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests HIPAA Compliance Validation should enforce minimum necessary principle for data access" name="Data Isolation Security Tests HIPAA Compliance Validation should enforce minimum necessary principle for data access" time="0">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:566:22)</failure>
+    </testcase>
+    <testcase classname="Data Isolation Security Tests HIPAA Compliance Validation should maintain audit trail for all data access" name="Data Isolation Security Tests HIPAA Compliance Validation should maintain audit trail for all data access" time="0.001">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;rows&apos;)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/security/dataIsolation.test.ts:582:21)</failure>
     </testcase>
   </testsuite>
-  <testsuite name="Agent Contract Tests" errors="0" failures="0" skipped="0" timestamp="2025-05-25T03:03:53" time="0.177" tests="9">
-    <testcase classname="Agent Contract Tests Agent Implementation Contract should ensure all agents implement required process method" name="Agent Contract Tests Agent Implementation Contract should ensure all agents implement required process method" time="0.001">
+  <testsuite name="SupervisorAgent" errors="0" failures="12" skipped="0" timestamp="2025-05-25T04:30:03" time="0.105" tests="23">
+    <testcase classname="SupervisorAgent constructor should create a SupervisorAgent instance" name="SupervisorAgent constructor should create a SupervisorAgent instance" time="0.002">
     </testcase>
-    <testcase classname="Agent Contract Tests Agent Implementation Contract should ensure all agents implement isAgentActive method" name="Agent Contract Tests Agent Implementation Contract should ensure all agents implement isAgentActive method" time="0">
+    <testcase classname="SupervisorAgent isAgentActive should return false initially" name="SupervisorAgent isAgentActive should return false initially" time="0.001">
     </testcase>
-    <testcase classname="Agent Contract Tests Agent Implementation Contract should ensure process method returns a Promise" name="Agent Contract Tests Agent Implementation Contract should ensure process method returns a Promise" time="0.001">
+    <testcase classname="SupervisorAgent healthCheck should return health status for all services" name="SupervisorAgent healthCheck should return health status for all services" time="0.001">
     </testcase>
-    <testcase classname="Agent Contract Tests Agent Implementation Contract should ensure isAgentActive method returns boolean" name="Agent Contract Tests Agent Implementation Contract should ensure isAgentActive method returns boolean" time="0.001">
+    <testcase classname="SupervisorAgent healthCheck should return healthy status when all services are available" name="SupervisorAgent healthCheck should return healthy status when all services are available" time="0.001">
     </testcase>
-    <testcase classname="Agent Contract Tests Agent Method Signatures should have consistent process method signature" name="Agent Contract Tests Agent Method Signatures should have consistent process method signature" time="0.001">
+    <testcase classname="SupervisorAgent process should process message and return response" name="SupervisorAgent process should process message and return response" time="0.002">
     </testcase>
-    <testcase classname="Agent Contract Tests Agent Method Signatures should have consistent isAgentActive method signature" name="Agent Contract Tests Agent Method Signatures should have consistent isAgentActive method signature" time="0">
+    <testcase classname="SupervisorAgent process should handle invalid token by creating guest session" name="SupervisorAgent process should handle invalid token by creating guest session" time="0.001">
     </testcase>
-    <testcase classname="Agent Contract Tests Agent Constructor Requirements should have constructors that accept required dependencies" name="Agent Contract Tests Agent Constructor Requirements should have constructors that accept required dependencies" time="0">
+    <testcase classname="SupervisorAgent process should handle no token by creating guest session" name="SupervisorAgent process should handle no token by creating guest session" time="0.001">
     </testcase>
-    <testcase classname="Agent Contract Tests Agent Interface Compliance should ensure all agents can be instantiated with proper dependencies" name="Agent Contract Tests Agent Interface Compliance should ensure all agents can be instantiated with proper dependencies" time="0.001">
+    <testcase classname="SupervisorAgent process should handle errors gracefully" name="SupervisorAgent process should handle errors gracefully" time="0">
     </testcase>
-    <testcase classname="Agent Contract Tests Agent Interface Compliance should ensure all agents are classes" name="Agent Contract Tests Agent Interface Compliance should ensure all agents are classes" time="0">
+    <testcase classname="SupervisorAgent resetConversation should reset conversation successfully" name="SupervisorAgent resetConversation should reset conversation successfully" time="0.004">
+    </testcase>
+    <testcase classname="SupervisorAgent resetConversation should handle reset errors gracefully" name="SupervisorAgent resetConversation should handle reset errors gracefully" time="0">
+    </testcase>
+    <testcase classname="SupervisorAgent Intent Analysis should recognize booking intent" name="SupervisorAgent Intent Analysis should recognize booking intent" time="0.001">
+      <failure>Error: expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+Expected: &quot;Delegating to BookingAgent&quot;, ObjectContaining {&quot;intent&quot;: ObjectContaining {&quot;confidence&quot;: 0.9, &quot;type&quot;: &quot;booking&quot;}, &quot;message&quot;: &quot;I want to book an appointment with a cardiologist&quot;}
+Received: &quot;SupervisorAgent processing message&quot;, {&quot;hasToken&quot;: false, &quot;messageLength&quot;: 49}
+
+Number of calls: 1
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/agents/SupervisorAgent.test.ts:304:31)</failure>
+    </testcase>
+    <testcase classname="SupervisorAgent Intent Analysis should recognize availability intent" name="SupervisorAgent Intent Analysis should recognize availability intent" time="0.001">
+      <failure>Error: expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+Expected: &quot;Delegating to AvailabilityAgent&quot;, ObjectContaining {&quot;intent&quot;: ObjectContaining {&quot;confidence&quot;: 0.8, &quot;type&quot;: &quot;availability&quot;}, &quot;message&quot;: &quot;What doctors are available this week?&quot;}
+Received: &quot;SupervisorAgent processing message&quot;, {&quot;hasToken&quot;: false, &quot;messageLength&quot;: 37}
+
+Number of calls: 1
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/agents/SupervisorAgent.test.ts:324:31)</failure>
+    </testcase>
+    <testcase classname="SupervisorAgent Intent Analysis should recognize information intent" name="SupervisorAgent Intent Analysis should recognize information intent" time="0.001">
+      <failure>Error: expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+Expected: &quot;Delegating to FAQAgent&quot;, ObjectContaining {&quot;intent&quot;: ObjectContaining {&quot;confidence&quot;: 0.7, &quot;type&quot;: &quot;information&quot;}, &quot;message&quot;: &quot;Tell me about your doctors&quot;}
+Received: &quot;SupervisorAgent processing message&quot;, {&quot;hasToken&quot;: false, &quot;messageLength&quot;: 26}
+
+Number of calls: 1
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/agents/SupervisorAgent.test.ts:344:31)</failure>
+    </testcase>
+    <testcase classname="SupervisorAgent Intent Analysis should handle general/unknown intents" name="SupervisorAgent Intent Analysis should handle general/unknown intents" time="0.001">
+      <failure>Error: expect(received).toContain(expected) // indexOf
+
+Expected substring: &quot;I understand you need assistance with appointments&quot;
+Received string:    &quot;I apologize, but I&apos;m experiencing some technical difficulties. Please try again in a moment. If the problem persists, you can contact our support team.&quot;
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/agents/SupervisorAgent.test.ts:363:24)</failure>
+    </testcase>
+    <testcase classname="SupervisorAgent Agent State Management should track active state during processing" name="SupervisorAgent Agent State Management should track active state during processing" time="0.001">
+    </testcase>
+    <testcase classname="SupervisorAgent Agent State Management should reset active state on error" name="SupervisorAgent Agent State Management should reset active state on error" time="0.001">
+      <failure>Error: expect(received).rejects.toThrow()
+
+Received promise resolved instead of rejected
+Resolved to value: &quot;I apologize, but I&apos;m experiencing some technical difficulties. Please try again in a moment. If the problem persists, you can contact our support team.&quot;
+    at expect (/Users/vishalmishra/workspace/self/agentcare/node_modules/expect/build/index.js:113:15)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/agents/SupervisorAgent.test.ts:389:13)
+    at Promise.then.completed (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:316:40)
+    at _runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+    <testcase classname="SupervisorAgent Metrics Collection should track operation metrics" name="SupervisorAgent Metrics Collection should track operation metrics" time="0.001">
+      <failure>Error: expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+Expected: &quot;supervisor_process&quot;
+Received: &quot;supervisor_process_1748147403955&quot;
+
+Number of calls: 1
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/agents/SupervisorAgent.test.ts:401:42)</failure>
+    </testcase>
+    <testcase classname="SupervisorAgent Metrics Collection should record error metrics on failure" name="SupervisorAgent Metrics Collection should record error metrics on failure" time="0.001">
+      <failure>Error: expect(received).rejects.toThrow()
+
+Received promise resolved instead of rejected
+Resolved to value: &quot;I apologize, but I&apos;m experiencing some technical difficulties. Please try again in a moment. If the problem persists, you can contact our support team.&quot;
+    at expect (/Users/vishalmishra/workspace/self/agentcare/node_modules/expect/build/index.js:113:15)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/agents/SupervisorAgent.test.ts:409:13)
+    at Promise.then.completed (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:316:40)
+    at _runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+    <testcase classname="SupervisorAgent Error Handling should handle booking agent errors" name="SupervisorAgent Error Handling should handle booking agent errors" time="0.001">
+      <failure>Error: expect(received).rejects.toThrow()
+
+Received promise resolved instead of rejected
+Resolved to value: &quot;I apologize, but I&apos;m experiencing some technical difficulties. Please try again in a moment. If the problem persists, you can contact our support team.&quot;
+    at expect (/Users/vishalmishra/workspace/self/agentcare/node_modules/expect/build/index.js:113:15)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/agents/SupervisorAgent.test.ts:421:13)
+    at Promise.then.completed (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:316:40)
+    at _runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+    <testcase classname="SupervisorAgent Error Handling should handle availability agent errors" name="SupervisorAgent Error Handling should handle availability agent errors" time="0.003">
+      <failure>Error: expect(received).rejects.toThrow()
+
+Received promise resolved instead of rejected
+Resolved to value: &quot;I apologize, but I&apos;m experiencing some technical difficulties. Please try again in a moment. If the problem persists, you can contact our support team.&quot;
+    at expect (/Users/vishalmishra/workspace/self/agentcare/node_modules/expect/build/index.js:113:15)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/agents/SupervisorAgent.test.ts:433:13)
+    at Promise.then.completed (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:316:40)
+    at _runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+    <testcase classname="SupervisorAgent Error Handling should handle FAQ agent errors" name="SupervisorAgent Error Handling should handle FAQ agent errors" time="0.001">
+      <failure>Error: expect(received).rejects.toThrow()
+
+Received promise resolved instead of rejected
+Resolved to value: &quot;I apologize, but I&apos;m experiencing some technical difficulties. Please try again in a moment. If the problem persists, you can contact our support team.&quot;
+    at expect (/Users/vishalmishra/workspace/self/agentcare/node_modules/expect/build/index.js:113:15)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/agents/SupervisorAgent.test.ts:445:13)
+    at Promise.then.completed (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:316:40)
+    at _runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+    <testcase classname="SupervisorAgent Logging should log processing start" name="SupervisorAgent Logging should log processing start" time="0.001">
+      <failure>Error: expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+Expected: &quot;SupervisorAgent processing request&quot;, ObjectContaining {&quot;message&quot;: &quot;Test message&quot;}
+Received: &quot;SupervisorAgent processing message&quot;, {&quot;hasToken&quot;: false, &quot;messageLength&quot;: 12}
+
+Number of calls: 1
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/agents/SupervisorAgent.test.ts:461:31)</failure>
+    </testcase>
+    <testcase classname="SupervisorAgent Logging should log delegation actions" name="SupervisorAgent Logging should log delegation actions" time="0">
+      <failure>Error: expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+Expected: &quot;Delegating to AvailabilityAgent&quot;, ObjectContaining {&quot;intent&quot;: ObjectContaining {&quot;type&quot;: &quot;availability&quot;}, &quot;message&quot;: &quot;What doctors are available?&quot;}
+Received: &quot;SupervisorAgent processing message&quot;, {&quot;hasToken&quot;: false, &quot;messageLength&quot;: 27}
+
+Number of calls: 1
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/agents/SupervisorAgent.test.ts:473:31)</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="OllamaService" errors="0" failures="3" skipped="0" timestamp="2025-05-25T04:30:03" time="0.064" tests="15">
+    <testcase classname="OllamaService generateResponse should generate a response successfully" name="OllamaService generateResponse should generate a response successfully" time="0.001">
+    </testcase>
+    <testcase classname="OllamaService generateResponse should handle API errors gracefully" name="OllamaService generateResponse should handle API errors gracefully" time="0.007">
+    </testcase>
+    <testcase classname="OllamaService generateResponse should handle network errors" name="OllamaService generateResponse should handle network errors" time="0.001">
+    </testcase>
+    <testcase classname="OllamaService generateResponse should format messages correctly with context and system prompt" name="OllamaService generateResponse should format messages correctly with context and system prompt" time="0.003">
+    </testcase>
+    <testcase classname="OllamaService analyzeIntent should analyze intent successfully" name="OllamaService analyzeIntent should analyze intent successfully" time="0.001">
+    </testcase>
+    <testcase classname="OllamaService analyzeIntent should use fallback intent analysis for invalid JSON" name="OllamaService analyzeIntent should use fallback intent analysis for invalid JSON" time="0">
+    </testcase>
+    <testcase classname="OllamaService analyzeIntent should handle intent analysis errors" name="OllamaService analyzeIntent should handle intent analysis errors" time="0.001">
+    </testcase>
+    <testcase classname="OllamaService generateEmbeddings should generate embeddings successfully" name="OllamaService generateEmbeddings should generate embeddings successfully" time="0.001">
+    </testcase>
+    <testcase classname="OllamaService generateEmbeddings should handle embedding generation errors" name="OllamaService generateEmbeddings should handle embedding generation errors" time="0.001">
+      <failure>Error: expect(received).rejects.toThrow()
+
+Received promise resolved instead of rejected
+Resolved to value: []
+    at expect (/Users/vishalmishra/workspace/self/agentcare/node_modules/expect/build/index.js:113:15)
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/OllamaService.test.ts:237:19)
+    at Promise.then.completed (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:316:40)
+    at _runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+    <testcase classname="OllamaService healthCheck should return true when Ollama is healthy" name="OllamaService healthCheck should return true when Ollama is healthy" time="0.001">
+    </testcase>
+    <testcase classname="OllamaService healthCheck should return false when Ollama is unhealthy" name="OllamaService healthCheck should return false when Ollama is unhealthy" time="0">
+      <failure>Error: expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+Expected: &quot;Ollama health check failed&quot;, Any&lt;Object&gt;
+
+Number of calls: 0
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/OllamaService.test.ts:265:38)</failure>
+    </testcase>
+    <testcase classname="OllamaService healthCheck should return false on network errors" name="OllamaService healthCheck should return false on network errors" time="0.001">
+    </testcase>
+    <testcase classname="OllamaService pullModel should pull model successfully" name="OllamaService pullModel should pull model successfully" time="0.003">
+    </testcase>
+    <testcase classname="OllamaService pullModel should use default model when none specified" name="OllamaService pullModel should use default model when none specified" time="0">
+    </testcase>
+    <testcase classname="OllamaService pullModel should handle pull errors" name="OllamaService pullModel should handle pull errors" time="0.001">
+      <failure>Error: Pull failed
+    at Object.&lt;anonymous&gt; (/Users/vishalmishra/workspace/self/agentcare/tests/unit/OllamaService.test.ts:312:17)
+    at Promise.then.completed (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:316:40)
+    at _runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/vishalmishra/workspace/self/agentcare/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Logger" errors="0" failures="0" skipped="0" timestamp="2025-05-25T04:30:04" time="0.097" tests="7">
+    <testcase classname="Logger Logging Methods should log info messages" name="Logger Logging Methods should log info messages" time="0.011">
+    </testcase>
+    <testcase classname="Logger Logging Methods should log error messages" name="Logger Logging Methods should log error messages" time="0.006">
+    </testcase>
+    <testcase classname="Logger Logging Methods should log warning messages" name="Logger Logging Methods should log warning messages" time="0.001">
+    </testcase>
+    <testcase classname="Logger Logging Methods should log debug messages" name="Logger Logging Methods should log debug messages" time="0.002">
+    </testcase>
+    <testcase classname="Logger Logger Configuration should create logger instance" name="Logger Logger Configuration should create logger instance" time="0.001">
+    </testcase>
+    <testcase classname="Logger Logger Configuration should handle messages without metadata" name="Logger Logger Configuration should handle messages without metadata" time="0.005">
+    </testcase>
+    <testcase classname="Logger Logger Configuration should handle empty messages" name="Logger Logger Configuration should handle empty messages" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="MetricsCollector" errors="0" failures="0" skipped="0" timestamp="2025-05-25T04:30:04" time="0.054" tests="12">
+    <testcase classname="MetricsCollector Counter Metrics should increment counter with default value" name="MetricsCollector Counter Metrics should increment counter with default value" time="0.001">
+    </testcase>
+    <testcase classname="MetricsCollector Counter Metrics should increment counter with custom value" name="MetricsCollector Counter Metrics should increment counter with custom value" time="0">
+    </testcase>
+    <testcase classname="MetricsCollector Counter Metrics should accumulate counter values" name="MetricsCollector Counter Metrics should accumulate counter values" time="0.003">
+    </testcase>
+    <testcase classname="MetricsCollector Timing Metrics should record timing metric" name="MetricsCollector Timing Metrics should record timing metric" time="0.001">
+    </testcase>
+    <testcase classname="MetricsCollector Timing Metrics should track operation start and end" name="MetricsCollector Timing Metrics should track operation start and end" time="0.013">
+    </testcase>
+    <testcase classname="MetricsCollector Error Metrics should record error for operation" name="MetricsCollector Error Metrics should record error for operation" time="0.001">
+    </testcase>
+    <testcase classname="MetricsCollector Error Metrics should accumulate error counts" name="MetricsCollector Error Metrics should accumulate error counts" time="0">
+    </testcase>
+    <testcase classname="MetricsCollector Metric Retrieval should return 0 for non-existent metric" name="MetricsCollector Metric Retrieval should return 0 for non-existent metric" time="0.001">
+    </testcase>
+    <testcase classname="MetricsCollector Metric Retrieval should return all metrics" name="MetricsCollector Metric Retrieval should return all metrics" time="0.001">
+    </testcase>
+    <testcase classname="MetricsCollector Metric Retrieval should export metrics as object" name="MetricsCollector Metric Retrieval should export metrics as object" time="0.001">
+    </testcase>
+    <testcase classname="MetricsCollector Metric Reset should reset all metrics" name="MetricsCollector Metric Reset should reset all metrics" time="0">
+    </testcase>
+    <testcase classname="MetricsCollector Metric Reset should log reset action" name="MetricsCollector Metric Reset should log reset action" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="ValidationService" errors="0" failures="0" skipped="0" timestamp="2025-05-25T04:30:04" time="0.049" tests="21">
+    <testcase classname="ValidationService Email Validation should validate correct email formats" name="ValidationService Email Validation should validate correct email formats" time="0.002">
+    </testcase>
+    <testcase classname="ValidationService Email Validation should reject invalid email formats" name="ValidationService Email Validation should reject invalid email formats" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService Email Validation should validate email using validation service" name="ValidationService Email Validation should validate email using validation service" time="0">
+    </testcase>
+    <testcase classname="ValidationService Phone Validation should validate correct phone formats" name="ValidationService Phone Validation should validate correct phone formats" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService Phone Validation should reject invalid phone formats" name="ValidationService Phone Validation should reject invalid phone formats" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService Phone Validation should validate phone using validation service" name="ValidationService Phone Validation should validate phone using validation service" time="0">
+    </testcase>
+    <testcase classname="ValidationService Booking Validation should validate complete booking details" name="ValidationService Booking Validation should validate complete booking details" time="0.002">
+    </testcase>
+    <testcase classname="ValidationService Booking Validation should reject booking with missing required fields" name="ValidationService Booking Validation should reject booking with missing required fields" time="0.002">
+    </testcase>
+    <testcase classname="ValidationService Booking Validation should reject booking with invalid email" name="ValidationService Booking Validation should reject booking with invalid email" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService Booking Validation should reject booking with past date" name="ValidationService Booking Validation should reject booking with past date" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService Booking Validation should reject booking outside business hours" name="ValidationService Booking Validation should reject booking outside business hours" time="0">
+    </testcase>
+    <testcase classname="ValidationService Booking Validation should reject weekend bookings" name="ValidationService Booking Validation should reject weekend bookings" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService Doctor Validation should validate complete doctor data" name="ValidationService Doctor Validation should validate complete doctor data" time="0">
+    </testcase>
+    <testcase classname="ValidationService Doctor Validation should reject doctor with missing name" name="ValidationService Doctor Validation should reject doctor with missing name" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService Doctor Validation should reject doctor with invalid email" name="ValidationService Doctor Validation should reject doctor with invalid email" time="0">
+    </testcase>
+    <testcase classname="ValidationService FAQ Validation should validate complete FAQ data" name="ValidationService FAQ Validation should validate complete FAQ data" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService FAQ Validation should reject FAQ with short question" name="ValidationService FAQ Validation should reject FAQ with short question" time="0">
+    </testcase>
+    <testcase classname="ValidationService FAQ Validation should reject FAQ with short answer" name="ValidationService FAQ Validation should reject FAQ with short answer" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService Input Sanitization should remove HTML tags" name="ValidationService Input Sanitization should remove HTML tags" time="0">
+    </testcase>
+    <testcase classname="ValidationService Input Sanitization should trim whitespace" name="ValidationService Input Sanitization should trim whitespace" time="0.001">
+    </testcase>
+    <testcase classname="ValidationService Input Sanitization should handle empty input" name="ValidationService Input Sanitization should handle empty input" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="ErrorHandler" errors="0" failures="0" skipped="0" timestamp="2025-05-25T04:30:04" time="0.046" tests="10">
+    <testcase classname="ErrorHandler Custom Error Types should create AgentError correctly" name="ErrorHandler Custom Error Types should create AgentError correctly" time="0.001">
+    </testcase>
+    <testcase classname="ErrorHandler Custom Error Types should create ToolError correctly" name="ErrorHandler Custom Error Types should create ToolError correctly" time="0.001">
+    </testcase>
+    <testcase classname="ErrorHandler Custom Error Types should create ValidationError correctly" name="ErrorHandler Custom Error Types should create ValidationError correctly" time="0.001">
+    </testcase>
+    <testcase classname="ErrorHandler Error Handling should handle AgentError" name="ErrorHandler Error Handling should handle AgentError" time="0.005">
+    </testcase>
+    <testcase classname="ErrorHandler Error Handling should handle ToolError" name="ErrorHandler Error Handling should handle ToolError" time="0.001">
+    </testcase>
+    <testcase classname="ErrorHandler Error Handling should handle ValidationError" name="ErrorHandler Error Handling should handle ValidationError" time="0.002">
+    </testcase>
+    <testcase classname="ErrorHandler Error Handling should handle generic Error" name="ErrorHandler Error Handling should handle generic Error" time="0">
+    </testcase>
+    <testcase classname="ErrorHandler Error Retry Logic should identify retryable errors" name="ErrorHandler Error Retry Logic should identify retryable errors" time="0.001">
+    </testcase>
+    <testcase classname="ErrorHandler Error Retry Logic should identify non-retryable errors" name="ErrorHandler Error Retry Logic should identify non-retryable errors" time="0">
+    </testcase>
+    <testcase classname="ErrorHandler Error Type Classification should classify error types correctly" name="ErrorHandler Error Type Classification should classify error types correctly" time="0">
     </testcase>
   </testsuite>
 </testsuites>
