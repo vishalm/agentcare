@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   # Ollama LLM Service - Core AI Engine

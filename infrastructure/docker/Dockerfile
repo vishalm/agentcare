@@ -117,7 +117,7 @@ EXPOSE ${PORT}
 ENTRYPOINT ["tini", "--"]
 
 # Start the backend service
-CMD ["node", "backend/dist/server.js"]
+CMD ["node", "backend/dist/index.js"]
 
 # ============================================================================
 # Frontend production stage with Nginx

@@ -66,25 +66,18 @@ const App: React.FC = () => {
     const themeKey = getThemeForUser();
     return getThemeByRole(themeKey);
   }, [getThemeForUser]);
-
-  // Get basename for GitHub Pages
-  const basename = useMemo(() => {
-    const isGitHubPages = import.meta.env.VITE_APP_GITHUB_PAGES === 'true';
-    return isGitHubPages ? '/agentcare' : '';
-  }, []);
   
   // Initialize app on mount
   useEffect(() => {
     // Any app initialization logic here
     console.log('🏥 AgentCare Frontend Initialized');
-    console.log('Router basename:', basename);
-  }, [basename]);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={currentTheme}>
         <CssBaseline />
-        <Router basename={basename}>
+        <Router>
           <AnimatePresence mode="wait">
             <motion.div
               initial={{ opacity: 0 }}

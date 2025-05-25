@@ -92,7 +92,7 @@ jobs:
         run: npm ci
 
       - name: "Run unit tests with coverage"
-        run: npm run test:unit -- --ci --watchAll=false --coverage
+        run: npm run test:unit -- --coverage --ci --watchAll=false
 
       - name: "Upload unit test coverage"
         uses: actions/upload-artifact@v4
@@ -146,11 +146,6 @@ jobs:
       - name: "Install dependencies"
         run: npm ci
 
-      - name: "Install PostgreSQL client"
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
-
       - name: "Wait for services"
         run: |
           echo "Waiting for PostgreSQL..."
@@ -159,33 +154,10 @@ jobs:
           timeout 30s bash -c 'until nc -z localhost 6379; do sleep 1; done'
 
       - name: "Setup test database"
-        run: |
-          # Create basic database structure for tests
-          PGPASSWORD=test psql -h localhost -p 5432 -U test -d agentcare_test -c "
-            CREATE TABLE IF NOT EXISTS users (
-              id SERIAL PRIMARY KEY,
-              email VARCHAR(255) UNIQUE NOT NULL,
-              password VARCHAR(255) NOT NULL,
-              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-            CREATE TABLE IF NOT EXISTS providers (
-              id SERIAL PRIMARY KEY,
-              name VARCHAR(255) NOT NULL,
-              email VARCHAR(255) UNIQUE NOT NULL,
-              specialty VARCHAR(255),
-              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-            CREATE TABLE IF NOT EXISTS appointments (
-              id SERIAL PRIMARY KEY,
-              user_id INTEGER REFERENCES users(id),
-              provider_id INTEGER REFERENCES providers(id),
-              appointment_date TIMESTAMP NOT NULL,
-              status VARCHAR(50) DEFAULT 'scheduled',
-              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-          "
+        run: npm run db:migrate
         env:
-          PGPASSWORD: test
+          DATABASE_URL: postgresql://test:test@localhost:5432/agentcare_test
+          REDIS_URL: redis://localhost:6379
 
       - name: "Run integration tests"
         run: npm run test:integration -- --ci --watchAll=false
@@ -196,12 +168,9 @@ jobs:
 
       - name: "Upload integration test results"
         uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: integration-test-results
-          path: |
-            coverage/
-            test-results.xml
+          path: coverage/test-results.xml
           retention-days: 7
 
   # Contract Tests
@@ -228,7 +197,6 @@ jobs:
 
       - name: "Upload contract test results"
         uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: contract-test-results
           path: coverage/
@@ -316,11 +284,6 @@ jobs:
       - name: "Install dependencies"
         run: npm ci
 
-      - name: "Install PostgreSQL client"
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
-
       - name: "Wait for services"
         run: |
           echo "Waiting for PostgreSQL..."
@@ -329,33 +292,10 @@ jobs:
           timeout 30s bash -c 'until nc -z localhost 6379; do sleep 1; done'
 
       - name: "Setup test database"
-        run: |
-          # Create basic database structure for tests
-          PGPASSWORD=test psql -h localhost -p 5432 -U test -d agentcare_test -c "
-            CREATE TABLE IF NOT EXISTS users (
-              id SERIAL PRIMARY KEY,
-              email VARCHAR(255) UNIQUE NOT NULL,
-              password VARCHAR(255) NOT NULL,
-              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-            CREATE TABLE IF NOT EXISTS providers (
-              id SERIAL PRIMARY KEY,
-              name VARCHAR(255) NOT NULL,
-              email VARCHAR(255) UNIQUE NOT NULL,
-              specialty VARCHAR(255),
-              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-            CREATE TABLE IF NOT EXISTS appointments (
-              id SERIAL PRIMARY KEY,
-              user_id INTEGER REFERENCES users(id),
-              provider_id INTEGER REFERENCES providers(id),
-              appointment_date TIMESTAMP NOT NULL,
-              status VARCHAR(50) DEFAULT 'scheduled',
-              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-          "
+        run: npm run db:migrate
         env:
-          PGPASSWORD: test
+          DATABASE_URL: postgresql://test:test@localhost:5432/agentcare_test
+          REDIS_URL: redis://localhost:6379
 
       - name: "Run all tests with coverage"
         run: npm run test:coverage
@@ -379,8 +319,6 @@ jobs:
               console.log('| Functions | ' + total.functions.pct + '% |');
               console.log('| Lines | ' + total.lines.pct + '% |');
             " >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| No coverage data | - |" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: "Upload comprehensive coverage"
@@ -413,7 +351,6 @@ jobs:
 
       - name: "Download coverage reports"
         uses: actions/download-artifact@v4
-        continue-on-error: true
         with:
           name: comprehensive-coverage
           path: coverage/
@@ -427,7 +364,7 @@ jobs:
           args: >
             -Dsonar.projectKey=vishalm_agentcare
             -Dsonar.organization=vishalm
-            -Dsonar.sources=backend/src,frontend/src
+            -Dsonar.sources=backend/src
             -Dsonar.tests=tests
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
@@ -457,11 +394,9 @@ jobs:
 
       - name: "Run security audit"
         run: npm audit --audit-level moderate
-        continue-on-error: true
 
       - name: "Run dependency check"
         run: npm run security:deps
-        continue-on-error: true
 
   # Performance Tests
   performance-tests:
