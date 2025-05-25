@@ -220,6 +220,27 @@ npm run security:scan      # Security audit
 
 ## 🚀 Deployment
 
+### Staging Environment
+Comprehensive staging environment for testing and validation:
+
+- **Frontend Staging**: https://staging-frontend.agentcare.dev
+- **Backend API Staging**: https://staging-api.agentcare.dev
+- **Health Check**: https://staging.agentcare.dev/health
+
+```bash
+# Deploy to staging (automated via CI/CD on main/develop branches)
+./scripts/deploy-staging.sh all staging
+
+# Deploy specific components
+./scripts/deploy-staging.sh frontend staging
+./scripts/deploy-staging.sh backend staging
+
+# Local staging environment
+docker-compose -f docker-compose.staging.yml up -d
+```
+
+👉 **[Staging Deployment Guide](docs/staging-deployment.md)**
+
 ### Docker Deployment
 ```bash
 # Quick start with Docker Compose
@@ -227,6 +248,9 @@ docker-compose up -d
 
 # Production deployment
 npm run docker:prod
+
+# Staging environment
+docker-compose -f docker-compose.staging.yml up -d
 ```
 
 ### Kubernetes Deployment

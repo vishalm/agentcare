@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database for Staging
+  postgres-staging:
+    image: postgres:15
+    container_name: agentcare-postgres-staging
+    environment:
+      POSTGRES_USER: staging
+      POSTGRES_PASSWORD: staging
+      POSTGRES_DB: agentcare_staging
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U staging -d agentcare_staging"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - agentcare-staging
+
+  # Redis Cache for Staging
+  redis-staging:
+    image: redis:7-alpine
+    container_name: agentcare-redis-staging
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_staging_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - agentcare-staging
+
+  # Backend API for Staging
+  backend-staging:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: agentcare-backend-staging
+    environment:
+      NODE_ENV: staging
+      PORT: 3001
+      DATABASE_URL: postgresql://staging:staging@postgres-staging:5432/agentcare_staging
+      REDIS_URL: redis://redis-staging:6379
+      JWT_SECRET: staging-jwt-secret-change-in-production
+      CORS_ORIGIN: http://localhost:3000,https://staging-frontend.agentcare.dev
+      LOG_LEVEL: debug
+      API_VERSION: v1
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres-staging:
+        condition: service_healthy
+      redis-staging:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    volumes:
+      - ./backend/logs:/app/logs
+    networks:
+      - agentcare-staging
+    restart: unless-stopped
+
+  # Frontend App for Staging
+  frontend-staging:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+      args:
+        NODE_ENV: staging
+        VITE_API_URL: http://localhost:3001
+        VITE_APP_ENV: staging
+        VITE_APP_NAME: "AgentCare Staging"
+        VITE_APP_VERSION: "staging"
+    container_name: agentcare-frontend-staging
+    environment:
+      NODE_ENV: staging
+    ports:
+      - "3000:80"
+    depends_on:
+      backend-staging:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - agentcare-staging
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy for Staging
+  nginx-staging:
+    image: nginx:alpine
+    container_name: agentcare-nginx-staging
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ./nginx/staging.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - frontend-staging
+      - backend-staging
+    networks:
+      - agentcare-staging
+    restart: unless-stopped
+
+volumes:
+  postgres_staging_data:
+    driver: local
+  redis_staging_data:
+    driver: local
+
+networks:
+  agentcare-staging:
+    driver: bridge
+    name: agentcare-staging-network 

@@ -1,0 +1,39 @@
+# Staging Environment Configuration
+# This file defines the staging environments for AgentCare
+
+environments:
+  frontend-staging:
+    name: "Frontend Staging"
+    description: "Staging environment for AgentCare frontend application"
+    url: "https://staging-frontend.agentcare.dev"
+    protection_rules:
+      required_reviewers: 0
+      wait_timer: 0
+    deployment_branch_policy:
+      protected_branches: true
+      custom_branch_policies: true
+      custom_branches:
+        - "main"
+        - "develop"
+    variables:
+      STAGING_API_URL: "https://staging-api.agentcare.dev"
+      NODE_ENV: "staging"
+      VITE_APP_ENV: "staging"
+
+  backend-staging:
+    name: "Backend Staging"
+    description: "Staging environment for AgentCare backend API"
+    url: "https://staging-api.agentcare.dev"
+    protection_rules:
+      required_reviewers: 0
+      wait_timer: 0
+    deployment_branch_policy:
+      protected_branches: true
+      custom_branch_policies: true
+      custom_branches:
+        - "main"
+        - "develop"
+    variables:
+      NODE_ENV: "staging"
+      DATABASE_URL: "postgresql://staging:staging@localhost:5432/agentcare_staging"
+      REDIS_URL: "redis://localhost:6379" 
