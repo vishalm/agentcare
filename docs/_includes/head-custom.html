@@ -1,0 +1,47 @@
+<!-- Mermaid.js for diagram rendering -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Mermaid
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      themeVariables: {
+        primaryColor: '#2563eb',
+        primaryTextColor: '#1f2937',
+        primaryBorderColor: '#3b82f6',
+        lineColor: '#6b7280',
+        sectionBkgColor: '#f3f4f6',
+        altSectionBkgColor: '#ffffff',
+        gridColor: '#e5e7eb'
+      }
+    });
+
+    // Initialize and render Mermaid diagrams
+    mermaid.run();
+  });
+</script>
+
+<!-- CSS for better diagram presentation -->
+<style>
+  .mermaid {
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+  
+  .mermaid svg {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  @media (max-width: 768px) {
+    .mermaid {
+      padding: 8px;
+      margin: 10px 0;
+    }
+  }
+</style> 

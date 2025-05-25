@@ -1,61 +1,75 @@
 ---
 layout: default
-title: Mermaid Diagram Test
-description: Testing Mermaid diagram rendering on GitHub Pages
+title: "Mermaid Test Page"
+description: "Testing Mermaid diagram rendering on GitHub Pages"
 ---
 
-# Mermaid Diagram Test
+# Mermaid Test Page
 
-This page tests whether Mermaid diagrams are rendering correctly on GitHub Pages.
+This page tests if Mermaid diagrams are rendering correctly on GitHub Pages.
 
-## Simple Flowchart Test
+## Simple Flowchart
 
-```mermaid
-graph TD
-    A[Start] --> B{Is it working?}
-    B -->|Yes| C[Great!]
-    B -->|No| D[Debug]
-    D --> B
-    C --> E[End]
-```
+<div class="mermaid">
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+</div>
 
-## System Architecture Test
+## Sequence Diagram
 
-```mermaid
-graph TB
-    subgraph "Frontend"
-        React[React App]
-        UI[Material-UI]
-    end
-    
-    subgraph "Backend"
-        API[Express API]
-        DB[(Database)]
-    end
-    
-    React --> API
-    API --> DB
-```
-
-## Sequence Diagram Test
-
-```mermaid
+<div class="mermaid">
 sequenceDiagram
-    participant User
-    participant App
-    participant API
-    participant DB
-    
-    User->>App: Make Request
-    App->>API: HTTP Call
-    API->>DB: Query Data
-    DB->>API: Return Data
-    API->>App: JSON Response
-    App->>User: Display Result
-```
+    participant Alice
+    participant Bob
+    Alice->>John: Hello John, how are you?
+    John-->>Alice: Great!
+    Alice-)John: See you later!
+</div>
 
-If you can see properly rendered diagrams above (not just code blocks), then Mermaid is working correctly!
+## More Complex Example
+
+<div class="mermaid">
+graph LR
+    A[Hard edge] -->|Link text| B(Round edge)
+    B --> C{Decision}
+    C -->|One| D[Result one]
+    C -->|Two| E[Result two]
+</div>
+
+## Class Diagram
+
+<div class="mermaid">
+classDiagram
+    class Agent {
+        +String name
+        +String status
+        +process()
+        +activate()
+        +deactivate()
+    }
+    
+    class SupervisorAgent {
+        +Array agents
+        +coordinate()
+        +monitor()
+    }
+    
+    class BookingAgent {
+        +createBooking()
+        +cancelBooking()
+    }
+    
+    Agent <|-- SupervisorAgent
+    Agent <|-- BookingAgent
+</div>
+
+## Test Complete
+
+If you can see all the diagrams above rendered properly (not as code), then Mermaid is working correctly!
 
 ---
 
-[← Back to Documentation](index.md) | [View on GitHub](https://github.com/vishalm/agentcare) 
+[← Back to Documentation](index.md) 

@@ -5,28 +5,28 @@ Welcome to the comprehensive documentation for AgentCare - the AI-powered health
 ## 🚀 Quick Navigation
 
 ### 🏃‍♂️ Getting Started
-- **[🚀 Quick Start Guide](setup/QUICK_START.md)** - Get up and running in minutes
-- **[🐳 Docker Setup](setup/DOCKER_SETUP.md)** - Complete containerized development environment
-- **[⚙️ Environment Configuration](setup/ENVIRONMENT_SETUP.md)** - Configuration and environment variables
+- **[🚀 Quick Start Guide](/agentcare/docs/setup/QUICK_START.html)** - Get up and running in minutes
+- **[🐳 Docker Setup](/agentcare/docs/setup/DOCKER_SETUP.html)** - Complete containerized development environment
+- **[⚙️ Environment Configuration](/agentcare/docs/setup/ENVIRONMENT_SETUP.html)** - Configuration and environment variables
 
 ### 🏗️ Architecture & Design
-- **[📊 System Architecture](architecture/diagrams/SYSTEM_ARCHITECTURE.md)** - Visual system diagrams
-- **[🏛️ Architecture Guide](architecture/ARCHITECTURE_GUIDE.md)** - Detailed system design
-- **[🏢 Multi-Tenancy](architecture/MULTI_TENANCY_GUIDE.md)** - Tenant isolation and management
-- **[🔄 12-Factor App](architecture/TWELVE_FACTOR_GUIDE.md)** - 12-Factor methodology compliance
+- **[📊 System Architecture](/agentcare/docs/architecture/diagrams/SYSTEM_ARCHITECTURE.html)** - Visual system diagrams
+- **[🏛️ Architecture Guide](/agentcare/docs/architecture/ARCHITECTURE_GUIDE.html)** - Detailed system design
+- **[🏢 Multi-Tenancy](/agentcare/docs/architecture/MULTI_TENANCY_GUIDE.html)** - Tenant isolation and management
+- **[🔄 12-Factor App](/agentcare/docs/architecture/TWELVE_FACTOR_GUIDE.html)** - 12-Factor methodology compliance
 
 ### 📁 Project Organization
-- **[📂 Project Structure](PROJECT_STRUCTURE.md)** - Complete codebase organization
-- **[📋 Documentation Organization](DOCUMENTATION_ORGANIZATION.md)** - How docs are structured
+- **[📂 Project Structure](/agentcare/docs/PROJECT_STRUCTURE.html)** - Complete codebase organization
+- **[📋 Documentation Organization](/agentcare/docs/DOCUMENTATION_ORGANIZATION.html)** - How docs are structured
 
 ### 🔧 API & Development
-- **[📖 API Reference](api-reference.md)** - Complete REST API documentation
-- **[🧪 Testing Guide](testing.md)** - Comprehensive testing strategies
-- **[🎯 Features Guide](features.md)** - Platform features overview
+- **[📖 API Reference](/agentcare/docs/api-reference.html)** - Complete REST API documentation
+- **[🧪 Testing Guide](/agentcare/docs/testing.html)** - Comprehensive testing strategies
+- **[🎯 Features Guide](/agentcare/docs/features.html)** - Platform features overview
 
 ### 🚀 Enterprise Features
-- **[🏥 Enterprise Guide](enterprise.md)** - Enterprise features and capabilities
-- **[🔒 Security & Compliance](operations/SECURITY.md)** - Security best practices
+- **[🏥 Enterprise Guide](/agentcare/docs/enterprise.html)** - Enterprise features and capabilities
+- **[🔒 Security & Compliance](/agentcare/docs/operations/SECURITY.html)** - Security best practices
 
 ## 🎯 Quick Reference
 
@@ -66,7 +66,7 @@ All demo accounts use password: **`AgentCare2024!`**
 
 ## 📊 System Overview
 
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "Frontend Layer"
         React[React Application]
@@ -103,7 +103,7 @@ graph TB
     Supervisor --> Ollama
     Express --> Postgres
     Express --> Redis
-```
+</div>
 
 ## 🤝 Contributing to Documentation
 
@@ -126,8 +126,8 @@ graph TB
 - **[Documentation Issues](https://github.com/vishalm/agentcare/issues/new?labels=documentation)** - Documentation improvements
 
 ### Additional Resources
-- **[Contributing Guide](../CONTRIBUTING.md)** - How to contribute to the project
-- **[License](../LICENSE)** - MIT license details
+- **[Contributing Guide](/agentcare/CONTRIBUTING.html)** - How to contribute to the project
+- **[License](/agentcare/LICENSE.html)** - MIT license details
 
 ---
 
@@ -135,6 +135,6 @@ graph TB
 
 **📚 Comprehensive documentation for a comprehensive platform**
 
-[🏠 Home](../README.md) • [🚀 Quick Start](setup/QUICK_START.md) • [🏗️ Architecture](architecture/ARCHITECTURE_GUIDE.md) • [🔧 API](api-reference.md)
+[🏠 Home](/agentcare/README.html) • [🚀 Quick Start](/agentcare/docs/setup/QUICK_START.html) • [🏗️ Architecture](/agentcare/docs/architecture/ARCHITECTURE_GUIDE.html) • [🔧 API](/agentcare/docs/api-reference.html)
 
 </div> 

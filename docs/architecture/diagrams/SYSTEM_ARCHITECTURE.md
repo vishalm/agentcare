@@ -2,7 +2,7 @@
 
 ## 🏗️ High-Level System Architecture
 
-```mermaid
+<div class="mermaid">
 graph TB
     subgraph "Frontend Layer"
         React[React App]
@@ -62,7 +62,7 @@ graph TB
     Docker --> K8s
     K8s --> Monitor
     K8s --> Logs
-```
+</div>
 
 ## 🤖 Multi-Agent Architecture
 
