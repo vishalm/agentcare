@@ -150,15 +150,15 @@ graph TB
         <span class="link-icon">🏠</span>
         <span class="link-text">Home</span>
       </a>
-      <a href="/agentcare/docs/setup/QUICK_START.html" class="footer-link">
+      <a href="/agentcare/PROJECT_STRUCTURE/" class="footer-link">
         <span class="link-icon">🚀</span>
         <span class="link-text">Quick Start</span>
       </a>
-      <a href="/agentcare/docs/architecture/ARCHITECTURE_GUIDE.html" class="footer-link">
+      <a href="/agentcare/architecture/" class="footer-link">
         <span class="link-icon">🏗️</span>
         <span class="link-text">Architecture</span>
       </a>
-      <a href="/agentcare/docs/api-reference.html" class="footer-link">
+      <a href="/agentcare/api-reference/" class="footer-link">
         <span class="link-icon">🔧</span>
         <span class="link-text">API</span>
       </a>

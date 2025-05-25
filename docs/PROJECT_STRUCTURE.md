@@ -1,3 +1,9 @@
+---
+layout: default
+title: "Project Structure Guide"
+permalink: /PROJECT_STRUCTURE/
+---
+
 {% include doc-header.html %}
 
 # AgentCare Project Structure Guide
