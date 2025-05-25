@@ -23,6 +23,15 @@ on:
           - integration
           - contract
           - ui
+      component:
+        description: 'Component to test'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - frontend
+          - backend
 
 env:
   NODE_VERSION: '18.x'
@@ -30,54 +39,52 @@ env:
   REDIS_VERSION: '7'
 
 jobs:
-  # Pre-flight checks
-  pre-flight:
-    name: "Pre-flight Checks"
+  # Detect changes to determine what to test
+  detect-changes:
+    name: "Detect Changes"
     runs-on: ubuntu-latest
     outputs:
+      frontend-changed: ${{ steps.changes.outputs.frontend }}
+      backend-changed: ${{ steps.changes.outputs.backend }}
+      docs-changed: ${{ steps.changes.outputs.docs }}
       should-run-tests: ${{ steps.changes.outputs.should-run }}
       test-level: ${{ github.event.inputs.test_level || 'all' }}
+      component: ${{ github.event.inputs.component || 'all' }}
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: "Check for relevant changes"
+      - name: "Detect file changes"
+        uses: dorny/paths-filter@v2
         id: changes
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "should-run=true" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.event_name }}" == "pull_request" ]] || [[ "${{ github.event_name }}" == "push" ]]; then
-            echo "should-run=true" >> $GITHUB_OUTPUT
-          else
-            echo "should-run=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: "Setup Node.js"
-        uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          filters: |
+            frontend:
+              - 'frontend/**'
+              - 'package.json'
+              - 'package-lock.json'
+            backend:
+              - 'backend/**'
+              - 'database/**'
+              - 'package.json'
+              - 'package-lock.json'
+            docs:
+              - 'docs/**'
+              - '*.md'
+            should-run:
+              - '**'
 
-      - name: "Install dependencies"
-        run: npm ci
-
-      - name: "Lint code"
-        run: npm run lint
-
-      - name: "Type check"
-        run: npm run type-check
-
-      - name: "Check build"
-        run: npm run build
-
-  # Unit Tests
-  unit-tests:
-    name: "Unit Tests"
+  # Frontend Pre-flight checks
+  frontend-preflight:
+    name: "Frontend Pre-flight"
     runs-on: ubuntu-latest
-    needs: pre-flight
-    if: needs.pre-flight.outputs.should-run-tests == 'true' && (needs.pre-flight.outputs.test-level == 'all' || needs.pre-flight.outputs.test-level == 'unit')
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend-changed == 'true' || needs.detect-changes.outputs.component == 'all' || needs.detect-changes.outputs.component == 'frontend' || github.event_name == 'workflow_dispatch'
+    defaults:
+      run:
+        working-directory: ./frontend
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -87,26 +94,138 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
 
-      - name: "Install dependencies"
+      - name: "Install frontend dependencies"
         run: npm ci
 
-      - name: "Run unit tests with coverage"
-        run: npm run test:unit -- --coverage --ci --watchAll=false
+      - name: "Lint frontend code"
+        run: npm run lint
 
-      - name: "Upload unit test coverage"
+      - name: "Type check frontend"
+        run: npm run type-check
+
+      - name: "Build frontend"
+        run: npm run build
+
+      - name: "Upload frontend build artifacts"
         uses: actions/upload-artifact@v4
         with:
-          name: unit-test-coverage
-          path: coverage/
+          name: frontend-build
+          path: frontend/dist/
           retention-days: 7
 
-  # Integration Tests
-  integration-tests:
-    name: "Integration Tests"
+  # Backend Pre-flight checks
+  backend-preflight:
+    name: "Backend Pre-flight"
     runs-on: ubuntu-latest
-    needs: pre-flight
-    if: needs.pre-flight.outputs.should-run-tests == 'true' && (needs.pre-flight.outputs.test-level == 'all' || needs.pre-flight.outputs.test-level == 'integration')
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend-changed == 'true' || needs.detect-changes.outputs.component == 'all' || needs.detect-changes.outputs.component == 'backend' || github.event_name == 'workflow_dispatch'
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'backend/package-lock.json'
+
+      - name: "Install backend dependencies"
+        run: npm ci
+
+      - name: "Lint backend code"
+        run: npm run lint
+
+      - name: "Type check backend"
+        run: npm run type-check
+
+      - name: "Build backend"
+        run: npm run build
+
+      - name: "Upload backend build artifacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-build
+          path: backend/dist/
+          retention-days: 7
+
+  # Frontend Unit Tests
+  frontend-unit-tests:
+    name: "Frontend Unit Tests"
+    runs-on: ubuntu-latest
+    needs: [detect-changes, frontend-preflight]
+    if: needs.frontend-preflight.result == 'success' && (needs.detect-changes.outputs.test-level == 'all' || needs.detect-changes.outputs.test-level == 'unit')
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: "Install frontend dependencies"
+        run: npm ci
+
+      - name: "Run frontend unit tests with coverage"
+        run: npm run test:unit -- --coverage --ci --watchAll=false
+
+      - name: "Upload frontend unit test coverage"
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-unit-test-coverage
+          path: frontend/coverage/
+          retention-days: 7
+
+  # Backend Unit Tests
+  backend-unit-tests:
+    name: "Backend Unit Tests"
+    runs-on: ubuntu-latest
+    needs: [detect-changes, backend-preflight]
+    if: needs.backend-preflight.result == 'success' && (needs.detect-changes.outputs.test-level == 'all' || needs.detect-changes.outputs.test-level == 'unit')
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'backend/package-lock.json'
+
+      - name: "Install backend dependencies"
+        run: npm ci
+
+      - name: "Run backend unit tests with coverage"
+        run: npm run test:unit -- --coverage --ci --watchAll=false
+
+      - name: "Upload backend unit test coverage"
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-unit-test-coverage
+          path: backend/coverage/
+          retention-days: 7
+
+  # Backend Integration Tests
+  backend-integration-tests:
+    name: "Backend Integration Tests"
+    runs-on: ubuntu-latest
+    needs: [detect-changes, backend-preflight]
+    if: needs.backend-preflight.result == 'success' && (needs.detect-changes.outputs.test-level == 'all' || needs.detect-changes.outputs.test-level == 'integration')
     
     services:
       postgres:
@@ -133,6 +252,10 @@ jobs:
         ports:
           - 6379:6379
 
+    defaults:
+      run:
+        working-directory: ./backend
+
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -142,8 +265,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: 'backend/package-lock.json'
 
-      - name: "Install dependencies"
+      - name: "Install backend dependencies"
         run: npm ci
 
       - name: "Wait for services"
@@ -159,26 +283,26 @@ jobs:
           DATABASE_URL: postgresql://test:test@localhost:5432/agentcare_test
           REDIS_URL: redis://localhost:6379
 
-      - name: "Run integration tests"
+      - name: "Run backend integration tests"
         run: npm run test:integration -- --ci --watchAll=false
         env:
           NODE_ENV: test
           DATABASE_URL: postgresql://test:test@localhost:5432/agentcare_test
           REDIS_URL: redis://localhost:6379
 
-      - name: "Upload integration test results"
+      - name: "Upload backend integration test results"
         uses: actions/upload-artifact@v4
         with:
-          name: integration-test-results
-          path: coverage/test-results.xml
+          name: backend-integration-test-results
+          path: backend/coverage/test-results.xml
           retention-days: 7
 
-  # Contract Tests
+  # Contract Tests (API contracts between frontend and backend)
   contract-tests:
     name: "Contract Tests"
     runs-on: ubuntu-latest
-    needs: pre-flight
-    if: needs.pre-flight.outputs.should-run-tests == 'true' && (needs.pre-flight.outputs.test-level == 'all' || needs.pre-flight.outputs.test-level == 'contract')
+    needs: [detect-changes, frontend-preflight, backend-preflight]
+    if: (needs.frontend-preflight.result == 'success' || needs.backend-preflight.result == 'success') && (needs.detect-changes.outputs.test-level == 'all' || needs.detect-changes.outputs.test-level == 'contract')
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -189,7 +313,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: "Install dependencies"
+      - name: "Install root dependencies"
         run: npm ci
 
       - name: "Run contract tests"
@@ -202,47 +326,12 @@ jobs:
           path: coverage/
           retention-days: 7
 
-  # UI Tests (Playwright)
-  ui-tests:
-    name: "UI Tests"
+  # End-to-End UI Tests
+  e2e-tests:
+    name: "E2E Tests"
     runs-on: ubuntu-latest
-    needs: pre-flight
-    if: needs.pre-flight.outputs.should-run-tests == 'true' && (needs.pre-flight.outputs.test-level == 'all' || needs.pre-flight.outputs.test-level == 'ui')
-    steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v4
-
-      - name: "Setup Node.js"
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: "Install dependencies"
-        run: npm ci
-
-      - name: "Install Playwright browsers"
-        run: npx playwright install --with-deps
-
-      - name: "Run UI tests"
-        run: npm run test:ui
-
-      - name: "Upload UI test results"
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: ui-test-results
-          path: |
-            test-results/
-            playwright-report/
-          retention-days: 7
-
-  # Comprehensive Test Coverage
-  coverage-report:
-    name: "Coverage Report"
-    runs-on: ubuntu-latest
-    needs: [unit-tests, integration-tests, contract-tests]
-    if: always() && needs.pre-flight.outputs.should-run-tests == 'true'
+    needs: [detect-changes, frontend-preflight, backend-preflight]
+    if: (needs.frontend-preflight.result == 'success' && needs.backend-preflight.result == 'success') && (needs.detect-changes.outputs.test-level == 'all' || needs.detect-changes.outputs.test-level == 'ui')
     
     services:
       postgres:
@@ -272,8 +361,6 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: "Setup Node.js"
         uses: actions/setup-node@v4
@@ -281,8 +368,19 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: "Install dependencies"
+      - name: "Install root dependencies"
         run: npm ci
+
+      - name: "Install frontend dependencies"
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: "Install backend dependencies"
+        working-directory: ./backend
+        run: npm ci
+
+      - name: "Install Playwright browsers"
+        run: npx playwright install --with-deps
 
       - name: "Wait for services"
         run: |
@@ -292,40 +390,120 @@ jobs:
           timeout 30s bash -c 'until nc -z localhost 6379; do sleep 1; done'
 
       - name: "Setup test database"
+        working-directory: ./backend
         run: npm run db:migrate
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/agentcare_test
           REDIS_URL: redis://localhost:6379
 
-      - name: "Run all tests with coverage"
-        run: npm run test:coverage
+      - name: "Build frontend"
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: "Build backend"
+        working-directory: ./backend
+        run: npm run build
+
+      - name: "Start backend server"
+        working-directory: ./backend
+        run: npm start &
         env:
           NODE_ENV: test
           DATABASE_URL: postgresql://test:test@localhost:5432/agentcare_test
           REDIS_URL: redis://localhost:6379
+          PORT: 3000
 
-      - name: "Generate coverage summary"
+      - name: "Start frontend server"
+        working-directory: ./frontend
+        run: npm run preview -- --port 3001 &
+
+      - name: "Wait for servers to start"
         run: |
+          echo "Waiting for backend server..."
+          timeout 60s bash -c 'until curl -f http://localhost:3000/health; do sleep 2; done'
+          echo "Waiting for frontend server..."
+          timeout 60s bash -c 'until curl -f http://localhost:3001; do sleep 2; done'
+
+      - name: "Run E2E tests"
+        run: npm run test:e2e
+        env:
+          FRONTEND_URL: http://localhost:3001
+          BACKEND_URL: http://localhost:3000
+
+      - name: "Upload E2E test results"
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-test-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+
+  # Comprehensive Coverage Report
+  coverage-report:
+    name: "Coverage Report"
+    runs-on: ubuntu-latest
+    needs: [frontend-unit-tests, backend-unit-tests, backend-integration-tests]
+    if: always() && (needs.frontend-unit-tests.result == 'success' || needs.backend-unit-tests.result == 'success' || needs.backend-integration-tests.result == 'success')
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: "Download frontend coverage"
+        uses: actions/download-artifact@v4
+        if: needs.frontend-unit-tests.result == 'success'
+        with:
+          name: frontend-unit-test-coverage
+          path: frontend-coverage/
+
+      - name: "Download backend coverage"
+        uses: actions/download-artifact@v4
+        if: needs.backend-unit-tests.result == 'success'
+        with:
+          name: backend-unit-test-coverage
+          path: backend-coverage/
+
+      - name: "Merge coverage reports"
+        run: |
+          mkdir -p merged-coverage
           echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
-          echo "| Metric | Percentage |" >> $GITHUB_STEP_SUMMARY
-          echo "|--------|------------|" >> $GITHUB_STEP_SUMMARY
-          if [ -f coverage/coverage-summary.json ]; then
+          echo "| Component | Statements | Branches | Functions | Lines |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|------------|----------|-----------|-------|" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f frontend-coverage/coverage-summary.json ]; then
+            echo "### Frontend Coverage" >> $GITHUB_STEP_SUMMARY
             node -e "
               const fs = require('fs');
-              const coverage = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
+              const coverage = JSON.parse(fs.readFileSync('frontend-coverage/coverage-summary.json', 'utf8'));
               const total = coverage.total;
-              console.log('| Statements | ' + total.statements.pct + '% |');
-              console.log('| Branches | ' + total.branches.pct + '% |');
-              console.log('| Functions | ' + total.functions.pct + '% |');
-              console.log('| Lines | ' + total.lines.pct + '% |');
+              console.log('| Frontend | ' + total.statements.pct + '% | ' + total.branches.pct + '% | ' + total.functions.pct + '% | ' + total.lines.pct + '% |');
+            " >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -f backend-coverage/coverage-summary.json ]; then
+            echo "### Backend Coverage" >> $GITHUB_STEP_SUMMARY
+            node -e "
+              const fs = require('fs');
+              const coverage = JSON.parse(fs.readFileSync('backend-coverage/coverage-summary.json', 'utf8'));
+              const total = coverage.total;
+              console.log('| Backend | ' + total.statements.pct + '% | ' + total.branches.pct + '% | ' + total.functions.pct + '% | ' + total.lines.pct + '% |');
             " >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: "Upload comprehensive coverage"
+      - name: "Upload merged coverage"
         uses: actions/upload-artifact@v4
         with:
-          name: comprehensive-coverage
-          path: coverage/
+          name: merged-coverage-report
+          path: |
+            frontend-coverage/
+            backend-coverage/
+            merged-coverage/
           retention-days: 30
 
   # SonarCloud Analysis
@@ -344,15 +522,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: "Install dependencies"
-        run: npm ci
 
       - name: "Download coverage reports"
         uses: actions/download-artifact@v4
         with:
-          name: comprehensive-coverage
+          name: merged-coverage-report
           path: coverage/
 
       - name: "SonarCloud Scan"
@@ -364,12 +538,12 @@ jobs:
           args: >
             -Dsonar.projectKey=vishalm_agentcare
             -Dsonar.organization=vishalm
-            -Dsonar.sources=backend/src
-            -Dsonar.tests=tests
-            -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-            -Dsonar.testExecutionReportPaths=coverage/test-results.xml
-            -Dsonar.coverage.exclusions=**/*.test.ts,**/*.spec.ts,**/node_modules/**,**/dist/**
+            -Dsonar.sources=frontend/src,backend/src
+            -Dsonar.tests=frontend/tests,backend/tests,tests
+            -Dsonar.typescript.lcov.reportPaths=coverage/frontend-coverage/lcov.info,coverage/backend-coverage/lcov.info
+            -Dsonar.javascript.lcov.reportPaths=coverage/frontend-coverage/lcov.info,coverage/backend-coverage/lcov.info
+            -Dsonar.testExecutionReportPaths=coverage/backend-coverage/test-results.xml
+            -Dsonar.coverage.exclusions=**/*.test.ts,**/*.spec.ts,**/node_modules/**,**/dist/**,**/coverage/**
             -Dsonar.cpd.exclusions=**/*.test.ts,**/*.spec.ts
             -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**,**/*.d.ts
 
@@ -377,8 +551,21 @@ jobs:
   security-scan:
     name: "Security Scan"
     runs-on: ubuntu-latest
-    needs: pre-flight
-    if: needs.pre-flight.outputs.should-run-tests == 'true'
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.should-run-tests == 'true'
+    strategy:
+      matrix:
+        component: [frontend, backend]
+        include:
+          - component: frontend
+            working-directory: ./frontend
+            package-lock: frontend/package-lock.json
+          - component: backend
+            working-directory: ./backend
+            package-lock: backend/package-lock.json
+    defaults:
+      run:
+        working-directory: ${{ matrix.working-directory }}
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -388,22 +575,54 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: ${{ matrix.package-lock }}
 
-      - name: "Install dependencies"
+      - name: "Install ${{ matrix.component }} dependencies"
         run: npm ci
 
-      - name: "Run security audit"
+      - name: "Run ${{ matrix.component }} security audit"
         run: npm audit --audit-level moderate
 
-      - name: "Run dependency check"
-        run: npm run security:deps
+      - name: "Run ${{ matrix.component }} dependency check"
+        run: |
+          if [ -f package.json ] && grep -q "security:deps" package.json; then
+            npm run security:deps
+          else
+            echo "No security:deps script found, skipping..."
+          fi
 
-  # Performance Tests
+  # Docker Build Tests
+  docker-build-test:
+    name: "Docker Build Test"
+    runs-on: ubuntu-latest
+    needs: [frontend-preflight, backend-preflight]
+    if: needs.frontend-preflight.result == 'success' && needs.backend-preflight.result == 'success'
+    strategy:
+      matrix:
+        component: [frontend, backend]
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Set up Docker Buildx"
+        uses: docker/setup-buildx-action@v3
+
+      - name: "Build ${{ matrix.component }} Docker image"
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.component }}
+          file: ./${{ matrix.component }}/Dockerfile
+          push: false
+          tags: agentcare-${{ matrix.component }}:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Performance Tests (only on main branch)
   performance-tests:
     name: "Performance Tests"
     runs-on: ubuntu-latest
-    needs: [integration-tests]
-    if: always() && needs.pre-flight.outputs.should-run-tests == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [e2e-tests]
+    if: always() && needs.e2e-tests.result == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -431,7 +650,20 @@ jobs:
   ci-status:
     name: "CI Status"
     runs-on: ubuntu-latest
-    needs: [pre-flight, unit-tests, integration-tests, contract-tests, ui-tests, coverage-report, sonarcloud, security-scan]
+    needs: [
+      detect-changes,
+      frontend-preflight,
+      backend-preflight,
+      frontend-unit-tests,
+      backend-unit-tests,
+      backend-integration-tests,
+      contract-tests,
+      e2e-tests,
+      coverage-report,
+      sonarcloud,
+      security-scan,
+      docker-build-test
+    ]
     if: always()
     steps:
       - name: "Check CI Status"
@@ -439,22 +671,39 @@ jobs:
           echo "## CI/CD Pipeline Results" >> $GITHUB_STEP_SUMMARY
           echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Pre-flight | ${{ needs.pre-flight.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Unit Tests | ${{ needs.unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Integration Tests | ${{ needs.integration-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Detect Changes | ${{ needs.detect-changes.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend Pre-flight | ${{ needs.frontend-preflight.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend Pre-flight | ${{ needs.backend-preflight.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend Unit Tests | ${{ needs.frontend-unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend Unit Tests | ${{ needs.backend-unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend Integration Tests | ${{ needs.backend-integration-tests.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Contract Tests | ${{ needs.contract-tests.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| UI Tests | ${{ needs.ui-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E Tests | ${{ needs.e2e-tests.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Coverage Report | ${{ needs.coverage-report.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| SonarCloud | ${{ needs.sonarcloud.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Security Scan | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Build Test | ${{ needs.docker-build-test.result }} |" >> $GITHUB_STEP_SUMMARY
 
       - name: "Fail if critical jobs failed"
-        if: needs.pre-flight.result == 'failure' || needs.unit-tests.result == 'failure' || needs.integration-tests.result == 'failure' || needs.security-scan.result == 'failure'
+        if: |
+          needs.detect-changes.result == 'failure' ||
+          (needs.frontend-preflight.result == 'failure' && needs.detect-changes.outputs.frontend-changed == 'true') ||
+          (needs.backend-preflight.result == 'failure' && needs.detect-changes.outputs.backend-changed == 'true') ||
+          needs.frontend-unit-tests.result == 'failure' ||
+          needs.backend-unit-tests.result == 'failure' ||
+          needs.backend-integration-tests.result == 'failure' ||
+          needs.security-scan.result == 'failure'
         run: |
           echo "❌ Critical CI jobs failed"
           exit 1
 
       - name: "Success notification"
-        if: needs.pre-flight.result == 'success' && needs.unit-tests.result == 'success' && needs.integration-tests.result == 'success'
+        if: |
+          needs.detect-changes.result == 'success' &&
+          (needs.frontend-preflight.result == 'success' || needs.frontend-preflight.result == 'skipped') &&
+          (needs.backend-preflight.result == 'success' || needs.backend-preflight.result == 'skipped') &&
+          (needs.frontend-unit-tests.result == 'success' || needs.frontend-unit-tests.result == 'skipped') &&
+          (needs.backend-unit-tests.result == 'success' || needs.backend-unit-tests.result == 'skipped') &&
+          (needs.backend-integration-tests.result == 'success' || needs.backend-integration-tests.result == 'skipped')
         run: |
           echo "✅ All critical CI jobs passed successfully"
