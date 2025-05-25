@@ -562,11 +562,11 @@ export class AgentCareCacheFactory {
 
     // Setup cache event logging
     cacheManager.onCacheEvent("cache-hit", (data) => {
-      console.log(`Cache hit on ${data.tier}: ${data.key?.split(':')[0] || 'unknown'}`);
+      console.log(`Cache hit on ${data.tier}: ${data.key?.split(':')[0] ?? 'unknown'}`);
     });
 
     cacheManager.onCacheEvent("cache-miss", (data) => {
-      console.log(`Cache miss: ${data.key?.split(':')[0] || 'unknown'}`);
+      console.log(`Cache miss: ${data.key?.split(':')[0] ?? 'unknown'}`);
     });
 
     return {

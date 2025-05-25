@@ -1,0 +1,78 @@
+---
+layout: default
+---
+<article class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">{{ page.title | escape }}</h1>
+    {% if page.description %}
+      <p class="post-description">{{ page.description }}</p>
+    {% endif %}
+  </header>
+
+  <div class="post-content">
+    {{ content }}
+  </div>
+
+  {% if page.date %}
+    <div class="post-meta">
+      <time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+        Last updated: {{ page.date | date: "%B %d, %Y" }}
+      </time>
+    </div>
+  {% endif %}
+
+</article>
+
+<style>
+  .post-description {
+    font-style: italic;
+    color: #666;
+    margin-bottom: 2em;
+    font-size: 1.1em;
+  }
+
+  .post-meta {
+    margin-top: 2em;
+    padding-top: 1em;
+    border-top: 1px solid #e1e1e1;
+    color: #666;
+    font-size: 0.9em;
+  }
+
+  /* Healthcare documentation styling */
+  .post-content h2 {
+    color: #2c5aa0;
+    border-bottom: 2px solid #2c5aa0;
+    padding-bottom: 0.3em;
+  }
+
+  .post-content h3 {
+    color: #4a90c2;
+  }
+
+  .post-content code {
+    background-color: #f8f9fa;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+
+  .post-content pre {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 1em;
+    overflow-x: auto;
+  }
+
+  .post-content blockquote {
+    border-left: 4px solid #2c5aa0;
+    padding-left: 1em;
+    margin: 1em 0;
+    font-style: italic;
+    background-color: #f8f9fa;
+    padding: 1em;
+    border-radius: 0 6px 6px 0;
+  }
+</style> 

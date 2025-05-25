@@ -1,75 +1,216 @@
-# AgentCare Dockerfile
-# Multi-stage build for optimized production image
+# AgentCare Monorepo Multi-Service Dockerfile
+# Enterprise Healthcare Scheduling Platform
 
-# Stage 1: Build stage
-FROM node:18-alpine AS builder
+# ============================================================================
+# Base stage with Node.js and common dependencies
+# ============================================================================
+FROM node:18-alpine AS base
+LABEL maintainer="AgentCare Team <dev@agentcare.com>"
+LABEL description="AgentCare Healthcare Platform - Monorepo Build"
+LABEL version="3.0.0"
+
+# Install system dependencies
+RUN apk add --no-cache \
+    curl \
+    dumb-init \
+    postgresql-client \
+    git \
+    tini \
+    && rm -rf /var/cache/apk/*
 
 # Set working directory
 WORKDIR /app
 
-# Install build dependencies
-RUN apk add --no-cache python3 make g++ curl
-
-# Copy package files
+# Copy root package.json for workspace management
 COPY package*.json ./
-COPY backend/tsconfig.json ./backend/
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+# ============================================================================
+# Backend build stage
+# ============================================================================
+FROM base AS backend-build
+LABEL service="backend"
 
-# Copy source code
-COPY backend/src ./backend/src
-COPY frontend/public ./frontend/public
+# Copy backend package.json
+COPY backend/package*.json ./backend/
 
-# Build the application
-RUN npm run build:backend
+# Install backend dependencies
+RUN npm ci --workspaces=false --only=production --no-audit --no-fund
+RUN cd backend && npm ci --include=dev --no-audit --no-fund
 
-# Stage 2: Production stage
-FROM node:18-alpine AS runtime
+# Copy backend source code and shared files
+COPY backend/ ./backend/
+COPY database/ ./database/
+COPY scripts/ ./scripts/
+COPY env.example ./
 
-# Set working directory
+# Build backend
+WORKDIR /app/backend
+RUN npm run build
+
+# ============================================================================
+# Frontend build stage
+# ============================================================================
+FROM base AS frontend-build
+LABEL service="frontend"
+
+# Copy frontend package.json
+COPY frontend/package*.json ./frontend/
+
+# Install frontend dependencies
+RUN npm ci --workspaces=false --only=production --no-audit --no-fund
+RUN cd frontend && npm ci --include=dev --no-audit --no-fund
+
+# Copy frontend source code
+COPY frontend/ ./frontend/
+
+# Build frontend
+WORKDIR /app/frontend
+RUN npm run build
+
+# ============================================================================
+# Backend production stage
+# ============================================================================
+FROM node:18-alpine AS backend-production
+ENV NODE_ENV=production
+ENV PORT=3000
+LABEL service="backend"
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    curl \
+    dumb-init \
+    postgresql-client \
+    tini \
+    && rm -rf /var/cache/apk/*
+
+# Create non-root user
+RUN addgroup -g 1001 -S agentcare && \
+    adduser -S agentcare -u 1001 -G agentcare
+
 WORKDIR /app
 
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S agentcare -u 1001
+# Copy production dependencies and built application from backend-build stage
+COPY --from=backend-build /app/backend/node_modules ./backend/node_modules
+COPY --from=backend-build /app/node_modules ./node_modules
+COPY --from=backend-build /app/backend/dist ./backend/dist
+COPY --from=backend-build /app/backend/package*.json ./backend/
+COPY --from=backend-build /app/database ./database
+COPY --from=backend-build /app/scripts ./scripts
+COPY --from=backend-build /app/package*.json ./
 
-# Install curl for health checks
-RUN apk add --no-cache curl
-
-# Copy built application from builder stage
-COPY --from=builder --chown=agentcare:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=agentcare:nodejs /app/backend/dist ./backend/dist
-COPY --from=builder --chown=agentcare:nodejs /app/frontend/public ./frontend/public
-COPY --from=builder --chown=agentcare:nodejs /app/package*.json ./
-
-# Create logs directory
-RUN mkdir -p logs && chown agentcare:nodejs logs
+# Create required directories and set permissions
+RUN mkdir -p /app/logs /app/tmp && \
+    chown -R agentcare:agentcare /app && \
+    chmod -R 755 /app
 
 # Switch to non-root user
 USER agentcare
 
-# Expose port
-EXPOSE 3000
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
+
+# Expose application port
+EXPOSE ${PORT}
+
+# Use tini as init system for proper signal handling
+ENTRYPOINT ["tini", "--"]
+
+# Start the backend service
+CMD ["node", "backend/dist/index.js"]
+
+# ============================================================================
+# Frontend production stage with Nginx
+# ============================================================================
+FROM nginx:alpine AS frontend-production
+ENV NODE_ENV=production
+LABEL service="frontend"
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    curl \
+    tini \
+    && rm -rf /var/cache/apk/*
+
+# Create non-root user
+RUN addgroup -g 1001 -S agentcare && \
+    adduser -S agentcare -u 1001 -G agentcare
+
+# Copy built application from frontend-build stage
+COPY --from=frontend-build /app/frontend/dist /usr/share/nginx/html
+
+# Copy custom nginx configuration
+COPY infrastructure/docker/nginx.conf /etc/nginx/nginx.conf
+
+# Create required directories and set permissions
+RUN mkdir -p /var/cache/nginx /var/log/nginx /var/run && \
+    chown -R agentcare:agentcare /var/cache/nginx /var/log/nginx /var/run /usr/share/nginx/html && \
+    chmod -R 755 /var/cache/nginx /var/log/nginx /var/run
+
+# Create nginx.pid file with proper permissions
+RUN touch /var/run/nginx.pid && \
+    chown agentcare:agentcare /var/run/nginx.pid
+
+# Switch to non-root user
+USER agentcare
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:80/ || exit 1
 
-# Environment variables
-ENV NODE_ENV=production
-ENV API_PORT=3000
-ENV LOG_LEVEL=info
+# Expose port
+EXPOSE 80
 
-# Labels for better Docker management
-LABEL org.opencontainers.image.title="AgentCare" \
-      org.opencontainers.image.description="Enhanced Multi-Agent Healthcare Scheduling System with Ollama LLM + RAG" \
-      org.opencontainers.image.version="2.0.0-alpha" \
-      org.opencontainers.image.authors="Vishal Mishra <vishal@agentcare.dev>" \
-      org.opencontainers.image.url="https://github.com/vishalm/agentcare" \
-      org.opencontainers.image.source="https://github.com/vishalm/agentcare" \
-      org.opencontainers.image.vendor="AgentCare" \
-      org.opencontainers.image.licenses="MIT"
+# Use tini as init system
+ENTRYPOINT ["tini", "--"]
 
-# Start the application
-CMD ["npm", "start"] 
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
+
+# ============================================================================
+# Development stage (for development builds)
+# ============================================================================
+FROM base AS development
+ENV NODE_ENV=development
+LABEL environment="development"
+
+# Install all dependencies for both frontend and backend
+RUN npm install --workspaces
+
+# Copy all source code
+COPY backend/ ./backend/
+COPY frontend/ ./frontend/
+COPY database/ ./database/
+COPY scripts/ ./scripts/
+COPY env.example ./
+
+# Create required directories
+RUN mkdir -p /app/logs && chmod 755 /app/logs
+
+# Expose development ports
+EXPOSE 3000 3001 9090
+
+# Use dumb-init for development
+ENTRYPOINT ["dumb-init", "--"]
+
+# Default to running both frontend and backend in development
+CMD ["npm", "run", "dev"]
+
+# ============================================================================
+# Multi-architecture build support
+# ============================================================================
+FROM backend-production AS backend-production-arm64
+LABEL architecture="arm64"
+# ARM64 specific optimizations can go here
+
+FROM backend-production AS backend-production-amd64
+LABEL architecture="amd64"
+# AMD64 specific optimizations can go here
+
+FROM frontend-production AS frontend-production-arm64
+LABEL architecture="arm64"
+# ARM64 specific optimizations can go here
+
+FROM frontend-production AS frontend-production-amd64
+LABEL architecture="amd64"
+# AMD64 specific optimizations can go here 

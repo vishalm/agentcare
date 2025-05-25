@@ -1,0 +1,59 @@
+# Kibana Configuration for AgentCare Development
+# Optimized for log visualization and dashboard management
+
+# Server Configuration
+server.host: 0.0.0.0
+server.port: 5601
+server.name: agentcare-kibana
+server.basePath: ""
+server.rewriteBasePath: false
+
+# Elasticsearch Configuration
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.requestTimeout: 30000
+elasticsearch.shardTimeout: 30000
+
+# Logging Configuration
+logging.appenders.file.type: file
+logging.appenders.file.fileName: /usr/share/kibana/logs/kibana.log
+logging.appenders.file.layout.type: json
+logging.root.level: info
+
+# Security Configuration (disabled for development)
+xpack.security.enabled: false
+xpack.encryptedSavedObjects.encryptionKey: "development-key-change-in-production-32-chars"
+
+# Monitoring Configuration
+xpack.monitoring.enabled: false
+xpack.monitoring.kibana.collection.enabled: false
+
+# Advanced Settings
+kibana.index: ".kibana"
+kibana.defaultAppId: "discover"
+
+# Data Configuration
+data.search.timeout: 30000
+data.search.sessions.enabled: true
+
+# Maps Configuration
+xpack.maps.enabled: true
+xpack.maps.showMapsInspectorAdapter: true
+
+# Canvas Configuration
+xpack.canvas.enabled: true
+
+# Performance Settings
+elasticsearch.pingTimeout: 1500
+elasticsearch.requestHeadersWhitelist: ["authorization", "content-type", "kbn-version", "kbn-xsrf"]
+
+# Development Settings
+status.allowAnonymous: true
+server.cors.enabled: true
+server.cors.origin: "*"
+
+# Index Patterns
+kibana.autocompleteTimeout: 1000
+kibana.autocompleteTerminateAfter: 100000
+
+# Dashboard Configuration
+dashboard.defaultDarkMode: false 
