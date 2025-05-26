@@ -611,4 +611,170 @@ graph TD
    kubectl exec -n agentcare agentcare-postgresql-0 -- pg_dump -U agentcare_user agentcare
    ```
 
-This Kubernetes-based architecture ensures that AgentCare operates as a robust, scalable, and secure healthcare scheduling system, maintaining HIPAA compliance while providing excellent observability and maintenance capabilities. 
+This Kubernetes-based architecture ensures that AgentCare operates as a robust, scalable, and secure healthcare scheduling system, maintaining HIPAA compliance while providing excellent observability and maintenance capabilities.
+
+## 🏗️ Kubernetes Deployment
+
+### Service Access URLs
+
+#### Main Application
+- **Frontend UI**: http://localhost:31781
+- **AgentCare API**: http://localhost:31780
+- **Health Check**: http://localhost:31780/health
+- **API Documentation**: http://localhost:31780/api/docs
+
+#### Monitoring Stack
+- **Grafana**: http://localhost:31800
+  - Username: admin
+  - Password: admin123
+  - Default Dashboards:
+    - AgentCare Overview
+    - Node Metrics
+    - API Performance
+
+- **Prometheus**: http://localhost:31790
+  - Metrics: http://localhost:31790/metrics
+  - Targets: http://localhost:31790/targets
+  - Rules: http://localhost:31790/rules
+
+- **AlertManager**: http://localhost:31791
+  - Alerts: http://localhost:31791/#/alerts
+  - Silences: http://localhost:31791/#/silences
+
+#### Tracing & Debugging
+- **Jaeger UI**: http://localhost:31810
+  - Trace Search: http://localhost:31810/search
+  - Dependencies: http://localhost:31810/dependencies
+- **Jaeger Collector**: http://localhost:31811 (for trace ingestion)
+
+#### Development Database Access
+> ⚠️ Note: Database ports are exposed in development environment only. In production, use proper security measures.
+
+- **PostgreSQL**:
+  ```bash
+  Host: localhost
+  Port: 31820
+  Database: agentcare
+  Username: agentcare_user
+  ```
+
+- **Redis**:
+  ```bash
+  Host: localhost
+  Port: 31830
+  ```
+
+### Port Ranges
+
+We use dedicated port ranges for different service types:
+
+```
+Frontend Service:      31781
+Application Services:  31780
+Monitoring Services:   31790-31799
+Visualization:        31800-31809
+Tracing Services:     31810-31819
+Database Services:    31820-31839 (dev only)
+```
+
+### Quick Access Commands
+
+```bash
+# Port forwarding shortcuts
+kubectl -n agentcare port-forward svc/agentcare 3000:3000 &                    # Main App
+kubectl -n agentcare port-forward svc/agentcare-grafana 3001:3001 &           # Grafana
+kubectl -n agentcare port-forward svc/agentcare-prometheus-server 9090:9090 &  # Prometheus
+kubectl -n agentcare port-forward svc/agentcare-jaeger-query 16686:16686 &    # Jaeger
+
+# View service status
+kubectl get svc -n agentcare
+
+# View pod status
+kubectl get pods -n agentcare
+
+# View logs
+kubectl logs -f deployment/agentcare -n agentcare                              # Main App
+kubectl logs -f deployment/agentcare-grafana -n agentcare                      # Grafana
+kubectl logs -f deployment/agentcare-prometheus-server -n agentcare            # Prometheus
+```
+
+### Health Checks
+
+Monitor service health using:
+
+```bash
+# Main application health
+curl http://localhost:31780/health
+
+# Prometheus targets health
+curl http://localhost:31790/api/v1/targets
+
+# Grafana health
+curl http://localhost:31800/api/health
+
+# Jaeger health
+curl http://localhost:31810/health
+```
+
+### Ingress Access
+
+If using ingress (enabled by default):
+
+```bash
+http://localhost/             # Main application
+http://localhost/grafana      # Grafana
+http://localhost/prometheus   # Prometheus
+http://localhost/jaeger      # Jaeger UI
+```
+
+### Development vs Production
+
+#### Development Environment
+- All services exposed via NodePorts
+- Database ports accessible
+- Debug logging enabled
+- Mock data available
+- Minimal resource requests
+
+#### Production Environment
+- Services exposed through Ingress only
+- Databases accessible internally only
+- HIPAA compliance enabled
+- Full monitoring and alerting
+- Resource limits enforced
+
+### Troubleshooting
+
+Common issues and solutions:
+
+1. **Service Not Accessible**
+   ```bash
+   # Check service status
+   kubectl get svc -n agentcare
+   
+   # Check pod status
+   kubectl get pods -n agentcare
+   
+   # Check pod logs
+   kubectl logs -f <pod-name> -n agentcare
+   ```
+
+2. **Database Connection Issues**
+   ```bash
+   # Check database pods
+   kubectl get pods -n agentcare | grep postgresql
+   kubectl get pods -n agentcare | grep redis
+   
+   # Check database services
+   kubectl get svc -n agentcare | grep postgresql
+   kubectl get svc -n agentcare | grep redis
+   ```
+
+3. **Monitoring Issues**
+   ```bash
+   # Check Prometheus targets
+   curl http://localhost:31790/api/v1/targets
+   
+   # Check Grafana datasources
+   curl http://localhost:31800/api/datasources
+   ```

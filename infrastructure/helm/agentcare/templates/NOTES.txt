@@ -23,27 +23,24 @@ To get started with AgentCare:
 {{- else if contains "ClusterIP" .Values.service.type }}
   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "agentcare.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
   export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
-  echo "Visit http://127.0.0.1:3000 to use your application"
-  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 3000:$CONTAINER_PORT
+  echo "Visit http://127.0.0.1:31780 to use your application"
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 31780:$CONTAINER_PORT
 {{- end }}
 
 2. Access the monitoring stack:
 {{- if .Values.monitoring.grafana.enabled }}
    Grafana:
-   kubectl port-forward svc/{{ .Release.Name }}-grafana 3000:80 -n {{ .Release.Namespace }}
-   Visit http://localhost:3000 and login with:
+   Visit http://localhost:31800 and login with:
    - Username: admin
    - Password: {{ .Values.monitoring.grafana.adminPassword }}
 {{- end }}
 {{- if .Values.monitoring.prometheus.enabled }}
    Prometheus:
-   kubectl port-forward svc/{{ .Release.Name }}-prometheus-server 9090:80 -n {{ .Release.Namespace }}
-   Visit http://localhost:9090
+   Visit http://localhost:31790
 {{- end }}
 {{- if .Values.tracing.jaeger.enabled }}
    Jaeger:
-   kubectl port-forward svc/{{ .Release.Name }}-jaeger-query 16686:16686 -n {{ .Release.Namespace }}
-   Visit http://localhost:16686
+   Visit http://localhost:31810
 {{- end }}
 
 3. View application logs:

@@ -1,0 +1,123 @@
+{{- if .Values.monitoring.prometheus.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-prometheus-server
+  labels:
+    app: prometheus
+    component: server
+    release: {{ .Release.Name }}
+spec:
+  type: {{ .Values.monitoring.prometheus.server.service.type }}
+  ports:
+    - port: {{ .Values.monitoring.prometheus.server.service.port }}
+      targetPort: 9090
+      {{- if and (eq .Values.monitoring.prometheus.server.service.type "NodePort") .Values.monitoring.prometheus.server.service.nodePort }}
+      nodePort: {{ .Values.monitoring.prometheus.server.service.nodePort }}
+      {{- end }}
+      protocol: TCP
+      name: http
+  selector:
+    app: prometheus
+    component: server
+    release: {{ .Release.Name }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-prometheus-alertmanager
+  labels:
+    app: prometheus
+    component: alertmanager
+    release: {{ .Release.Name }}
+spec:
+  type: {{ .Values.monitoring.prometheus.alertmanager.service.type }}
+  ports:
+    - port: {{ .Values.monitoring.prometheus.alertmanager.service.port }}
+      targetPort: 9093
+      {{- if and (eq .Values.monitoring.prometheus.alertmanager.service.type "NodePort") .Values.monitoring.prometheus.alertmanager.service.nodePort }}
+      nodePort: {{ .Values.monitoring.prometheus.alertmanager.service.nodePort }}
+      {{- end }}
+      protocol: TCP
+      name: http
+  selector:
+    app: prometheus
+    component: alertmanager
+    release: {{ .Release.Name }}
+{{- end }}
+
+{{- if .Values.monitoring.grafana.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-grafana
+  labels:
+    app: grafana
+    release: {{ .Release.Name }}
+spec:
+  type: {{ .Values.monitoring.grafana.service.type }}
+  ports:
+    - port: {{ .Values.monitoring.grafana.service.port }}
+      targetPort: 3000
+      {{- if and (eq .Values.monitoring.grafana.service.type "NodePort") .Values.monitoring.grafana.service.nodePort }}
+      nodePort: {{ .Values.monitoring.grafana.service.nodePort }}
+      {{- end }}
+      protocol: TCP
+      name: http
+  selector:
+    app: grafana
+    release: {{ .Release.Name }}
+{{- end }}
+
+{{- if .Values.tracing.jaeger.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-jaeger-query
+  labels:
+    app: jaeger
+    component: query
+    release: {{ .Release.Name }}
+spec:
+  type: {{ .Values.tracing.jaeger.allInOne.service.type }}
+  ports:
+    - port: {{ .Values.tracing.jaeger.allInOne.service.port }}
+      targetPort: 16686
+      {{- if and (eq .Values.tracing.jaeger.allInOne.service.type "NodePort") .Values.tracing.jaeger.allInOne.service.nodePort }}
+      nodePort: {{ .Values.tracing.jaeger.allInOne.service.nodePort }}
+      {{- end }}
+      protocol: TCP
+      name: http
+  selector:
+    app: jaeger
+    component: all-in-one
+    release: {{ .Release.Name }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-jaeger-collector
+  labels:
+    app: jaeger
+    component: collector
+    release: {{ .Release.Name }}
+spec:
+  type: {{ .Values.tracing.jaeger.collector.service.type }}
+  ports:
+    - port: {{ .Values.tracing.jaeger.collector.service.port }}
+      targetPort: 14268
+      {{- if and (eq .Values.tracing.jaeger.collector.service.type "NodePort") .Values.tracing.jaeger.collector.service.nodePort }}
+      nodePort: {{ .Values.tracing.jaeger.collector.service.nodePort }}
+      {{- end }}
+      protocol: TCP
+      name: http
+  selector:
+    app: jaeger
+    component: all-in-one
+    release: {{ .Release.Name }}
+{{- end }} 

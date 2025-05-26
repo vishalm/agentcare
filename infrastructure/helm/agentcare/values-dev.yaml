@@ -10,6 +10,7 @@ service:
   type: NodePort
   port: 3000
   targetPort: 3000
+  nodePort: 31780
 
 ingress:
   enabled: true
@@ -40,6 +41,10 @@ postgresql:
   primary:
     persistence:
       size: 1Gi
+    service:
+      type: NodePort
+      port: 5432
+      nodePort: 31820
   auth:
     database: agentcare
     username: agentcare_user
@@ -49,6 +54,10 @@ redis:
   master:
     persistence:
       size: 1Gi
+    service:
+      type: NodePort
+      port: 6379
+      nodePort: 31830
   auth:
     enabled: true
   replica:
@@ -60,23 +69,53 @@ monitoring:
     server:
       persistentVolume:
         enabled: false
+      service:
+        type: NodePort
+        port: 9090
+        nodePort: 31790
+    alertmanager:
+      service:
+        type: NodePort
+        port: 9093
+        nodePort: 31791
+    pushgateway:
+      service:
+        type: NodePort
+        port: 9091
+        nodePort: 31792
+    nodeExporter:
+      service:
+        type: NodePort
+        port: 9100
+        nodePort: 31793
   grafana:
     enabled: true
     persistence:
       enabled: false
+    service:
+      type: NodePort
+      port: 3001
+      nodePort: 31800
+    adminPassword: admin123
 
 tracing:
   jaeger:
     enabled: true
     allInOne:
       enabled: true
+      service:
+        type: NodePort
+        port: 16686
+        nodePort: 31810
+    collector:
+      enabled: true
+      service:
+        type: NodePort
+        port: 14268
+        nodePort: 31811
     agent:
       enabled: false
-    collector:
-      enabled: false
     query:
-      enabled: false
-    cassandra:
       enabled: false
     storage:
       type: memory
@@ -123,4 +162,21 @@ volumeMounts:
 volumes:
   - name: app-code
     configMap:
-      name: agentcare-app 
+      name: agentcare-app
+
+# Frontend Configuration
+frontend:
+  replicaCount: 1
+  image:
+    repository: node
+    tag: "18-alpine"
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: NodePort
+    port: 80
+    nodePort: 31781
+  
+  env:
+    apiUrl: "http://localhost:31780"
+    environment: "development" 

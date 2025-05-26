@@ -16,9 +16,10 @@ serviceAccount:
 
 # Service configuration
 service:
-  type: ClusterIP
+  type: NodePort
   port: 3000
   targetPort: 3000
+  nodePort: 31780
   annotations: {}
 
 # Autoscaling
@@ -129,12 +130,17 @@ agentcare:
       mountPath: /tmp
     - name: cache
       mountPath: /app/cache
+    - name: app-code
+      mountPath: /app
 
   volumes:
     - name: tmp
       emptyDir: {}
     - name: cache
       emptyDir: {}
+    - name: app-code
+      configMap:
+        name: agentcare-app
 
 # Ollama LLM Service
 ollama:
@@ -195,12 +201,10 @@ redis:
       requests:
         cpu: 100m
         memory: 256Mi
-
-  replica:
-    replicaCount: 1
-    persistence:
-      enabled: true
-      size: 8Gi
+    service:
+      type: NodePort
+      port: 6379
+      nodePort: 31830
 
 # PostgreSQL Configuration
 postgresql:
@@ -222,6 +226,10 @@ postgresql:
       requests:
         cpu: 250m
         memory: 512Mi
+    service:
+      type: NodePort
+      port: 5432
+      nodePort: 31820
 
   metrics:
     enabled: true
@@ -231,14 +239,12 @@ ingress:
   enabled: true
   className: nginx
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
     nginx.ingress.kubernetes.io/rate-limit: "100"
     nginx.ingress.kubernetes.io/rate-limit-window: "1m"
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-  
   hosts:
-    - host: agentcare.example.com
+    - host: localhost
       paths:
         - path: /
           pathType: Prefix
@@ -246,70 +252,79 @@ ingress:
             name: agentcare
             port:
               number: 3000
-  
-  tls:
-    - secretName: agentcare-tls
-      hosts:
-        - agentcare.example.com
 
 # Monitoring Configuration
 monitoring:
   prometheus:
     enabled: true
-    namespace: monitoring
-    serviceMonitor:
-      enabled: true
-      interval: 30s
-      path: /api/v1/metrics
-      labels:
-        app: agentcare
-    
-    rules:
-      enabled: true
-
+    server:
+      persistentVolume:
+        enabled: false
+      service:
+        type: NodePort
+        nodePort: 31790
+        ports:
+          - name: http-web
+            port: 80
+            targetPort: 9090
+            nodePort: 31790
+          - name: http-api
+            port: 9090
+            targetPort: 9090
+    alertmanager:
+      service:
+        type: NodePort
+        port: 9093
+        nodePort: 31791
+    pushgateway:
+      service:
+        type: NodePort
+        port: 9091
+        nodePort: 31792
+    nodeExporter:
+      service:
+        type: NodePort
+        port: 9100
+        nodePort: 31793
   grafana:
     enabled: true
-    namespace: monitoring
-    adminPassword: admin123  # Change in production
-    
-    dashboards:
-      enabled: true
-      folder: AgentCare
-    
-    datasources:
-      prometheus:
-        url: http://prometheus:9090
-      loki:
-        url: http://loki:3100
+    persistence:
+      enabled: false
+    service:
+      type: NodePort
+      port: 3001
+      nodePort: 31800
+    adminPassword: admin123
 
 # Logging Configuration
 logging:
   loki:
-    enabled: true
-    namespace: logging
-    persistence:
-      enabled: true
-      size: 50Gi
-
+    enabled: false
   promtail:
-    enabled: true
-    config:
-      clients:
-        - url: http://loki:3100/loki/api/v1/push
+    enabled: false
 
 # Tracing Configuration
 tracing:
   jaeger:
     enabled: true
-    namespace: tracing
-    
+    allInOne:
+      enabled: true
+      service:
+        type: NodePort
+        port: 16686
+        nodePort: 31810
     collector:
+      enabled: true
       service:
-        type: ClusterIP
-    
+        type: NodePort
+        port: 14268
+        nodePort: 31811
+    agent:
+      enabled: false
     query:
-      service:
-        type: ClusterIP
+      enabled: false
+    storage:
+      type: memory
 
 # Security and Compliance
 security:
@@ -424,8 +439,40 @@ features:
   tracing: true
   auditLogging: true
 
-# Service Account
-serviceAccount:
-  create: true
-  name: agentcare
-  annotations: {} 
+# Resource Configuration
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# Application Configuration
+command: ["node"]
+args: ["/app/server.js"]
+
+# Frontend Configuration
+frontend:
+  replicaCount: 2
+  image:
+    repository: node
+    tag: "18-alpine"
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: NodePort
+    port: 80
+    nodePort: 31781
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  
+  env:
+    apiUrl: "http://localhost:31780"
+    environment: "development" 
