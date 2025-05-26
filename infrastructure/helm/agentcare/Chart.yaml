@@ -67,7 +67,7 @@ annotations:
 # Dependencies
 dependencies:
   - name: redis
-    version: "18.1.5"
+    version: "16.13.2"
     repository: https://charts.bitnami.com/bitnami
     condition: redis.enabled
     tags:
@@ -75,7 +75,7 @@ dependencies:
       - session-store
 
   - name: postgresql
-    version: "12.12.10"
+    version: "12.5.8"
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
     tags:
@@ -83,7 +83,7 @@ dependencies:
       - persistence
 
   - name: prometheus
-    version: "25.8.0"
+    version: "19.7.2"
     repository: https://prometheus-community.github.io/helm-charts
     condition: monitoring.prometheus.enabled
     tags:
@@ -91,7 +91,7 @@ dependencies:
       - observability
 
   - name: grafana
-    version: "7.0.19"
+    version: "6.57.3"
     repository: https://grafana.github.io/helm-charts
     condition: monitoring.grafana.enabled
     tags:
@@ -99,7 +99,7 @@ dependencies:
       - visualization
 
   - name: loki
-    version: "5.36.3"
+    version: "4.8.0"
     repository: https://grafana.github.io/helm-charts
     condition: logging.loki.enabled
     tags:
@@ -107,7 +107,7 @@ dependencies:
       - observability
 
   - name: promtail
-    version: "6.15.3"
+    version: "6.11.0"
     repository: https://grafana.github.io/helm-charts
     condition: logging.promtail.enabled
     tags:
@@ -122,8 +122,8 @@ dependencies:
       - tracing
       - observability
 
-  - name: nginx-ingress
-    version: "4.8.3"
+  - name: ingress-nginx
+    version: "4.7.1"
     repository: https://kubernetes.github.io/ingress-nginx
     condition: ingress.enabled
     tags:

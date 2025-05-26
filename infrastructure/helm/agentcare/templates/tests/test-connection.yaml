@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "agentcare.fullname" . }}-test-connection"
+  labels:
+    {{- include "agentcare.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "agentcare.fullname" . }}:{{ .Values.agentcare.service.port | default 3000 }}/health']
+  restartPolicy: Never 

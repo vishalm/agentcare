@@ -1,0 +1,126 @@
+global:
+  environment: development
+
+image:
+  repository: node
+  tag: "18-alpine"
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 3000
+  targetPort: 3000
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: localhost
+      paths:
+        - path: /
+          pathType: Prefix
+          service:
+            name: agentcare
+            port:
+              number: 3000
+
+env:
+  NODE_ENV: development
+  API_PORT: "3000"
+  LOG_LEVEL: debug
+  ENABLE_OLLAMA_LLM: "true"
+  ENABLE_RAG_SYSTEM: "true"
+  ENABLE_USER_REGISTRATION: "true"
+  HIPAA_LOGGING: "true"
+  ENABLE_METRICS: "true"
+  ENABLE_TRACING: "true"
+
+postgresql:
+  enabled: true
+  primary:
+    persistence:
+      size: 1Gi
+  auth:
+    database: agentcare
+    username: agentcare_user
+
+redis:
+  enabled: true
+  master:
+    persistence:
+      size: 1Gi
+  auth:
+    enabled: true
+  replica:
+    replicaCount: 0
+
+monitoring:
+  prometheus:
+    enabled: true
+    server:
+      persistentVolume:
+        enabled: false
+  grafana:
+    enabled: true
+    persistence:
+      enabled: false
+
+tracing:
+  jaeger:
+    enabled: true
+    allInOne:
+      enabled: true
+    agent:
+      enabled: false
+    collector:
+      enabled: false
+    query:
+      enabled: false
+    cassandra:
+      enabled: false
+    storage:
+      type: memory
+
+logging:
+  loki:
+    enabled: false
+  promtail:
+    enabled: false
+
+development:
+  enabled: true
+  debugMode: true
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+command: ["node"]
+args: ["/app/server.js"]
+
+volumeMounts:
+  - name: app-code
+    mountPath: /app
+
+volumes:
+  - name: app-code
+    configMap:
+      name: agentcare-app 

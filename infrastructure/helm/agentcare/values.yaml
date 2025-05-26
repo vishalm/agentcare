@@ -8,6 +8,27 @@ global:
   storageClass: ""
   environment: production
   
+# Service Account
+serviceAccount:
+  create: true
+  name: agentcare
+  annotations: {}
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+  annotations: {}
+
+# Autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
 # AgentCare Application
 agentcare:
   image:
@@ -24,7 +45,6 @@ agentcare:
       maxSurge: 1
       maxUnavailable: 0
 
-  # Service configuration
   service:
     type: ClusterIP
     port: 3000
@@ -402,4 +422,10 @@ features:
   emailReminders: true
   monitoring: true
   tracing: true
-  auditLogging: true 
+  auditLogging: true
+
+# Service Account
+serviceAccount:
+  create: true
+  name: agentcare
+  annotations: {} 

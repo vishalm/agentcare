@@ -389,4 +389,226 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 </div>
 
-**[🏠 Home](https://vishalm.github.io/agentcare/) • [🚀 Quick Start](https://vishalm.github.io/agentcare/docs/setup/QUICK_START.html) • [🏗️ Architecture](https://vishalm.github.io/agentcare/docs/architecture/ARCHITECTURE_GUIDE.html) • [🔧 API](https://vishalm.github.io/agentcare/docs/api-reference.html)** 
+**[🏠 Home](https://vishalm.github.io/agentcare/) • [🚀 Quick Start](https://vishalm.github.io/agentcare/docs/setup/QUICK_START.html) • [🏗️ Architecture](https://vishalm.github.io/agentcare/docs/architecture/ARCHITECTURE_GUIDE.html) • [🔧 API](https://vishalm.github.io/agentcare/docs/api-reference.html)**
+
+# AgentCare - Multi-Agent Healthcare Scheduling System
+
+## Kubernetes Architecture and Benefits
+
+### Why Kubernetes for AgentCare?
+
+1. **Scalability and High Availability**
+   - Automatic horizontal scaling of agents based on load
+   - Self-healing capabilities for failed components
+   - Load balancing across multiple replicas
+   - Zero-downtime deployments
+
+2. **Resource Optimization**
+   - Efficient resource allocation for AI agents
+   - Automatic bin packing for optimal resource usage
+   - Resource quotas and limits per component
+   - Cost optimization through efficient scheduling
+
+3. **Security and Compliance (HIPAA)**
+   - Network policies for inter-agent communication
+   - Secret management for sensitive data
+   - RBAC for access control
+   - Data encryption at rest and in transit
+   - Audit logging and compliance tracking
+
+4. **Monitoring and Observability**
+   - Real-time metrics with Prometheus
+   - Visual dashboards with Grafana
+   - Distributed tracing with Jaeger
+   - Centralized logging with Loki
+   - Health checks and readiness probes
+
+### System Components
+
+1. **Core Services**
+   ```
+   - Main Application: NodePort 31780 (http://localhost:31780)
+   - Health Endpoint: http://localhost:31780/health
+   ```
+
+2. **Databases**
+   ```
+   - PostgreSQL: agentcare-postgresql.agentcare.svc.cluster.local:5432
+   - Redis Cache: agentcare-redis-master.agentcare.svc.cluster.local:6379
+   ```
+
+3. **Monitoring Stack**
+   ```
+   - Grafana: http://localhost:3000 (admin/admin123)
+   - Prometheus: http://localhost:9090
+   - Jaeger Tracing: http://localhost:16686
+   ```
+
+### Quick Start
+
+1. **Prerequisites**
+   ```bash
+   # Required tools
+   - Docker Desktop with Kubernetes enabled
+   - Helm v3.0.0+
+   - kubectl configured for local cluster
+   ```
+
+2. **Installation**
+   ```bash
+   # Clone the repository
+   git clone https://github.com/vishalm/agentcare.git
+   cd agentcare/infrastructure/helm/agentcare
+
+   # Install with Helm
+   helm install agentcare . -f values-dev.yaml --create-namespace --namespace agentcare
+   ```
+
+3. **Access Services**
+   ```bash
+   # Port forwarding for monitoring
+   kubectl port-forward svc/agentcare-grafana 3000:80 -n agentcare &
+   kubectl port-forward svc/agentcare-prometheus-server 9090:80 -n agentcare &
+   ```
+
+### Architecture Overview
+
+```mermaid
+graph TD
+    A[Client] --> B[Ingress Controller]
+    B --> C[AgentCare API]
+    C --> D[PostgreSQL]
+    C --> E[Redis Cache]
+    C --> F[LLM Service]
+    
+    G[Prometheus] --> C
+    H[Grafana] --> G
+    I[Jaeger] --> C
+    J[Loki] --> C
+```
+
+### Component Details
+
+1. **Agent Layer**
+   - Supervisor Agent: Orchestrates other agents
+   - Availability Agent: Manages scheduling slots
+   - Booking Agent: Handles appointment scheduling
+   - FAQ Agent: Manages patient queries
+
+2. **Infrastructure Layer**
+   - Kubernetes Deployments: Rolling updates
+   - StatefulSets: Database persistence
+   - ConfigMaps: Configuration management
+   - Secrets: Sensitive data management
+
+3. **Monitoring Layer**
+   - Metrics Collection: Prometheus
+   - Visualization: Grafana
+   - Tracing: Jaeger
+   - Logging: Loki + Promtail
+
+### Development Workflow
+
+1. **Local Development**
+   ```bash
+   # Start local environment
+   helm install agentcare . -f values-dev.yaml --namespace agentcare
+
+   # Access application
+   open http://localhost:31780
+
+   # Monitor logs
+   kubectl logs -f deployment/agentcare -n agentcare
+   ```
+
+2. **Testing**
+   ```bash
+   # Run health check
+   curl http://localhost:31780/health
+
+   # Access monitoring
+   open http://localhost:3000  # Grafana
+   open http://localhost:9090  # Prometheus
+   ```
+
+### Kubernetes Benefits for Each Component
+
+1. **AI Agents**
+   - Isolated runtime environments
+   - Automatic scaling based on load
+   - Resource guarantees
+   - Fault isolation
+
+2. **Databases**
+   - Automated backups
+   - Data persistence
+   - Automatic failover
+   - Resource management
+
+3. **Monitoring**
+   - Centralized metrics collection
+   - Automated alerting
+   - Performance visualization
+   - Distributed tracing
+
+4. **Security**
+   - Network isolation
+   - Secret rotation
+   - Access control
+   - Audit logging
+
+### Troubleshooting
+
+1. **Common Commands**
+   ```bash
+   # Check pod status
+   kubectl get pods -n agentcare
+
+   # View logs
+   kubectl logs -f deployment/agentcare -n agentcare
+
+   # Check services
+   kubectl get svc -n agentcare
+   ```
+
+2. **Health Verification**
+   ```bash
+   # System health
+   curl http://localhost:31780/health
+
+   # Component status
+   kubectl describe pods -n agentcare
+   ```
+
+### Security Considerations
+
+1. **HIPAA Compliance**
+   - Encrypted data storage
+   - Secure communication
+   - Access logging
+   - Data backup and recovery
+
+2. **Network Security**
+   - Pod-to-pod encryption
+   - Network policies
+   - Service mesh integration
+   - TLS termination
+
+### Maintenance and Updates
+
+1. **Upgrade Process**
+   ```bash
+   # Update dependencies
+   helm dependency update
+
+   # Upgrade deployment
+   helm upgrade agentcare . -f values-dev.yaml -n agentcare
+   ```
+
+2. **Backup Process**
+   ```bash
+   # Backup databases
+   kubectl exec -n agentcare agentcare-postgresql-0 -- pg_dump -U agentcare_user agentcare
+   ```
+
+This Kubernetes-based architecture ensures that AgentCare operates as a robust, scalable, and secure healthcare scheduling system, maintaining HIPAA compliance while providing excellent observability and maintenance capabilities. 

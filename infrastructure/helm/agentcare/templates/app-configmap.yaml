@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "agentcare.fullname" . }}-app
+  labels:
+    {{- include "agentcare.labels" . | nindent 4 }}
+data:
+  server.js: |
+    const http = require('http');
+    const server = http.createServer((req, res) => {
+      if (req.url === '/health') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ health: 'ok' }));
+      } else {
+        res.writeHead(404);
+        res.end();
+      }
+    });
+    server.listen(3000, '0.0.0.0', () => {
+      console.log('Server running on port 3000');
+    }); 
