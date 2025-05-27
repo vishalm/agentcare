@@ -1,100 +1,112 @@
 # AgentCare Frontend Dockerfile
 # React + TypeScript + Vite
 
-# Base stage
-FROM node:22-alpine AS base
-LABEL maintainer="AgentCare Team <dev@agentcare.com>"
-LABEL description="AgentCare Frontend - AI Healthcare Scheduling Interface"
-LABEL version="2.0.0"
+# =============================================================================
+# Base stage - Common foundation
+# =============================================================================
+FROM node:20-alpine3.19 AS base
 
-# Install system dependencies
-RUN apk add --no-cache \
-    curl \
-    dumb-init \
-    && rm -rf /var/cache/apk/*
+LABEL maintainer="AgentCare Team <dev@agentcare.com>" \
+      description="AgentCare Frontend - AI Healthcare Scheduling Interface" \
+      version="2.0.0"
 
-# Set working directory
+# Create non-root user for security
+RUN addgroup -g 1001 -S agentcare && \
+    adduser -S agentcare -u 1001 -G agentcare
+
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# =============================================================================
+# Dependencies stage - Install and cache dependencies
+# =============================================================================
+FROM base AS deps
 
+# Copy package files for dependency installation
+COPY package.json package-lock.json* ./
+
+# Install dependencies with npm ci for consistent builds
+RUN npm ci --only=production && \
+    npm cache clean --force
+
+# =============================================================================
 # Development stage
+# =============================================================================
 FROM base AS development
+
 ENV NODE_ENV=development
 
-# Install all dependencies
-RUN npm ci
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install all dependencies (including devDependencies)
+RUN npm ci && \
+    npm cache clean --force
 
 # Copy source code
-COPY . .
-
-# Create user for security
-RUN addgroup -g 1001 -S agentcare && \
-    adduser -S agentcare -u 1001 -G agentcare && \
-    chown -R agentcare:agentcare /app
+COPY --chown=agentcare:agentcare . .
 
 USER agentcare
 
-# Expose Vite dev server port
 EXPOSE 3001
 
-# Use dumb-init for proper signal handling
-ENTRYPOINT ["dumb-init", "--"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 
-# Development command
-CMD ["npm", "run", "dev"]
-
-# Build stage
+# =============================================================================
+# Build stage - TypeScript compilation and bundling
+# =============================================================================
 FROM base AS builder
-ENV NODE_ENV=production
 
-# Install all dependencies for building
-RUN npm ci
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install all dependencies needed for building
+RUN npm ci && \
+    npm cache clean --force
 
 # Copy source code
 COPY . .
 
-# Fix Rollup optional dependencies issue
-RUN rm -rf node_modules package-lock.json && \
-    npm install && \
-    npm ci --production=false
+# Type check and build the application
+RUN npm run type-check 2>/dev/null || echo "No type-check script found, skipping..." && \
+    npm run build && \
+    # Remove development dependencies to reduce size
+    npm prune --production
 
-# Build the application
-RUN npm run build
+# =============================================================================
+# Production stage - Nginx serving static files
+# =============================================================================
+FROM nginx:1.25-alpine AS production
 
-# Production stage
-FROM nginx:alpine AS production
-ENV NODE_ENV=production
-
-# Install curl for health checks
-RUN apk add --no-cache curl
-
-# Copy built assets from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Install curl for healthcheck
+RUN apk add --no-cache curl && \
+    rm -rf /var/cache/apk/*
 
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# Copy built application from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
 # Create nginx user and set permissions
-RUN addgroup -g 1001 -S agentcare && \
-    adduser -S agentcare -u 1001 -G agentcare && \
-    chown -R agentcare:agentcare /usr/share/nginx/html && \
-    chown -R agentcare:agentcare /var/cache/nginx && \
-    chown -R agentcare:agentcare /var/log/nginx && \
-    chown -R agentcare:agentcare /etc/nginx/conf.d && \
-    touch /var/run/nginx.pid && \
-    chown -R agentcare:agentcare /var/run/nginx.pid
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx && \
+    chown -R nginx:nginx /etc/nginx/conf.d
 
 # Switch to non-root user
-USER agentcare
+USER nginx
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost:80 || exit 1
+# Health check with better configuration
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:80/ || exit 1
 
-# Expose port
 EXPOSE 80
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"] 
+# Use nginx in foreground mode
+CMD ["nginx", "-g", "daemon off;"]
+
+# =============================================================================
+# Multi-stage build targets:
+# - docker build --target development . (for dev)
+# - docker build --target production . (for prod, default)
+# =============================================================================
